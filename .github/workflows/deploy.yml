@@ -1,0 +1,58 @@
+name: Deploy to cPanel (FTP)
+# Deploys changed files quickly using lftp via FTP-Deploy-Action.
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  web-deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get latest code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Project
+        run: npm run build
+
+      - name: Prepare Deployment Files
+        run: |
+          # Create deployment directory
+          mkdir -p deploy
+
+          # Copy built frontend files
+          cp -r dist/* deploy/
+
+          # Copy PHP API backend files
+          mkdir -p deploy/api
+          cp -r public/api/* deploy/api/
+
+          # Copy environment template (user will need to configure on server)
+          cp .env deploy/.env.example
+
+          echo "✓ Deployment files prepared"
+          ls -la deploy
+
+      - name: Sync files via FTP
+        uses: SamKirkland/FTP-Deploy-Action@4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ./public_html/
+          local-dir: ./deploy/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**

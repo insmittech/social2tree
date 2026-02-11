@@ -1,0 +1,8 @@
+
+{
+  "name": "Social2Tree",
+  "description": "A feature-rich, customizable Linktree clone for managing and sharing social links with analytics, themes, and AI-powered bio generation.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

@@ -1,0 +1,120 @@
+
+import React, { useState, useEffect } from 'react';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import LandingPage from './pages/LandingPage';
+import Dashboard from './pages/Dashboard';
+import PublicProfile from './pages/PublicProfile';
+import Analytics from './pages/Analytics';
+import Themes from './pages/Themes';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminUsers from './pages/AdminUsers';
+import AdminSettings from './pages/AdminSettings';
+import AdminAnalytics from './pages/AdminAnalytics';
+import AdminSecurity from './pages/AdminSecurity';
+
+const App: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // Check authentication status on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // Check if user is logged in by calling /auth/me.php
+        const { default: client } = await import('./src/api/client');
+        const response = await client.get('/auth/me.php');
+        
+        if (response.data.user) {
+          setIsAuthenticated(true);
+          setIsAdmin(response.data.user.role === 'admin');
+        }
+      } catch (err) {
+        // Not authenticated
+        setIsAuthenticated(false);
+        setIsAdmin(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    checkAuth();
+  }, []);
+
+  const handleLogin = (isAdminUser: boolean = false) => {
+    setIsAuthenticated(true);
+    setIsAdmin(isAdminUser);
+  };
+
+  const handleLogout = async () => {
+    try {
+      const { default: client } = await import('./src/api/client');
+      await client.post('/auth/logout.php');
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+    setIsAuthenticated(false);
+    setIsAdmin(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  return (
+    <HashRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/register" element={<Register />} />
+        
+        {/* Protected Dashboard Routes */}
+        <Route 
+          path="/dashboard" 
+          element={isAuthenticated ? <Dashboard onLogout={handleLogout} /> : <Navigate to="/login" />} 
+        />
+        <Route 
+          path="/dashboard/analytics" 
+          element={isAuthenticated ? <Analytics onLogout={handleLogout} /> : <Navigate to="/login" />} 
+        />
+        <Route 
+          path="/dashboard/themes" 
+          element={isAuthenticated ? <Themes onLogout={handleLogout} /> : <Navigate to="/login" />} 
+        />
+
+        {/* Admin Routes */}
+        <Route 
+          path="/admin" 
+          element={isAuthenticated && isAdmin ? <AdminDashboard onLogout={handleLogout} /> : <Navigate to="/dashboard" />} 
+        />
+        <Route 
+          path="/admin/users" 
+          element={isAuthenticated && isAdmin ? <AdminUsers onLogout={handleLogout} /> : <Navigate to="/dashboard" />} 
+        />
+        <Route 
+          path="/admin/analytics" 
+          element={isAuthenticated && isAdmin ? <AdminAnalytics onLogout={handleLogout} /> : <Navigate to="/dashboard" />} 
+        />
+        <Route 
+          path="/admin/security" 
+          element={isAuthenticated && isAdmin ? <AdminSecurity onLogout={handleLogout} /> : <Navigate to="/dashboard" />} 
+        />
+        <Route 
+          path="/admin/settings" 
+          element={isAuthenticated && isAdmin ? <AdminSettings onLogout={handleLogout} /> : <Navigate to="/dashboard" />} 
+        />
+
+        {/* Public Profile View */}
+        <Route path="/:username" element={<PublicProfile />} />
+      </Routes>
+    </HashRouter>
+  );
+};
+
+export default App;
