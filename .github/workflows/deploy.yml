@@ -1,5 +1,4 @@
-name: Deploy to cPanel (FTP)
-# Deploys changed files quickly using lftp via FTP-Deploy-Action.
+name: Deploy via FTP (Production)
 
 on:
   push:
@@ -8,53 +7,110 @@ on:
 
 jobs:
   web-deploy:
-    name: Deploy
+    name: 🎉 Build & Deploy
     runs-on: ubuntu-latest
+
     steps:
-      - name: Get latest code
+      - name: 1. Checkout Code
         uses: actions/checkout@v4
 
-      - name: Use Node.js 20
+      - name: 2. Setup Node.js (with Cache)
         uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
 
-      - name: Install Dependencies
-        run: npm ci --legacy-peer-deps
-
-      - name: Build Project
-        run: npm run build
-
-      - name: Prepare Deployment Files
+      - name: 3. Install & Build React
         run: |
-          # Create deployment directory
-          mkdir -p deploy
+          npm ci --legacy-peer-deps
+          npm run build
 
-          # Copy built frontend files
-          cp -r dist/* deploy/
+      - name: 4. Prepare Deployment Package
+        run: |
+          mkdir deploy_package
 
-          # Copy PHP API backend files
-          mkdir -p deploy/api
-          cp -r public/api/* deploy/api/
+          # A. Copy React Build (Frontend) to root
+          cp -r dist/* deploy_package/
 
-          # Copy environment template (user will need to configure on server)
-          cp .env deploy/.env.example
+          # B. Create Backend API Folder Structure
+          mkdir -p deploy_package/api
+          cp -r public/api/* deploy_package/api/
 
-          echo "✓ Deployment files prepared"
-          ls -la deploy
-      - name: Deploy to Server (FTP)
+          # C. Copy Database Schema (if needed for reference)
+          if [ -d "server" ]; then 
+            mkdir -p deploy_package/server
+            cp -r server/* deploy_package/server/
+          fi
+
+          # D. Copy Environment Template
+          if [ -f ".env" ]; then
+            cp .env deploy_package/.env.example
+          fi
+
+          # E. Create .htaccess for URL Rewriting
+          echo "<IfModule mod_rewrite.c>" > deploy_package/.htaccess
+          echo "  RewriteEngine On" >> deploy_package/.htaccess
+          echo "  RewriteBase /" >> deploy_package/.htaccess
+
+          # 1. Force HTTPS (Prevents Loops)
+          echo "" >> deploy_package/.htaccess
+          echo "  # Force HTTPS" >> deploy_package/.htaccess
+          echo "  RewriteCond %{HTTPS} off" >> deploy_package/.htaccess
+          echo "  RewriteCond %{HTTP:X-Forwarded-Proto} !https" >> deploy_package/.htaccess
+          echo "  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]" >> deploy_package/.htaccess
+
+          # 2. Force non-www (optional - uncomment if needed)
+          # echo "" >> deploy_package/.htaccess
+          # echo "  # Force non-www" >> deploy_package/.htaccess
+          # echo "  RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]" >> deploy_package/.htaccess
+          # echo "  RewriteRule ^(.*)$ https://%1/$1 [R=301,L]" >> deploy_package/.htaccess
+
+          # 3. Protect API Folder (allow PHP execution)
+          echo "" >> deploy_package/.htaccess
+          echo "  # Allow API routes to work" >> deploy_package/.htaccess
+          echo "  RewriteRule ^api/ - [L,NC]" >> deploy_package/.htaccess
+
+          # 4. Ignore Real Files & Directories
+          echo "" >> deploy_package/.htaccess
+          echo "  # Don't rewrite files or directories that exist" >> deploy_package/.htaccess
+          echo "  RewriteCond %{REQUEST_FILENAME} -f [OR]" >> deploy_package/.htaccess
+          echo "  RewriteCond %{REQUEST_FILENAME} -d" >> deploy_package/.htaccess
+          echo "  RewriteRule ^ - [L]" >> deploy_package/.htaccess
+
+          # 5. Frontend Fallback (React Router)
+          echo "" >> deploy_package/.htaccess
+          echo "  # Fallback to index.html for React Router" >> deploy_package/.htaccess
+          echo "  RewriteRule ^ index.html [L]" >> deploy_package/.htaccess
+          echo "</IfModule>" >> deploy_package/.htaccess
+
+          # F. Create API .htaccess (for cleaner URLs without .php extension)
+          echo "<IfModule mod_rewrite.c>" > deploy_package/api/.htaccess
+          echo "  RewriteEngine On" >> deploy_package/api/.htaccess
+          echo "  RewriteBase /api/" >> deploy_package/api/.htaccess
+          echo "" >> deploy_package/api/.htaccess
+          echo "  # Remove .php extension" >> deploy_package/api/.htaccess
+          echo "  RewriteCond %{REQUEST_FILENAME} !-d" >> deploy_package/api/.htaccess
+          echo "  RewriteCond %{REQUEST_FILENAME}\.php -f" >> deploy_package/api/.htaccess
+          echo "  RewriteRule ^(.*)$ \$1.php [L]" >> deploy_package/api/.htaccess
+          echo "</IfModule>" >> deploy_package/api/.htaccess
+
+          echo "✓ Deployment package prepared"
+          ls -la deploy_package/
+
+      - name: 5. Deploy to Server (FTP)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./deploy/
-          server-dir: ./
+          local-dir: ./deploy_package/
+          server-dir: ./public_html/
           protocol: ftp
           port: 21
           security: loose
+          timeout: 300000
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
+            **/.env.example
