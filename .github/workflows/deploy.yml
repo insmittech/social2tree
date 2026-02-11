@@ -22,7 +22,7 @@ jobs:
 
       - name: 3. Install & Build React
         run: |
-          npm ci
+          npm ci --legacy-peer-deps
           npm run build
 
       - name: 4. Prepare Deployment Package
