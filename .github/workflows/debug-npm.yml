@@ -1,0 +1,58 @@
+name: Diagnostic Test - npm ci Debug
+
+on:
+  workflow_dispatch: # Manual trigger only
+
+jobs:
+  debug-npm:
+    name: Debug npm ci Issue
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Show Environment Info
+        run: |
+          echo "=== Node & npm versions ==="
+          node --version
+          npm --version
+          echo ""
+          echo "=== Registry ==="
+          npm config get registry
+          echo ""
+          echo "=== Package.json name & version ==="
+          cat package.json | grep -E '"name"|"version"|"homepage"'
+          echo ""
+          echo "=== Package-lock.json check ==="
+          head -20 package-lock.json
+
+      - name: Validate package.json
+        run: |
+          echo "=== Checking for JSON errors ==="
+          node -e "JSON.parse(require('fs').readFileSync('package.json')); console.log('✅ package.json is valid JSON')"
+          node -e "JSON.parse(require('fs').readFileSync('package-lock.json')); console.log('✅ package-lock.json is valid JSON')"
+
+      - name: Try npm ci with verbose output
+        run: |
+          npm ci --legacy-peer-deps --verbose 2>&1 | tee npm-ci-output.txt || {
+            echo "=== npm ci FAILED ==="
+            echo "Exit code: $?"
+            echo "=== Last 50 lines of output ==="
+            tail -50 npm-ci-output.txt
+            exit 1
+          }
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-debug-logs
+          path: |
+            npm-ci-output.txt
+            /home/runner/.npm/_logs/
