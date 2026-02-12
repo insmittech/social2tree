@@ -21,6 +21,7 @@ jobs:
 
       - name: 3. Install & Build React
         run: |
+          rm -f package-lock.json
           npm install --legacy-peer-deps
           npm run build
 
