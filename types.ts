@@ -9,7 +9,9 @@ export interface Link {
   url: string;
   active: boolean;
   clicks: number;
-  type?: 'social' | 'payment' | 'custom';
+  type?: 'social' | 'payment' | 'custom' | 'social_icon';
+  scheduledStart?: string | null;
+  scheduledEnd?: string | null;
 }
 
 export interface UserTheme {

@@ -56,6 +56,20 @@ const SortableLink: React.FC<SortableLinkProps> = ({ link, getSocialIcon, handle
                         >
                             {link.url} <ExternalLink size={10} />
                         </a>
+                        {(link.scheduledStart || link.scheduledEnd) && (
+                            <div className="flex flex-wrap gap-2 mt-1">
+                                {link.scheduledStart && (
+                                    <span className="text-[10px] font-bold bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded flex items-center gap-1">
+                                        Starts: {new Date(link.scheduledStart).toLocaleDateString()}
+                                    </span>
+                                )}
+                                {link.scheduledEnd && (
+                                    <span className="text-[10px] font-bold bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded flex items-center gap-1">
+                                        Ends: {new Date(link.scheduledEnd).toLocaleDateString()}
+                                    </span>
+                                )}
+                            </div>
+                        )}
                     </div>
                     <div className="flex items-center gap-2 sm:gap-4 ml-2">
                         <label className="relative inline-flex items-center cursor-pointer scale-90 sm:scale-100">

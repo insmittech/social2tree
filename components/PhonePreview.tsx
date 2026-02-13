@@ -2,6 +2,7 @@
 import React from 'react';
 import { UserProfile, THEMES, ButtonStyle } from '../types';
 import { Share2, TreePine } from 'lucide-react';
+import { getSocialIcon } from '../src/utils/socialIcons';
 
 interface PhonePreviewProps {
   profile: UserProfile;
@@ -12,8 +13,8 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({ profile }) => {
 
   const getButtonStyle = (baseClass: string, style?: ButtonStyle) => {
     const filteredBase = baseClass.split(' ').filter(c => !c.startsWith('rounded-')).join(' ');
-    
-    switch(style) {
+
+    switch (style) {
       case 'rounded-full': return `${filteredBase} rounded-full`;
       case 'rounded-none': return `${filteredBase} rounded-none`;
       case 'brutal': return `${filteredBase} rounded-none border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`;
@@ -27,19 +28,19 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({ profile }) => {
       <div className="relative w-[300px] h-[600px] bg-slate-800 rounded-[3rem] border-[8px] border-slate-900 shadow-2xl overflow-hidden">
         {/* Notch */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-900 rounded-b-2xl z-10"></div>
-        
+
         {/* Content Container */}
         <div className={`w-full h-full overflow-y-auto no-scrollbar ${theme.background} p-6 flex flex-col items-center pt-12`}>
-          <img 
-            src={profile.avatarUrl} 
-            alt={profile.displayName} 
+          <img
+            src={profile.avatarUrl}
+            alt={profile.displayName}
             className="w-20 h-20 rounded-full border-2 border-white/50 mb-3 object-cover shadow-sm"
           />
           <h2 className={`text-lg font-bold mb-1 ${theme.textClass}`}>{profile.displayName}</h2>
           <p className={`text-xs text-center opacity-80 mb-6 ${theme.textClass}`}>{profile.bio}</p>
 
-          <div className="w-full space-y-3 mb-10">
-            {profile.links.filter(l => l.active).map(link => (
+          <div className="w-full space-y-3 mb-6">
+            {profile.links.filter(l => l.active && l.type !== 'social_icon').map(link => (
               <a
                 key={link.id}
                 href={link.url}
@@ -52,10 +53,24 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({ profile }) => {
             ))}
           </div>
 
+          <div className="w-full flex flex-wrap justify-center gap-4 mb-8">
+            {profile.links.filter(l => l.active && l.type === 'social_icon').map(link => (
+              <a
+                key={link.id}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:scale-110 transition-transform active:scale-90"
+              >
+                {getSocialIcon(link.url, 22)}
+              </a>
+            ))}
+          </div>
+
           <div className="mt-auto pb-4">
-             <div className="flex items-center gap-1 text-[10px] opacity-40 font-bold uppercase tracking-widest text-inherit">
-               <TreePine size={12} /> Social2Tree
-             </div>
+            <div className={`flex items-center gap-1 text-[10px] opacity-40 font-bold uppercase tracking-widest ${theme.textClass}`}>
+              <TreePine size={12} /> Social2Tree
+            </div>
           </div>
         </div>
       </div>

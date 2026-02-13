@@ -39,6 +39,14 @@ if (!empty($data['id'])) {
         $fields[] = "type = ?";
         $params[] = sanitize_input($data['type']);
     }
+    if (isset($data['scheduled_start'])) {
+        $fields[] = "scheduled_start = ?";
+        $params[] = !empty($data['scheduled_start']) ? sanitize_input($data['scheduled_start']) : null;
+    }
+    if (isset($data['scheduled_end'])) {
+        $fields[] = "scheduled_end = ?";
+        $params[] = !empty($data['scheduled_end']) ? sanitize_input($data['scheduled_end']) : null;
+    }
 
     if (empty($fields)) {
         json_response(["message" => "No fields to update."], 400);

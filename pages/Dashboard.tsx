@@ -6,9 +6,10 @@ import PhonePreview from '../components/PhonePreview';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import client from '../src/api/client';
 import { UserProfile } from '../types';
-import { Plus, Trash2, GripVertical, ExternalLink, Edit2, X, Wand2, QrCode, Download, Share2, Globe, Instagram, Github, Twitter, Youtube, Star, Zap, ShieldAlert, Check, Eye } from 'lucide-react';
+import { Plus, Trash2, GripVertical, ExternalLink, Edit2, X, Wand2, QrCode, Download, Share2, Globe, Instagram, Github, Twitter, Youtube, Star, Zap, ShieldAlert, Check, Eye, Link as LinkIcon, Facebook, Linkedin } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { useToast } from '../src/context/ToastContext';
+import { getSocialIcon } from '../src/utils/socialIcons';
 import {
   DndContext,
   closestCenter,
@@ -37,8 +38,12 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [loading, setLoading] = useState(true);
 
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showSocialForm, setShowSocialForm] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newUrl, setNewUrl] = useState('');
+  const [newScheduledStart, setNewScheduledStart] = useState('');
+  const [newScheduledEnd, setNewScheduledEnd] = useState('');
+  const [newSocialUrl, setNewSocialUrl] = useState('');
   const [isGeneratingBio, setIsGeneratingBio] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -112,28 +117,41 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleAddLink = async (e: React.FormEvent) => {
+  const handleAddLink = async (e: React.FormEvent, type: 'social' | 'social_icon' = 'social') => {
     e.preventDefault();
-    if (!newTitle || !newUrl) return;
-    if (hasReachedLimit) {
+    const url = type === 'social_icon' ? newSocialUrl : newUrl;
+    const title = type === 'social_icon' ? 'Social Icon' : newTitle;
+
+    if (!url || (type === 'social' && !title)) return;
+    if (type === 'social' && hasReachedLimit) {
       showToast("You've reached your free link limit!", "warning");
       return;
     }
 
     try {
-      const res = await client.post('/links/create.php', {
-        title: newTitle,
-        url: newUrl
-      });
+      const payload: any = { title, url, type };
+      if (type === 'social') {
+        payload.scheduledStart = newScheduledStart || null;
+        payload.scheduledEnd = newScheduledEnd || null;
+      }
+
+      const res = await client.post('/links/create.php', payload);
 
       setProfile(prev => prev ? {
         ...prev,
         links: [...prev.links, res.data.link]
       } : null);
 
-      setNewTitle('');
-      setNewUrl('');
-      setShowAddForm(false);
+      if (type === 'social_icon') {
+        setNewSocialUrl('');
+        setShowSocialForm(false);
+      } else {
+        setNewTitle('');
+        setNewUrl('');
+        setNewScheduledStart('');
+        setNewScheduledEnd('');
+        setShowAddForm(false);
+      }
       showToast('Link added successfully!', 'success');
     } catch (err) {
       console.error("Failed to add link", err);
@@ -232,14 +250,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     }
   };
 
-  const getSocialIcon = (url: string) => {
-    const lower = url.toLowerCase();
-    if (lower.includes('instagram')) return <span className="text-pink-500"><Instagram size={16} /></span>;
-    if (lower.includes('github')) return <span className="text-slate-900"><Github size={16} /></span>;
-    if (lower.includes('twitter') || lower.includes('x.com')) return <span className="text-sky-500"><Twitter size={16} /></span>;
-    if (lower.includes('youtube')) return <span className="text-red-600"><Youtube size={16} /></span>;
-    return <span className="text-slate-400"><Globe size={16} /></span>;
-  };
+  const mainLinks = profile.links.filter(l => l.type !== 'social_icon');
+  const socialIcons = profile.links.filter(l => l.type === 'social_icon');
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -406,6 +418,26 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                         onChange={(e) => setNewUrl(e.target.value)}
                       />
                     </div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Start Date (Optional)</label>
+                        <input
+                          type="datetime-local"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm"
+                          value={newScheduledStart}
+                          onChange={(e) => setNewScheduledStart(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">End Date (Optional)</label>
+                        <input
+                          type="datetime-local"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm"
+                          value={newScheduledEnd}
+                          onChange={(e) => setNewScheduledEnd(e.target.value)}
+                        />
+                      </div>
+                    </div>
                     <div className="flex justify-end gap-3">
                       <button
                         type="button"
@@ -432,10 +464,10 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   onDragEnd={handleDragEnd}
                 >
                   <SortableContext
-                    items={profile.links.map(l => l.id)}
+                    items={mainLinks.map(l => l.id)}
                     strategy={verticalListSortingStrategy}
                   >
-                    {profile.links.map((link) => (
+                    {mainLinks.map((link) => (
                       <SortableLink
                         key={link.id}
                         link={link}
@@ -446,6 +478,88 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     ))}
                   </SortableContext>
                 </DndContext>
+              </div>
+            </section>
+
+            {/* Social Icons Section */}
+            <section className="space-y-4">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <h2 className="text-xl font-bold text-slate-900">Social Icons</h2>
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">
+                    {socialIcons.length}
+                  </span>
+                </div>
+                <button
+                  onClick={() => setShowSocialForm(true)}
+                  className="px-4 py-2 rounded-full font-bold flex items-center gap-2 transition-all shadow-sm bg-white border border-slate-200 hover:border-indigo-300 text-indigo-600 text-sm"
+                >
+                  <Plus size={18} /> Add Icon
+                </button>
+              </div>
+
+              {showSocialForm && (
+                <div className="bg-white p-6 rounded-2xl shadow-xl border-2 border-indigo-100 animate-in fade-in slide-in-from-top-4 duration-300">
+                  <div className="flex justify-between mb-4">
+                    <h3 className="font-bold">New Social Icon</h3>
+                    <button onClick={() => setShowSocialForm(false)} className="text-slate-400 hover:text-slate-600"><X size={18} /></button>
+                  </div>
+                  <form onSubmit={(e) => handleAddLink(e, 'social_icon')} className="space-y-4">
+                    <div>
+                      <input
+                        placeholder="Social Profile URL (e.g. https://instagram.com/...)"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono text-sm"
+                        value={newSocialUrl}
+                        onChange={(e) => setNewSocialUrl(e.target.value)}
+                        autoFocus
+                      />
+                    </div>
+                    <div className="flex justify-end gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setShowSocialForm(false)}
+                        className="px-4 py-2 rounded-lg text-slate-500 font-semibold hover:bg-slate-100 transition-all"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="bg-indigo-600 text-white px-8 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-all shadow-md"
+                      >
+                        Add Icon
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {socialIcons.map((link) => (
+                  <div key={link.id} className="bg-white p-3 rounded-xl border border-slate-200 flex items-center justify-between">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <div className="p-2 bg-slate-50 rounded-lg">
+                        {getSocialIcon(link.url)}
+                      </div>
+                      <div className="overflow-hidden">
+                        <p className="text-xs font-mono text-slate-500 truncate">{link.url}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="relative inline-flex items-center cursor-pointer scale-75">
+                        <input
+                          type="checkbox"
+                          className="sr-only peer"
+                          checked={link.active}
+                          onChange={(e) => handleToggleActive(link.id, e.target.checked)}
+                        />
+                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                      </label>
+                      <button onClick={() => handleDelete(link.id)} className="text-slate-300 hover:text-red-500 p-1">
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </section>
           </div>

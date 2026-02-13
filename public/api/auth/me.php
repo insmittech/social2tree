@@ -64,7 +64,9 @@ if (isset($_SESSION['user_id'])) {
                     'url' => $link['url'],
                     'active' => (bool) $link['is_active'],
                     'clicks' => (int) $link['clicks'],
-                    'type' => $link['type'] ?? 'social'
+                    'type' => $link['type'] ?? 'social',
+                    'scheduledStart' => $link['scheduled_start'] ?? null,
+                    'scheduledEnd' => $link['scheduled_end'] ?? null
                 ];
             }, $links);
 

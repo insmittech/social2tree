@@ -5,6 +5,7 @@ import { UserProfile, THEMES, ButtonStyle } from '../types';
 import { Helmet } from 'react-helmet-async';
 import client from '../src/api/client';
 import { TreePine, Share2 } from 'lucide-react';
+import { getSocialIcon } from '../src/utils/socialIcons';
 
 const PublicProfile: React.FC = () => {
   const { username } = useParams();
@@ -17,7 +18,7 @@ const PublicProfile: React.FC = () => {
       try {
         const res = await client.get(`/public/get_profile.php?username=${username}`);
         setProfile(res.data);
-         // View tracking is handled by the backend endpoint
+        // View tracking is handled by the backend endpoint
       } catch (err) {
         console.error("Failed to fetch profile", err);
         setError(true);
@@ -55,13 +56,21 @@ const PublicProfile: React.FC = () => {
 
   const getButtonStyle = (baseClass: string, style?: ButtonStyle) => {
     const filteredBase = baseClass.split(' ').filter(c => !c.startsWith('rounded-')).join(' ');
-    switch(style) {
+    switch (style) {
       case 'rounded-full': return `${filteredBase} rounded-full`;
       case 'rounded-none': return `${filteredBase} rounded-none`;
       case 'brutal': return `${filteredBase} rounded-none border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]`;
       case 'rounded-lg':
       default: return `${filteredBase} rounded-lg`;
     }
+  };
+
+  const isLinkActive = (link: any) => {
+    if (!link.active) return false;
+    const now = new Date();
+    if (link.scheduledStart && new Date(link.scheduledStart) > now) return false;
+    if (link.scheduledEnd && new Date(link.scheduledEnd) < now) return false;
+    return true;
   };
 
   return (
@@ -80,17 +89,17 @@ const PublicProfile: React.FC = () => {
           <Share2 size={20} />
         </button>
 
-        <img 
-          src={profile.avatarUrl} 
-          alt={profile.displayName} 
+        <img
+          src={profile.avatarUrl}
+          alt={profile.displayName}
           className="w-24 h-24 rounded-full border-4 border-white/30 shadow-xl object-cover mb-4"
         />
         <h1 className={`text-2xl font-bold mb-2 tracking-tight ${theme.textClass}`}>{profile.displayName}</h1>
         <p className={`text-center max-w-[320px] text-sm leading-relaxed opacity-90 ${theme.textClass}`}>{profile.bio}</p>
       </header>
 
-      <main className="w-full max-w-[580px] px-6 space-y-4 pb-20">
-        {profile.links.filter(l => l.active).map(link => (
+      <main className="w-full max-w-[580px] px-6 space-y-4 pb-12">
+        {profile.links.filter(l => isLinkActive(l) && l.type !== 'social_icon').map(link => (
           <a
             key={link.id}
             href={link.url}
@@ -105,11 +114,22 @@ const PublicProfile: React.FC = () => {
       </main>
 
       <footer className="mt-auto py-10 flex flex-col items-center gap-6">
-        <div className="flex gap-4">
-           {/* Social shortcuts can be added here */}
+        <div className="flex flex-wrap justify-center gap-6 px-6">
+          {profile.links.filter(l => isLinkActive(l) && l.type === 'social_icon').map(link => (
+            <a
+              key={link.id}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => handleLinkClick(link.id, link.url)}
+              className="hover:scale-110 transition-transform active:scale-90"
+            >
+              {getSocialIcon(link.url, 28)}
+            </a>
+          ))}
         </div>
-        <a 
-          href="#/" 
+        <a
+          href="#/"
           className={`flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.2em] opacity-40 hover:opacity-100 transition-opacity ${theme.textClass}`}
         >
           <TreePine size={14} /> Social2Tree
