@@ -8,6 +8,7 @@ import client from '../src/api/client';
 import { UserProfile } from '../types';
 import { Plus, Trash2, GripVertical, ExternalLink, Edit2, X, Wand2, QrCode, Download, Share2, Globe, Instagram, Github, Twitter, Youtube, Star, Zap, ShieldAlert, Check, Eye } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
+import { useToast } from '../src/context/ToastContext';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -15,8 +16,7 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const navigate = useNavigate();
-  // Initialize with null or loading state ideally, but type requires UserProfile
-  // We can use a partial or a loading flag.
+  const { showToast } = useToast();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -36,7 +36,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         if (res.data.user) {
           setProfile(res.data.user);
         } else {
-          // Not logged in
           navigate('/login');
         }
       } catch (err) {
@@ -73,9 +72,10 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      showToast('QR Code downloaded!', 'success');
     } catch (err) {
       console.error("Failed to download QR", err);
-      alert("Failed to download QR code. Please try again.");
+      showToast("Failed to download QR code.", "error");
     } finally {
       setIsDownloading(false);
     }
@@ -84,6 +84,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const handleShare = () => {
     navigator.clipboard.writeText(publicUrl);
     setCopied(true);
+    showToast('Link copied to clipboard!', 'success');
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -91,7 +92,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     e.preventDefault();
     if (!newTitle || !newUrl) return;
     if (hasReachedLimit) {
-      alert("You've reached your free link limit! Upgrade to Pro for unlimited links.");
+      showToast("You've reached your free link limit!", "warning");
       return;
     }
 
@@ -101,7 +102,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         url: newUrl
       });
 
-      // Update local state
       setProfile(prev => prev ? {
         ...prev,
         links: [...prev.links, res.data.link]
@@ -110,9 +110,10 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       setNewTitle('');
       setNewUrl('');
       setShowAddForm(false);
+      showToast('Link added successfully!', 'success');
     } catch (err) {
       console.error("Failed to add link", err);
-      alert("Failed to create link");
+      showToast("Failed to create link", "error");
     }
   };
 
@@ -124,13 +125,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         ...prev,
         links: prev.links.filter(l => l.id !== id)
       } : null);
+      showToast('Link deleted', 'info');
     } catch (err) {
       console.error("Failed to delete link", err);
+      showToast('Failed to delete link', 'error');
     }
   };
 
   const handleToggleActive = async (id: string, active: boolean) => {
-    // Optimistic update
     setProfile(prev => prev ? {
       ...prev,
       links: prev.links.map(l => l.id === id ? { ...l, active } : l)
@@ -138,27 +140,26 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
     try {
       await client.post('/links/update.php', { id, is_active: active ? 1 : 0 });
+      showToast(active ? 'Link activated' : 'Link deactivated', 'success');
     } catch (err) {
       console.error("Failed to update link", err);
-      // Revert if needed, but for now just log
+      showToast('Failed to update status', 'error');
     }
   };
 
   const handleProfileUpdate = async (updates: Partial<UserProfile>) => {
-    // Optimistic update for UI responsiveness
     setProfile(prev => prev ? { ...prev, ...updates } : null);
 
     try {
       await client.post('/profile/update.php', updates);
     } catch (err) {
       console.error("Failed to update profile", err);
+      showToast('Failed to update profile', 'error');
     }
   };
 
   const handleUpgrade = () => {
-    // Placeholder for payment integration
-    alert("Payment gateway integration pending. This would redirect to Stripe/PayPal.");
-    // In real app, redirect to checkout
+    showToast("Payment gateway integration pending.", "info");
   };
 
   const generateAIBio = async () => {
@@ -172,9 +173,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
       if (response.text) {
         handleProfileUpdate({ bio: response.text.trim().replace(/"/g, '') });
+        showToast('AI Bio generated!', 'success');
       }
     } catch (err) {
       console.error("Failed to generate bio", err);
+      showToast('AI Bio generation failed', 'error');
     } finally {
       setIsGeneratingBio(false);
     }
@@ -253,8 +256,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   <button
                     onClick={handleShare}
                     className={`flex items-center gap-2 px-4 py-2 border text-[10px] sm:text-xs font-bold rounded-lg transition-all ${copied
-                        ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
-                        : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                      ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
+                      : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                       }`}
                   >
                     {copied ? <><Check size={14} /> Copied!</> : <><Share2 size={14} /> Copy Link</>}
@@ -415,14 +418,12 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             </section>
           </div>
 
-          {/* Desktop Sidebar: Phone Preview */}
           <div className="hidden lg:block sticky top-24">
             <PhonePreview profile={profile} />
           </div>
         </div>
       </main>
 
-      {/* Mobile-only Preview/Share Actions */}
       <div className="lg:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-40 w-full px-4 flex gap-2">
         <button
           className="flex-grow bg-slate-900 text-white px-4 py-3 rounded-xl font-bold shadow-2xl flex items-center justify-center gap-2 border border-slate-700 active:scale-95 transition-all text-xs"
@@ -438,7 +439,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         </button>
       </div>
 
-      {/* Mobile Preview Modal */}
       {showMobilePreview && (
         <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 lg:hidden animate-in fade-in duration-300">
           <div className="relative animate-in slide-in-from-bottom-10 duration-500">
@@ -455,7 +455,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         </div>
       )}
 
-      {/* Mobile Navigation */}
       <MobileNav />
     </div>
   );

@@ -25,28 +25,47 @@ try {
     $user_id = $user['id'];
 
     // 2. Fetch Links
-    $query = "SELECT id, title, url, type FROM links WHERE user_id = ? AND is_active = 1 ORDER BY sort_order ASC, created_at DESC";
+    $query = "SELECT id, title, url, type, is_active, clicks FROM links WHERE user_id = ? AND is_active = 1 ORDER BY sort_order ASC, created_at DESC";
     $stmt = $pdo->prepare($query);
     $stmt->execute([$user_id]);
     $links = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // 3. Track View (Async-ish)
-    // We log the view but don't hold up the response if it fails
-    // Using INSERT DELAYED is deprecated, so we just do a standard insert.
-    // In high traffic, this should be queued.
-    $ip = $_SERVER['REMOTE_ADDR'];
-    $ua = $_SERVER['HTTP_USER_AGENT'];
-
-    // Check if we should track (simple spam prevention could go here)
-    $track_sql = "INSERT INTO analytics (user_id, visitor_id, ip_address, user_agent) VALUES (?, ?, ?, ?)";
-    $track_stmt = $pdo->prepare($track_sql);
-    // Simple visitor ID hash
+    // 3. Track View
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    $ua = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
     $visitor_id = hash('sha256', $ip . $ua . date('Y-m-d'));
-    $track_stmt->execute([$user_id, $visitor_id, $ip, $ua]);
+    
+    try {
+        $track_sql = "INSERT INTO analytics (user_id, visitor_id, ip_address, user_agent) VALUES (?, ?, ?, ?)";
+        $track_stmt = $pdo->prepare($track_sql);
+        $track_stmt->execute([$user_id, $visitor_id, $ip, $ua]);
+    } catch (PDOException $e) {
+        // Silently fail analytics
+    }
 
-    // Return Data
-    $user['links'] = $links;
-    json_response($user);
+    // 4. Map Data to standard structure
+    $profile = [
+        'id' => (string) $user['id'],
+        'username' => $user['username'],
+        'displayName' => $user['display_name'] ?? $user['username'],
+        'bio' => $user['bio'] ?? '',
+        'avatarUrl' => $user['avatar_url'] ?? 'https://ui-avatars.com/api/?name=' . urlencode($user['username']),
+        'theme' => $user['theme'] ?? 'default',
+        'buttonStyle' => $user['button_style'] ?? 'rounded-lg',
+        'plan' => $user['plan'],
+        'role' => $user['role'],
+        'links' => array_map(function ($link) {
+            return [
+                'id' => (string) $link['id'],
+                'title' => $link['title'],
+                'url' => $link['url'],
+                'active' => (bool) $link['is_active'],
+                'clicks' => (int) $link['clicks'],
+                'type' => $link['type'] ?? 'social'
+            ];
+        }, $links)
+    ];
+    json_response($profile);
 
 } catch (PDOException $e) {
     json_response(["message" => "Database error: " . $e->getMessage()], 500);
