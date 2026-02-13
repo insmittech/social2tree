@@ -32,6 +32,61 @@ try {
         }
     }
 
+    // 2. Ensure missing tables exist
+    echo "<h2>Checking for missing tables...</h2>";
+    
+    $tables = [
+        'links' => "CREATE TABLE IF NOT EXISTS links (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            title VARCHAR(255) NOT NULL,
+            url TEXT NOT NULL,
+            is_active TINYINT(1) DEFAULT 1,
+            clicks INT DEFAULT 0,
+            type VARCHAR(50) DEFAULT 'social',
+            sort_order INT DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            INDEX idx_user_links (user_id, sort_order)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+        
+        'analytics' => "CREATE TABLE IF NOT EXISTS analytics (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            link_id INT NULL,
+            visitor_id VARCHAR(64),
+            ip_address VARCHAR(45),
+            user_agent VARCHAR(255),
+            referrer VARCHAR(255),
+            country_code VARCHAR(3),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            INDEX idx_analytics_user (user_id, created_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+        
+        'settings' => "CREATE TABLE IF NOT EXISTS settings (
+            setting_key VARCHAR(50) PRIMARY KEY,
+            setting_value TEXT
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    ];
+
+    foreach ($tables as $tableName => $sql) {
+        echo "Checking table <strong>$tableName</strong>... ";
+        $pdo->exec($sql);
+        echo "✅ OK<br>";
+    }
+
+    // 3. Seed default settings
+    echo "<h2>Seeding default settings...</h2>";
+    $seedSql = "INSERT IGNORE INTO settings (setting_key, setting_value) VALUES 
+        ('site_name', 'Social2Tree'), 
+        ('maintenance_mode', 'false'),
+        ('free_link_limit', '5'),
+        ('pro_price', '15.00')";
+    $pdo->exec($seedSql);
+    echo "✅ Done<br>";
+
     echo "<h3>Migration completed successfully!</h3>";
     echo "<p><a href='diagnostic.php'>Go to Diagnostics</a> | <a href='auth/me.php'>Check API</a></p>";
 
