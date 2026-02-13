@@ -61,6 +61,22 @@ try {
 
     echo "✅ Database connection successful!<br>";
     echo "Connected to: $db on $host<br>";
+
+    // 5. Check Table Schema
+    echo "<h2>📊 Table Schema Check (users)</h2>";
+    $stmt = $pdo->query("DESCRIBE users");
+    $columns = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    echo "<table border='1' style='border-collapse: collapse; width: 100%;'>";
+    echo "<tr><th>Field</th><th>Type</th><th>Null</th><th>Key</th><th>Default</th><th>Extra</th></tr>";
+    foreach ($columns as $column) {
+        echo "<tr>";
+        foreach ($column as $value) {
+            echo "<td>" . ($value === null ? 'NULL' : htmlspecialchars($value)) . "</td>";
+        }
+        echo "</tr>";
+    }
+    echo "</table>";
+
 } catch (Exception $e) {
     echo "❌ Database connection failed!<br>";
     echo "Error: " . $e->getMessage() . "<br>";
