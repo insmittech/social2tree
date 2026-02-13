@@ -1,7 +1,7 @@
 {
   "name": "social2tree",
   "private": true,
-  "homepage": "https://social2tree.insmithtech.com",
+  "homepage": "https://social2tree.insmittech.com",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
