@@ -50,14 +50,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   }, [navigate]);
 
   if (loading || !profile) {
-     return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div></div>;
+    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div></div>;
   }
 
   const isFreePlan = profile.plan === 'free';
   const linkLimit = isFreePlan ? 3 : Infinity;
   const hasReachedLimit = (profile.links?.length || 0) >= linkLimit;
 
-  const publicUrl = `${window.location.origin}/#/${profile.username}`;
+  const publicUrl = `${window.location.origin}/${profile.username}`;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(publicUrl)}&bgcolor=ffffff&color=0f172a&margin=2`;
 
   const handleDownloadQR = async () => {
@@ -94,19 +94,19 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       alert("You've reached your free link limit! Upgrade to Pro for unlimited links.");
       return;
     }
-    
+
     try {
       const res = await client.post('/links/create.php', {
         title: newTitle,
         url: newUrl
       });
-      
+
       // Update local state
       setProfile(prev => prev ? {
         ...prev,
         links: [...prev.links, res.data.link]
       } : null);
-      
+
       setNewTitle('');
       setNewUrl('');
       setShowAddForm(false);
@@ -132,8 +132,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const handleToggleActive = async (id: string, active: boolean) => {
     // Optimistic update
     setProfile(prev => prev ? {
-        ...prev,
-        links: prev.links.map(l => l.id === id ? { ...l, active } : l)
+      ...prev,
+      links: prev.links.map(l => l.id === id ? { ...l, active } : l)
     } : null);
 
     try {
@@ -192,15 +192,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <Navbar isDashboard onLogout={onLogout} />
-      
+
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full pb-32 lg:pb-8">
         <div className="grid lg:grid-cols-[1fr,320px] gap-8 items-start">
-          
+
           <div className="space-y-6">
             {/* Plan Info Bar */}
-            <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-4 transition-all ${
-              isFreePlan ? 'bg-amber-50 border-amber-200' : 'bg-indigo-600 text-white border-indigo-700 shadow-lg shadow-indigo-100'
-            }`}>
+            <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-4 transition-all ${isFreePlan ? 'bg-amber-50 border-amber-200' : 'bg-indigo-600 text-white border-indigo-700 shadow-lg shadow-indigo-100'
+              }`}>
               <div className="flex items-center gap-3">
                 <div className={`p-2 rounded-xl ${isFreePlan ? 'bg-amber-200 text-amber-800' : 'bg-white/20 text-white'}`}>
                   {isFreePlan ? <Zap size={20} /> : <Star size={20} />}
@@ -211,7 +210,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 </div>
               </div>
               {isFreePlan && (
-                <button 
+                <button
                   onClick={handleUpgrade}
                   className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded-xl font-black text-sm transition-all shadow-md active:scale-95"
                 >
@@ -222,47 +221,46 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
             {/* QR Code Quick Access */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row items-center gap-6">
-               <button 
-                 onClick={handleDownloadQR}
-                 className="p-2 bg-white border border-slate-100 rounded-xl shadow-sm hover:border-indigo-200 transition-colors group relative"
-                 title="Click to download QR Code"
-               >
-                 <img 
-                   src={qrUrl} 
-                   alt="Your QR Code" 
-                   className={`w-24 h-24 group-hover:opacity-90 transition-opacity ${isDownloading ? 'opacity-30' : 'opacity-100'}`} 
-                 />
-                 {isDownloading && (
-                   <div className="absolute inset-0 flex items-center justify-center">
-                     <div className="animate-spin rounded-full h-6 w-6 border-2 border-indigo-600 border-t-transparent"></div>
-                   </div>
-                 )}
-               </button>
-               <div className="text-center sm:text-left flex-grow">
-                 <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2 justify-center sm:justify-start">
-                   <QrCode size={20} className="text-indigo-600" /> Your QR Code
-                 </h2>
-                 <p className="text-slate-500 text-xs sm:text-sm mt-1">One code. Complete digital identity.</p>
-                 <div className="mt-4 flex flex-wrap gap-2 justify-center sm:justify-start">
-                    <button 
-                      onClick={handleDownloadQR} 
-                      disabled={isDownloading}
-                      className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-[10px] sm:text-xs font-bold rounded-lg hover:bg-slate-800 transition-all disabled:opacity-50"
-                    >
-                      <Download size={14} /> {isDownloading ? '...' : 'Download'}
-                    </button>
-                    <button 
-                      onClick={handleShare}
-                      className={`flex items-center gap-2 px-4 py-2 border text-[10px] sm:text-xs font-bold rounded-lg transition-all ${
-                        copied 
-                        ? 'bg-emerald-50 border-emerald-200 text-emerald-600' 
+              <button
+                onClick={handleDownloadQR}
+                className="p-2 bg-white border border-slate-100 rounded-xl shadow-sm hover:border-indigo-200 transition-colors group relative"
+                title="Click to download QR Code"
+              >
+                <img
+                  src={qrUrl}
+                  alt="Your QR Code"
+                  className={`w-24 h-24 group-hover:opacity-90 transition-opacity ${isDownloading ? 'opacity-30' : 'opacity-100'}`}
+                />
+                {isDownloading && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-2 border-indigo-600 border-t-transparent"></div>
+                  </div>
+                )}
+              </button>
+              <div className="text-center sm:text-left flex-grow">
+                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2 justify-center sm:justify-start">
+                  <QrCode size={20} className="text-indigo-600" /> Your QR Code
+                </h2>
+                <p className="text-slate-500 text-xs sm:text-sm mt-1">One code. Complete digital identity.</p>
+                <div className="mt-4 flex flex-wrap gap-2 justify-center sm:justify-start">
+                  <button
+                    onClick={handleDownloadQR}
+                    disabled={isDownloading}
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-[10px] sm:text-xs font-bold rounded-lg hover:bg-slate-800 transition-all disabled:opacity-50"
+                  >
+                    <Download size={14} /> {isDownloading ? '...' : 'Download'}
+                  </button>
+                  <button
+                    onClick={handleShare}
+                    className={`flex items-center gap-2 px-4 py-2 border text-[10px] sm:text-xs font-bold rounded-lg transition-all ${copied
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
                         : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                       }`}
-                    >
-                      {copied ? <><Check size={14} /> Copied!</> : <><Share2 size={14} /> Copy Link</>}
-                    </button>
-                 </div>
-               </div>
+                  >
+                    {copied ? <><Check size={14} /> Copied!</> : <><Share2 size={14} /> Copy Link</>}
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Profile Section */}
@@ -280,9 +278,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 <div className="flex-grow w-full space-y-4">
                   <div>
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Display Name</label>
-                    <input 
-                      type="text" 
-                      value={profile.displayName} 
+                    <input
+                      type="text"
+                      value={profile.displayName}
                       onChange={(e) => handleProfileUpdate({ displayName: e.target.value })}
                       className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium"
                     />
@@ -290,7 +288,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   <div>
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block flex justify-between items-center">
                       Bio
-                      <button 
+                      <button
                         onClick={generateAIBio}
                         disabled={isGeneratingBio}
                         className="bg-indigo-50 text-indigo-600 px-2 py-1 rounded text-[10px] flex items-center gap-1 normal-case font-bold hover:bg-indigo-100 disabled:opacity-50 transition-colors"
@@ -298,8 +296,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                         <Wand2 size={10} /> {isGeneratingBio ? 'Thinking...' : 'AI Enhance'}
                       </button>
                     </label>
-                    <textarea 
-                      value={profile.bio} 
+                    <textarea
+                      value={profile.bio}
                       onChange={(e) => handleProfileUpdate({ bio: e.target.value })}
                       className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm h-20 resize-none"
                     />
@@ -317,12 +315,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                     {profile.links.length} / {isFreePlan ? '3' : '∞'}
                   </span>
                 </div>
-                <button 
+                <button
                   onClick={() => setShowAddForm(true)}
                   disabled={hasReachedLimit}
-                  className={`px-4 sm:px-6 py-2.5 rounded-full font-bold flex items-center gap-2 transition-all shadow-lg active:scale-95 text-sm ${
-                    hasReachedLimit ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                  }`}
+                  className={`px-4 sm:px-6 py-2.5 rounded-full font-bold flex items-center gap-2 transition-all shadow-lg active:scale-95 text-sm ${hasReachedLimit ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                    }`}
                 >
                   <Plus size={18} /> <span className="hidden xs:inline">Add Link</span>
                 </button>
@@ -339,33 +336,33 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 <div className="bg-white p-6 rounded-2xl shadow-xl border-2 border-indigo-100 animate-in fade-in slide-in-from-top-4 duration-300">
                   <div className="flex justify-between mb-4">
                     <h3 className="font-bold">New Link</h3>
-                    <button onClick={() => setShowAddForm(false)} className="text-slate-400 hover:text-slate-600"><X size={18}/></button>
+                    <button onClick={() => setShowAddForm(false)} className="text-slate-400 hover:text-slate-600"><X size={18} /></button>
                   </div>
                   <form onSubmit={handleAddLink} className="space-y-4">
                     <div className="grid gap-4 sm:grid-cols-2">
-                      <input 
-                        placeholder="Title (e.g. My Website)" 
+                      <input
+                        placeholder="Title (e.g. My Website)"
                         className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                         value={newTitle}
                         onChange={(e) => setNewTitle(e.target.value)}
                         autoFocus
                       />
-                      <input 
-                        placeholder="URL (e.g. https://...)" 
+                      <input
+                        placeholder="URL (e.g. https://...)"
                         className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono text-sm"
                         value={newUrl}
                         onChange={(e) => setNewUrl(e.target.value)}
                       />
                     </div>
                     <div className="flex justify-end gap-3">
-                      <button 
+                      <button
                         type="button"
                         onClick={() => setShowAddForm(false)}
                         className="px-4 py-2 rounded-lg text-slate-500 font-semibold hover:bg-slate-100 transition-all"
                       >
                         Cancel
                       </button>
-                      <button 
+                      <button
                         type="submit"
                         className="bg-indigo-600 text-white px-8 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-all shadow-md"
                       >
@@ -386,8 +383,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                       <div className="flex justify-between items-start">
                         <div className="space-y-1 overflow-hidden">
                           <div className="flex items-center gap-2">
-                             {getSocialIcon(link.url)}
-                             <h4 className="font-bold text-slate-800 text-sm sm:text-base truncate">{link.title}</h4>
+                            {getSocialIcon(link.url)}
+                            <h4 className="font-bold text-slate-800 text-sm sm:text-base truncate">{link.title}</h4>
                           </div>
                           <a href={link.url} target="_blank" className="text-[10px] sm:text-xs text-slate-400 font-mono flex items-center gap-1 hover:text-indigo-500 truncate max-w-[150px] xs:max-w-[250px] sm:max-w-none">
                             {link.url} <ExternalLink size={10} />
@@ -395,15 +392,15 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                         </div>
                         <div className="flex items-center gap-2 sm:gap-4 ml-2">
                           <label className="relative inline-flex items-center cursor-pointer scale-90 sm:scale-100">
-                            <input 
-                              type="checkbox" 
-                              className="sr-only peer" 
+                            <input
+                              type="checkbox"
+                              className="sr-only peer"
                               checked={link.active}
                               onChange={(e) => handleToggleActive(link.id, e.target.checked)}
                             />
                             <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
                           </label>
-                          <button 
+                          <button
                             onClick={() => handleDelete(link.id)}
                             className="text-slate-300 hover:text-red-500 transition-colors p-1"
                           >
@@ -427,15 +424,15 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
       {/* Mobile-only Preview/Share Actions */}
       <div className="lg:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-40 w-full px-4 flex gap-2">
-        <button 
-           className="flex-grow bg-slate-900 text-white px-4 py-3 rounded-xl font-bold shadow-2xl flex items-center justify-center gap-2 border border-slate-700 active:scale-95 transition-all text-xs"
-           onClick={handleShare}
+        <button
+          className="flex-grow bg-slate-900 text-white px-4 py-3 rounded-xl font-bold shadow-2xl flex items-center justify-center gap-2 border border-slate-700 active:scale-95 transition-all text-xs"
+          onClick={handleShare}
         >
           <Share2 size={16} /> {copied ? 'Copied!' : 'Copy Link'}
         </button>
-        <button 
-           className="bg-white text-indigo-600 px-4 py-3 rounded-xl font-bold shadow-2xl flex items-center justify-center gap-2 border border-slate-200 active:scale-95 transition-all text-xs"
-           onClick={() => setShowMobilePreview(true)}
+        <button
+          className="bg-white text-indigo-600 px-4 py-3 rounded-xl font-bold shadow-2xl flex items-center justify-center gap-2 border border-slate-200 active:scale-95 transition-all text-xs"
+          onClick={() => setShowMobilePreview(true)}
         >
           <Eye size={16} /> Preview
         </button>
@@ -444,17 +441,17 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       {/* Mobile Preview Modal */}
       {showMobilePreview && (
         <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 lg:hidden animate-in fade-in duration-300">
-           <div className="relative animate-in slide-in-from-bottom-10 duration-500">
-              <button 
-                onClick={() => setShowMobilePreview(false)}
-                className="absolute -top-4 -right-4 bg-white text-slate-900 p-2 rounded-full shadow-xl border border-slate-100 z-[70] hover:scale-110 active:scale-95 transition-all"
-              >
-                <X size={24} />
-              </button>
-              <div className="max-h-[90vh] overflow-y-auto no-scrollbar bg-white rounded-[3rem] p-2 shadow-2xl">
-                 <PhonePreview profile={profile} />
-              </div>
-           </div>
+          <div className="relative animate-in slide-in-from-bottom-10 duration-500">
+            <button
+              onClick={() => setShowMobilePreview(false)}
+              className="absolute -top-4 -right-4 bg-white text-slate-900 p-2 rounded-full shadow-xl border border-slate-100 z-[70] hover:scale-110 active:scale-95 transition-all"
+            >
+              <X size={24} />
+            </button>
+            <div className="max-h-[90vh] overflow-y-auto no-scrollbar bg-white rounded-[3rem] p-2 shadow-2xl">
+              <PhonePreview profile={profile} />
+            </div>
+          </div>
         </div>
       )}
 

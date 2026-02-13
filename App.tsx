@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import PublicProfile from './pages/PublicProfile';
@@ -68,7 +68,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <HashRouter>
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
@@ -113,7 +113,7 @@ const App: React.FC = () => {
         {/* Public Profile View */}
         <Route path="/:username" element={<PublicProfile />} />
       </Routes>
-    </HashRouter>
+    </BrowserRouter>
   );
 };
 

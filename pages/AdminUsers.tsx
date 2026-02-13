@@ -16,7 +16,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredUsers = users.filter(u => 
+  const filteredUsers = users.filter(u =>
     u.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     u.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -27,7 +27,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
   };
 
   const getPlanBadge = (plan: PlanType) => {
-    switch(plan) {
+    switch (plan) {
       case 'business': return <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-lg text-[8px] font-black uppercase tracking-wider">Business</span>;
       case 'pro': return <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-lg text-[8px] font-black uppercase tracking-wider">Pro</span>;
       default: return <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-lg text-[8px] font-black uppercase tracking-wider">Free</span>;
@@ -37,31 +37,31 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
   return (
     <div className="min-h-screen bg-slate-50">
       <Navbar isDashboard onLogout={onLogout} />
-      
+
       <div className="max-w-[1600px] mx-auto flex">
         <AdminSidebar />
-        
+
         <main className="flex-grow p-4 sm:p-8 lg:p-12 overflow-hidden pb-32 lg:pb-12">
           <header className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <h1 className="text-2xl sm:text-3xl font-black text-slate-900">User Management</h1>
               <p className="text-slate-500 font-medium">Roles and subscriptions</p>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-3">
-               <div className="relative group">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
-                  <input 
-                    type="text" 
-                    placeholder="Search name..." 
-                    className="pl-12 pr-6 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-100 outline-none w-full sm:w-80 font-bold text-sm transition-all shadow-sm"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-               </div>
-               <button className="hidden sm:flex items-center gap-2 bg-white border border-slate-200 px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-widest text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
-                 <Filter size={18} /> Filter
-               </button>
+              <div className="relative group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                <input
+                  type="text"
+                  placeholder="Search name..."
+                  className="pl-12 pr-6 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-100 outline-none w-full sm:w-80 font-bold text-sm transition-all shadow-sm"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <button className="hidden sm:flex items-center gap-2 bg-white border border-slate-200 px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-widest text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
+                <Filter size={18} /> Filter
+              </button>
             </div>
           </header>
 
@@ -90,36 +90,35 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
                         </div>
                       </td>
                       <td className="hidden sm:table-cell px-8 py-5">
-                         <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider ${
-                           user.status === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
-                         }`}>
-                           {user.status}
-                         </span>
+                        <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider ${user.status === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
+                          }`}>
+                          {user.status}
+                        </span>
                       </td>
                       <td className="px-4 sm:px-8 py-5">
-                         {getPlanBadge(user.plan)}
+                        {getPlanBadge(user.plan)}
                       </td>
                       <td className="hidden lg:table-cell px-8 py-5">
-                         <div className="flex flex-col gap-0.5">
-                            <p className="text-xs font-black text-slate-700">{user.views.toLocaleString()} views</p>
-                         </div>
+                        <div className="flex flex-col gap-0.5">
+                          <p className="text-xs font-black text-slate-700">{user.views.toLocaleString()} views</p>
+                        </div>
                       </td>
                       <td className="px-4 sm:px-8 py-5">
-                         <div className="flex items-center justify-center gap-1 sm:gap-2">
-                            <button 
-                              onClick={() => handlePlanChange(user.id, user.plan === 'pro' ? 'free' : 'pro')}
-                              className="p-2 sm:p-3 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
-                            >
-                               <CreditCard size={16} />
-                            </button>
-                            <a 
-                              href={`/#/${user.username}`} 
-                              target="_blank" 
-                              className="p-2 sm:p-3 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
-                            >
-                               <ExternalLink size={16} />
-                            </a>
-                         </div>
+                        <div className="flex items-center justify-center gap-1 sm:gap-2">
+                          <button
+                            onClick={() => handlePlanChange(user.id, user.plan === 'pro' ? 'free' : 'pro')}
+                            className="p-2 sm:p-3 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                          >
+                            <CreditCard size={16} />
+                          </button>
+                          <a
+                            href={`/${user.username}`}
+                            target="_blank"
+                            className="p-2 sm:p-3 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
+                          >
+                            <ExternalLink size={16} />
+                          </a>
+                        </div>
                       </td>
                     </tr>
                   ))}

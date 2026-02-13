@@ -61,7 +61,7 @@ if (isset($_SESSION['user_id'])) {
             $stmt->execute([$user_id]);
             $profile['views'] = (int) $stmt->fetchColumn();
 
-            echo json_encode(["user" => $profile]);
+            json_response(["user" => $profile]);
         } else {
             // User ID in session but not in DB? Weird.
             session_destroy();

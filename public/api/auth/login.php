@@ -22,18 +22,18 @@ if (!empty($data['username']) && !empty($data['password'])) {
             $role = $row['role'];
 
             if (password_verify($password, $password_hash)) {
-                // Determine 'secure' flag based on server protocol
-                $is_secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+                // Determine 'secure' flag based on server protocol and proxies
+                $is_secure = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') || 
+                            (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
 
-                // Set session token (simple implementation for now, ideally use JWT)
-                // For simplicity in generic PHP hosting, we'll use PHP sessions
+                // Set session token
                 session_set_cookie_params([
                     'lifetime' => 0, // Session cookie
                     'path' => '/',
                     'domain' => '', // Current domain
                     'secure' => $is_secure,
                     'httponly' => true,
-                    'samesite' => 'Strict'
+                    'samesite' => 'Lax' // Changed from Strict for better site navigation
                 ]);
                 session_start();
                 $_SESSION['user_id'] = $id;

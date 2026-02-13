@@ -2,7 +2,6 @@
 // Set headers for CORS and JSON response
 function json_response($data = null, $status = 200)
 {
-    header_remove();
     http_response_code($status);
     header("Cache-Control: no-transform,public,max-age=300,s-maxage=900");
     header('Content-Type: application/json');
