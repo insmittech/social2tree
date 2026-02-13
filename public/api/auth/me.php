@@ -22,7 +22,7 @@ if (isset($_SESSION['user_id'])) {
             // Let's map it.
 
             $profile = [
-                'id' => $user['id'],
+                'id' => (string) $user['id'],
                 'username' => $user['username'],
                 'displayName' => $user['display_name'] ?? $user['username'],
                 'bio' => $user['bio'] ?? '',
@@ -46,7 +46,7 @@ if (isset($_SESSION['user_id'])) {
             // Map links to frontend structure
             $profile['links'] = array_map(function ($link) {
                 return [
-                    'id' => $link['id'],
+                    'id' => (string) $link['id'],
                     'title' => $link['title'],
                     'url' => $link['url'],
                     'active' => (bool) $link['is_active'],

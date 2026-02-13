@@ -35,11 +35,11 @@ if (!empty($data['url']) && !empty($data['title'])) {
         json_response([
             "message" => "Link created.",
             "link" => [
-                "id" => $link_id,
+                "id" => (string) $link_id,
                 "title" => $title,
                 "url" => $url,
                 "type" => $type,
-                "active" => 1,
+                "active" => true,
                 "clicks" => 0
             ]
         ], 201);

@@ -54,13 +54,11 @@ if (!empty($data['id'])) {
         $stmt = $pdo->prepare($query);
 
         if ($stmt->execute($params)) {
-            if ($stmt->rowCount() > 0) {
-                json_response(["message" => "Link updated."]);
-            } else {
-                json_response(["message" => "Link not found or no changes made."], 404);
-            }
+             // Even if rowCount is 0, the record was found and potentially matched existing values.
+             // We consider this a success to avoid 404 errors in frontend on "no-change" saves.
+             json_response(["message" => "Link updated successfully."]);
         } else {
-            json_response(["message" => "Unable to update link."], 503);
+             json_response(["message" => "Unable to update link."], 503);
         }
     } catch (PDOException $e) {
         json_response(["message" => "Database error: " . $e->getMessage()], 500);
