@@ -9,6 +9,22 @@ import { UserProfile } from '../types';
 import { Plus, Trash2, GripVertical, ExternalLink, Edit2, X, Wand2, QrCode, Download, Share2, Globe, Instagram, Github, Twitter, Youtube, Star, Zap, ShieldAlert, Check, Eye } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { useToast } from '../src/context/ToastContext';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import SortableLink from '../components/SortableLink';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -27,6 +43,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
+
+  // DnD Sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Fetch profile on mount
   useEffect(() => {
@@ -160,6 +184,31 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
   const handleUpgrade = () => {
     showToast("Payment gateway integration pending.", "info");
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = profile.links.findIndex(l => l.id === active.id);
+      const newIndex = profile.links.findIndex(l => l.id === over.id);
+
+      const newLinks = arrayMove(profile.links, oldIndex, newIndex);
+
+      setProfile(prev => prev ? { ...prev, links: newLinks } : null);
+
+      try {
+        await client.post('/links/reorder.php', {
+          ids: newLinks.map(l => l.id)
+        });
+        showToast('Order updated', 'success');
+      } catch (err) {
+        console.error("Failed to reorder links", err);
+        showToast('Failed to save link order', 'error');
+        // Rollback on error
+        setProfile(prev => prev ? { ...prev, links: profile.links } : null);
+      }
+    }
   };
 
   const generateAIBio = async () => {
@@ -377,43 +426,26 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               )}
 
               <div className="space-y-4">
-                {profile.links.map((link) => (
-                  <div key={link.id} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-start gap-3 sm:gap-4 group hover:border-indigo-300 transition-all">
-                    <div className="mt-1 text-slate-300 cursor-grab active:cursor-grabbing">
-                      <GripVertical size={20} />
-                    </div>
-                    <div className="flex-grow">
-                      <div className="flex justify-between items-start">
-                        <div className="space-y-1 overflow-hidden">
-                          <div className="flex items-center gap-2">
-                            {getSocialIcon(link.url)}
-                            <h4 className="font-bold text-slate-800 text-sm sm:text-base truncate">{link.title}</h4>
-                          </div>
-                          <a href={link.url} target="_blank" className="text-[10px] sm:text-xs text-slate-400 font-mono flex items-center gap-1 hover:text-indigo-500 truncate max-w-[150px] xs:max-w-[250px] sm:max-w-none">
-                            {link.url} <ExternalLink size={10} />
-                          </a>
-                        </div>
-                        <div className="flex items-center gap-2 sm:gap-4 ml-2">
-                          <label className="relative inline-flex items-center cursor-pointer scale-90 sm:scale-100">
-                            <input
-                              type="checkbox"
-                              className="sr-only peer"
-                              checked={link.active}
-                              onChange={(e) => handleToggleActive(link.id, e.target.checked)}
-                            />
-                            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                          </label>
-                          <button
-                            onClick={() => handleDelete(link.id)}
-                            className="text-slate-300 hover:text-red-500 transition-colors p-1"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={profile.links.map(l => l.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {profile.links.map((link) => (
+                      <SortableLink
+                        key={link.id}
+                        link={link}
+                        getSocialIcon={getSocialIcon}
+                        handleToggleActive={handleToggleActive}
+                        handleDelete={handleDelete}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
               </div>
             </section>
           </div>
