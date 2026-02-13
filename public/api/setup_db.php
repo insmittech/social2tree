@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+include_once __DIR__ . '/db.php';
 
 $schemaFile = __DIR__ . '/../../server/schema.sql';
 

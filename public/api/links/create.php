@@ -1,8 +1,8 @@
 <?php
-include_once '../utils.php';
+include_once __DIR__ . '/../utils.php';
 session_start();
 json_response();
-include_once '../db.php';
+include_once __DIR__ . '/../db.php';
 
 if (!isset($_SESSION['user_id'])) {
     json_response(["message" => "Unauthorized."], 401);

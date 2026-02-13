@@ -1,5 +1,5 @@
 <?php
-include_once '../utils.php';
+include_once __DIR__ . '/../utils.php';
 
 session_start();
 session_unset();

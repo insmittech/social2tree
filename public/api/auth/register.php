@@ -1,10 +1,10 @@
 <?php
-include_once '../utils.php';
+include_once __DIR__ . '/../utils.php';
 
 // Handle CORS and preflight
 json_response();
 
-include_once '../db.php';
+include_once __DIR__ . '/../db.php';
 
 $data = get_json_input();
 

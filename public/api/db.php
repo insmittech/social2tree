@@ -1,5 +1,5 @@
 <?php
-include 'env_loader.php';
+include_once __DIR__ . '/env_loader.php';
 
 $host = getenv('DB_HOST');
 $db = getenv('DB_DATABASE');
