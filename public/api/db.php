@@ -25,10 +25,13 @@ $options = [
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
-    // In production, log this error instead of echoing it
-    // error_log($e->getMessage());
-    // echo json_encode(['error' => 'Database connection failed']);
-    // exit;
-    throw new \PDOException($e->getMessage(), (int) $e->getCode());
+    if (function_exists('json_response')) {
+        json_response(['error' => 'Database connection failed: ' . $e->getMessage()], 500);
+    } else {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode(['error' => 'Database connection failed: ' . $e->getMessage()]);
+    }
+    exit;
 }
 ?>

@@ -1,5 +1,20 @@
 <?php
 include_once __DIR__ . '/../utils.php';
+
+// Determine 'secure' flag consistently
+$is_secure = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') || 
+            (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'domain' => '',
+    'secure' => $is_secure,
+    'httponly' => true,
+    'samesite' => 'Lax'
+]);
+
+session_start();
 json_response();
 include_once __DIR__ . '/../db.php';
 
@@ -43,7 +58,7 @@ if (!empty($data['username']) && !empty($data['password'])) {
                 json_response([
                     "message" => "Login successful.",
                     "user" => [
-                        "id" => $id,
+                        "id" => (string) $id,
                         "username" => $username,
                         "role" => $role
                     ]

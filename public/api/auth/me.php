@@ -1,9 +1,22 @@
 <?php
 include_once __DIR__ . '/../utils.php';
-include_once __DIR__ . '/../db.php';
+
+// Determine 'secure' flag consistently
+$is_secure = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') || 
+            (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'domain' => '',
+    'secure' => $is_secure,
+    'httponly' => true,
+    'samesite' => 'Lax'
+]);
 
 session_start();
 json_response();
+include_once __DIR__ . '/../db.php';
 
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
