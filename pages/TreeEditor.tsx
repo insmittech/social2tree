@@ -38,7 +38,7 @@ const TreeEditor: React.FC = () => {
 
     // No fetchProfile useEffect needed
 
-    const activePage = profile?.pages.find(p => p.id === id) || null;
+    const activePage = profile?.pages?.find(p => p.id === id) || null;
 
     if (!profile) {
         return (

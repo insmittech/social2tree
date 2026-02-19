@@ -18,10 +18,10 @@ const Themes: React.FC<ThemesProps> = ({ onLogout }) => {
   const { selectedPageId, setSelectedPageId } = usePageSelector();
 
   // Derived active page
-  const activePage = profile?.pages.find(p => p.id === selectedPageId) || profile?.pages[0] || null;
+  const activePage = profile?.pages?.find(p => p.id === selectedPageId) || profile?.pages?.[0] || null;
 
   useEffect(() => {
-    if (profile && !selectedPageId && profile.pages.length > 0) {
+    if (profile && !selectedPageId && profile.pages?.length > 0) {
       setSelectedPageId(profile.pages[0].id);
     }
   }, [profile, selectedPageId, setSelectedPageId]);

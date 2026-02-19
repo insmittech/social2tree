@@ -14,7 +14,7 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({ onLogin, isAuthenticated }) => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { login } = useAuth();
+  const { login, refreshProfile } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -38,15 +38,16 @@ const Login: React.FC<LoginProps> = ({ onLogin, isAuthenticated }) => {
         password
       });
 
-      const user = response.data.user;
+      const partialUser = response.data.user;
 
-      // Update global auth state
-      login(user);
+      // Update global auth state by fetching full profile (including pages)
+      // login(partialUser) // Don't use this as it might miss 'pages' array
+      await refreshProfile();
 
       showToast('Welcome back!', 'success');
       // onLogin prop is likely redundant now but keeping it for compatibility if needed
-      onLogin(user.role === 'admin', user);
-      navigate(user.role === 'admin' ? '/admin' : '/dashboard');
+      onLogin(partialUser.role === 'admin', partialUser);
+      navigate(partialUser.role === 'admin' ? '/admin' : '/dashboard');
     } catch (err: any) {
       console.error(err);
       showToast(err.response?.data?.message || 'Login failed. Check your credentials.', 'error');
