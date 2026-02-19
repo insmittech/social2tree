@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Layout, Palette, BarChart2, LayoutDashboard, Users, Settings } from 'lucide-react';
+import { Layout, Palette, BarChart2, LayoutDashboard, Users, Settings, User } from 'lucide-react';
 
 interface MobileNavProps {
   isAdmin?: boolean;
@@ -14,6 +14,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ isAdmin }) => {
     { to: '/dashboard/links', icon: <Layout size={20} />, label: 'Links' },
     { to: '/dashboard/themes', icon: <Palette size={20} />, label: 'Themes' },
     { to: '/dashboard/analytics', icon: <BarChart2 size={20} />, label: 'Analytics' },
+    { to: '/dashboard/profile', icon: <User size={20} />, label: 'Profile' },
   ];
 
   const adminLinks = [
@@ -72,8 +73,8 @@ const MobileNav: React.FC<MobileNavProps> = ({ isAdmin }) => {
               {/* Floating Icon Container */}
               <div
                 className={`transition-all duration-500 ease-out flex items-center justify-center rounded-2xl ${isActive
-                    ? '-translate-y-10 bg-indigo-600 text-white w-14 h-14 shadow-xl shadow-indigo-200 scale-110'
-                    : 'text-slate-400 hover:text-slate-600 h-full'
+                  ? '-translate-y-10 bg-indigo-600 text-white w-14 h-14 shadow-xl shadow-indigo-200 scale-110'
+                  : 'text-slate-400 hover:text-slate-600 h-full'
                   }`}
               >
                 {link.icon}

@@ -3,7 +3,9 @@ import React, { useMemo, useState, useEffect } from 'react';
 import client from '../src/api/client';
 import { UserProfile } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { Users, MousePointer2, QrCode, TrendingUp, ArrowUpRight } from 'lucide-react';
+import { Users, MousePointer2, QrCode, TrendingUp, ArrowUpRight, BarChart2 } from 'lucide-react';
+import { usePageSelector } from '../src/hooks/usePageSelector';
+import PageManager from '../components/PageManager';
 
 interface AnalyticsProps {
   onLogout: () => void;
@@ -12,19 +14,29 @@ interface AnalyticsProps {
 const Analytics: React.FC<AnalyticsProps> = ({ onLogout }) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
 
+  const { selectedPageId, setSelectedPageId } = usePageSelector();
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const res = await client.get('/auth/me.php');
         if (res.data.user) {
           setProfile(res.data.user);
+          if (!selectedPageId && res.data.user.pages.length > 0) {
+            setSelectedPageId(res.data.user.pages[0].id);
+          }
         }
       } catch (err) {
         console.error('Failed to fetch profile', err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchProfile();
-  }, []);
+  }, [selectedPageId, setSelectedPageId]);
+
+  const activePage = profile?.pages.find(p => p.id === selectedPageId) || profile?.pages[0] || null;
 
   const chartData = useMemo(() => [
     { name: 'Mon', views: 120, clicks: 80 },
@@ -36,9 +48,9 @@ const Analytics: React.FC<AnalyticsProps> = ({ onLogout }) => {
     { name: 'Sun', views: 480, clicks: 360 },
   ], []);
 
-  const totalClicks = profile?.links.reduce((acc, l) => acc + l.clicks, 0) || 0;
+  const totalClicks = activePage?.links.reduce((acc, l) => acc + l.clicks, 0) || 0;
 
-  if (!profile) {
+  if (loading || !profile || !activePage) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
@@ -46,21 +58,38 @@ const Analytics: React.FC<AnalyticsProps> = ({ onLogout }) => {
     );
   }
 
+  const onPageCreated = (page: any) => {
+    setProfile(prev => prev ? {
+      ...prev,
+      pages: [...prev.pages, page]
+    } : null);
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32 lg:pb-8">
+      <PageManager
+        pages={profile.pages}
+        onPageCreated={onPageCreated}
+        className="mb-8"
+      />
+
       <header className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-          <TrendingUp size={28} className="text-indigo-600" />
-          Analytics
-        </h1>
-        <p className="text-slate-500 mt-1">Real-time performance of your page</p>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+              <BarChart2 size={28} className="text-indigo-600" />
+              Analytics
+            </h1>
+            <p className="text-slate-500 mt-1">Performance for <span className="text-indigo-600 font-bold">@{activePage.slug}</span></p>
+          </div>
+        </div>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8">
         {[
           { label: 'Lifetime Views', value: profile.views.toLocaleString(), icon: <Users size={20} />, color: 'blue', trend: '+12%' },
           { label: 'Link Clicks', value: totalClicks.toLocaleString(), icon: <MousePointer2 size={20} />, color: 'indigo', trend: '+24%' },
-          { label: 'QR Scans', value: profile.qrScans.toLocaleString(), icon: <QrCode size={20} />, color: 'purple', trend: 'Stable' }
+          { label: 'QR Scans', value: (profile as any).qrScans?.toLocaleString() || '0', icon: <QrCode size={20} />, color: 'purple', trend: 'Stable' }
         ].map((stat, i) => (
           <div key={i} className="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
             <div className="flex justify-between items-start">
@@ -109,7 +138,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onLogout }) => {
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
           <h3 className="font-bold text-slate-800 mb-6">Link Performance</h3>
           <div className="space-y-6">
-            {profile.links.length > 0 ? profile.links.map(link => {
+            {activePage.links.length > 0 ? activePage.links.map(link => {
               const percentage = Math.round((link.clicks / totalClicks) * 100) || 0;
               return (
                 <div key={link.id}>

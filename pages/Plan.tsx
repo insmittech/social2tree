@@ -1,8 +1,44 @@
 
-import React from 'react';
-import { CreditCard, Zap, Check, Star } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { UserProfile, PlanType } from '../types';
+import client from '../src/api/client';
 
 const Plan: React.FC = () => {
+    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const res = await client.get('/auth/me.php');
+                if (res.data.user) {
+                    setProfile(res.data.user);
+                }
+            } catch (err) {
+                console.error('Failed to fetch profile:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProfile();
+    }, []);
+
+    if (loading || !profile) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
+            </div>
+        );
+    }
+
+    const currentPlan = profile.plan;
+
+    const planHierarchy: Record<PlanType, number> = {
+        'free': 0,
+        'pro': 1,
+        'business': 2
+    };
+
     return (
         <div className="p-8 max-w-4xl mx-auto">
             <header className="mb-8">
@@ -21,7 +57,9 @@ const Plan: React.FC = () => {
                             <h2 className="text-2xl font-black text-slate-900">Free</h2>
                             <p className="text-slate-500 font-medium text-sm">Best for personal use</p>
                         </div>
-                        <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Active</span>
+                        {currentPlan === 'free' && (
+                            <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Active Plan</span>
+                        )}
                     </div>
                     <div className="mb-8">
                         <span className="text-4xl font-black text-slate-900">$0</span>
@@ -79,9 +117,15 @@ const Plan: React.FC = () => {
                             </li>
                         ))}
                     </ul>
-                    <button className="w-full bg-white text-indigo-600 py-4 rounded-2xl font-black transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-indigo-700/20">
-                        Upgrade Now
-                    </button>
+                    {currentPlan === 'free' ? (
+                        <button className="w-full bg-white text-indigo-600 py-4 rounded-2xl font-black transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-indigo-700/20">
+                            Upgrade Now
+                        </button>
+                    ) : (
+                        <div className="w-full bg-white/20 backdrop-blur-md text-white py-4 rounded-2xl font-black text-center">
+                            Your Active Plan
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

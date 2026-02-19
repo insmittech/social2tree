@@ -15,6 +15,7 @@ import AdminSecurity from './pages/AdminSecurity';
 import LinksPage from './pages/Links';
 import Plan from './pages/Plan';
 import SavedLinks from './pages/SavedLinks';
+import Profile from './pages/Profile';
 import Layout from './components/Layout';
 import { ToastProvider } from './src/context/ToastContext';
 import { ToastContainer } from './components/Toast';
@@ -88,6 +89,10 @@ const App: React.FC = () => {
           <Route
             path="/dashboard"
             element={isAuthenticated ? <Layout userProfile={userProfile} onLogout={handleLogout}><Dashboard onLogout={handleLogout} /></Layout> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/dashboard/profile"
+            element={isAuthenticated ? <Layout userProfile={userProfile} onLogout={handleLogout}><Profile /></Layout> : <Navigate to="/login" />}
           />
           <Route
             path="/dashboard/links"
