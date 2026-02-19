@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { TreePine, ArrowLeft, Mail, Lock, ShieldCheck, User } from 'lucide-react';
 import client from '../src/api/client';
 import { useToast } from '../src/context/ToastContext';
+import { useAuth } from '../src/context/AuthContext';
 
 interface LoginProps {
   onLogin: (isAdmin: boolean, user: any) => void;
@@ -13,6 +14,7 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({ onLogin, isAuthenticated }) => {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -37,9 +39,12 @@ const Login: React.FC<LoginProps> = ({ onLogin, isAuthenticated }) => {
       });
 
       const user = response.data.user;
-      // You might want to store user info in context/store here
+
+      // Update global auth state
+      login(user);
 
       showToast('Welcome back!', 'success');
+      // onLogin prop is likely redundant now but keeping it for compatibility if needed
       onLogin(user.role === 'admin', user);
       navigate(user.role === 'admin' ? '/admin' : '/dashboard');
     } catch (err: any) {
