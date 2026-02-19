@@ -22,11 +22,10 @@ const AdminSidebar: React.FC = () => {
               key={item.path}
               to={item.path}
               end
-              className={({ isActive }) => 
-                `flex items-center gap-3 px-3 py-3 rounded-xl font-bold text-sm transition-all ${
-                  isActive 
-                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' 
-                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-3 rounded-xl font-bold text-sm transition-all ${isActive
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
+                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
                 }`
               }
             >
@@ -43,11 +42,10 @@ const AdminSidebar: React.FC = () => {
             <NavLink
               key={item.path}
               to={item.path}
-              className={({ isActive }) => 
-                `flex items-center gap-3 px-3 py-3 rounded-xl font-bold text-sm transition-all ${
-                  isActive 
-                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' 
-                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-3 rounded-xl font-bold text-sm transition-all ${isActive
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
+                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
                 }`
               }
             >

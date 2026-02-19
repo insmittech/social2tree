@@ -12,6 +12,7 @@ import AdminUsers from './pages/AdminUsers';
 import AdminSettings from './pages/AdminSettings';
 import AdminAnalytics from './pages/AdminAnalytics';
 import AdminSecurity from './pages/AdminSecurity';
+import LinksPage from './pages/Links';
 import { ToastProvider } from './src/context/ToastContext';
 import { ToastContainer } from './components/Toast';
 
@@ -80,6 +81,10 @@ const App: React.FC = () => {
           <Route
             path="/dashboard"
             element={isAuthenticated ? <Dashboard onLogout={handleLogout} /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/dashboard/links"
+            element={isAuthenticated ? <LinksPage onLogout={handleLogout} /> : <Navigate to="/login" />}
           />
           <Route
             path="/dashboard/analytics"

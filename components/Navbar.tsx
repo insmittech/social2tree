@@ -24,7 +24,7 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout }) => {
               <TreePine className="text-white w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <span className={`text-lg sm:text-xl font-black tracking-tighter ${isAdminPath ? 'text-white' : 'text-slate-900'}`}>
-              S2T <span className="hidden xs:inline">Social2Tree</span> 
+              S2T <span className="hidden xs:inline">Social2Tree</span>
               <span className="text-indigo-500 font-medium text-xs ml-1">{isAdminPath ? 'ADM' : ''}</span>
             </span>
           </Link>
@@ -34,13 +34,12 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout }) => {
               <>
                 {/* Mode Switcher */}
                 {isAdmin && (
-                  <Link 
-                    to={isAdminPath ? "/dashboard" : "/admin"} 
-                    className={`flex items-center gap-1.5 font-bold text-[10px] sm:text-xs px-2 sm:px-3 py-2 rounded-xl transition-all ${
-                      isAdminPath 
-                        ? 'bg-white/10 text-white hover:bg-white/20' 
+                  <Link
+                    to={isAdminPath ? "/dashboard" : "/admin"}
+                    className={`flex items-center gap-1.5 font-bold text-[10px] sm:text-xs px-2 sm:px-3 py-2 rounded-xl transition-all ${isAdminPath
+                        ? 'bg-white/10 text-white hover:bg-white/20'
                         : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'
-                    }`}
+                      }`}
                   >
                     {isAdminPath ? <User size={14} /> : <Shield size={14} />}
                     <span className="hidden sm:inline">{isAdminPath ? "User Mode" : "Admin Panel"}</span>
@@ -51,7 +50,7 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout }) => {
                 {/* Desktop-only Links */}
                 {!isAdminPath && (
                   <div className="hidden lg:flex items-center gap-6">
-                    <Link to="/dashboard" className="flex items-center gap-1.5 text-slate-600 hover:text-indigo-600 font-medium text-sm transition-colors">
+                    <Link to="/dashboard/links" className="flex items-center gap-1.5 text-slate-600 hover:text-indigo-600 font-medium text-sm transition-colors">
                       <Layout size={18} /> Links
                     </Link>
                     <Link to="/dashboard/themes" className="flex items-center gap-1.5 text-slate-600 hover:text-indigo-600 font-medium text-sm transition-colors">
@@ -65,8 +64,8 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout }) => {
 
                 {/* Profile / Logout */}
                 <div className="flex items-center gap-2 sm:gap-3 ml-2 sm:pl-4 border-l border-slate-200/20">
-                   <img src={defaultAvatar} className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-indigo-500" />
-                   <button 
+                  <img src={defaultAvatar} className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-indigo-500" />
+                  <button
                     onClick={onLogout}
                     className={`flex items-center gap-1.5 font-medium text-sm transition-colors ${isAdminPath ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-red-600'}`}
                   >

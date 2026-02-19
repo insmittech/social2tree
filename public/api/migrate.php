@@ -38,7 +38,8 @@ try {
         'button_style' => "VARCHAR(50) DEFAULT 'rounded-lg' AFTER theme",
         'plan' => "ENUM('free', 'pro', 'business') DEFAULT 'free' AFTER button_style",
         'role' => "ENUM('user', 'admin') DEFAULT 'user' AFTER plan",
-        'status' => "ENUM('active', 'suspended') DEFAULT 'active' AFTER role"
+        'status' => "ENUM('active', 'suspended') DEFAULT 'active' AFTER role",
+        'custom_domain' => "VARCHAR(255) NULL AFTER status"
     ];
 
     foreach ($needed_columns as $column => $definition) {
@@ -60,10 +61,13 @@ try {
             user_id INT NOT NULL,
             title VARCHAR(255) NOT NULL,
             url TEXT NOT NULL,
+            icon VARCHAR(50) NULL,
             is_active TINYINT(1) DEFAULT 1,
             clicks INT DEFAULT 0,
             type VARCHAR(50) DEFAULT 'social',
             sort_order INT DEFAULT 0,
+            scheduled_start DATETIME NULL,
+            scheduled_end DATETIME NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -96,6 +100,19 @@ try {
         echo "<span class='success'>✅ Proper</span><br>";
     }
 
+    // Ensure links table has scheduled columns if it already exists
+    $stmt = $pdo->query("DESCRIBE links");
+    $link_columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    if (!in_array('scheduled_start', $link_columns)) {
+        $pdo->exec("ALTER TABLE links ADD scheduled_start DATETIME NULL AFTER sort_order");
+    }
+    if (!in_array('scheduled_end', $link_columns)) {
+        $pdo->exec("ALTER TABLE links ADD scheduled_end DATETIME NULL AFTER scheduled_start");
+    }
+    if (!in_array('icon', $link_columns)) {
+        $pdo->exec("ALTER TABLE links ADD icon VARCHAR(50) NULL AFTER url");
+    }
+
     // 3. Ensure default Admin exists
     echo "<h2>3. Verifying Administrator account...</h2>";
     $stmt = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'admin'");
@@ -114,10 +131,13 @@ try {
     // 4. Seed default settings
     echo "<h2>4. Seeding system settings...</h2>";
     $seedSql = "INSERT IGNORE INTO settings (setting_key, setting_value) VALUES 
-        ('site_name', 'SocialTree'), 
+        ('site_name', 'Social2Tree'), 
         ('maintenance_mode', 'false'),
-        ('free_link_limit', '5'),
-        ('pro_price', '15.00')";
+        ('free_link_limit', '3'),
+        ('pro_link_limit', '100'),
+        ('pro_price', '15.00'),
+        ('enable_custom_domains', 'true'),
+        ('available_themes', '[\"default\", \"dark\", \"glass\", \"minimal\"]')";
     $pdo->exec($seedSql);
     echo "System settings... <span class='success'>✅ Synchronized</span><br>";
 
