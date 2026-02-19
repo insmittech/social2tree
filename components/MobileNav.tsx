@@ -11,8 +11,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ isAdmin }) => {
   const location = useLocation();
 
   const userLinks = [
-    { to: '/dashboard/links', icon: <Layout size={20} />, label: 'Links' },
-    { to: '/dashboard/themes', icon: <Palette size={20} />, label: 'Themes' },
+    { to: '/dashboard/trees', icon: <Layout size={20} />, label: 'Trees' },
     { to: '/dashboard/analytics', icon: <BarChart2 size={20} />, label: 'Analytics' },
     { to: '/dashboard/profile', icon: <User size={20} />, label: 'Profile' },
   ];

@@ -28,8 +28,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout }) => 
     const userLinks = [
         { to: '/dashboard/profile', icon: <User size={20} />, label: 'Profile' },
         { to: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Overview' },
-        { to: '/dashboard/links', icon: <Layout size={20} />, label: 'Bio Links' },
-        { to: '/dashboard/themes', icon: <Palette size={20} />, label: 'Themes' },
+        { to: '/dashboard/trees', icon: <Layout size={20} />, label: 'Bio Trees' },
         { to: '/dashboard/analytics', icon: <BarChart2 size={20} />, label: 'Analytics' },
         { to: '/dashboard/plan', icon: <CreditCard size={20} />, label: 'Plan' },
         { to: '/dashboard/saved', icon: <Bookmark size={20} />, label: 'Saved Links' },

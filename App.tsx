@@ -16,6 +16,8 @@ import LinksPage from './pages/Links';
 import Plan from './pages/Plan';
 import SavedLinks from './pages/SavedLinks';
 import Profile from './pages/Profile';
+import BioTrees from './pages/BioTrees';
+import TreeEditor from './pages/TreeEditor';
 import Layout from './components/Layout';
 import { ToastProvider } from './src/context/ToastContext';
 import { ToastContainer } from './components/Toast';
@@ -96,11 +98,23 @@ const App: React.FC = () => {
           />
           <Route
             path="/dashboard/links"
-            element={isAuthenticated ? <Layout userProfile={userProfile} onLogout={handleLogout}><LinksPage onLogout={handleLogout} /></Layout> : <Navigate to="/login" />}
+            element={isAuthenticated ? <Navigate to="/dashboard/trees" /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/dashboard/trees"
+            element={isAuthenticated ? <Layout userProfile={userProfile} onLogout={handleLogout}><BioTrees /></Layout> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/dashboard/trees/:id"
+            element={isAuthenticated ? <Layout userProfile={userProfile} onLogout={handleLogout}><TreeEditor /></Layout> : <Navigate to="/login" />}
           />
           <Route
             path="/dashboard/analytics"
             element={isAuthenticated ? <Layout userProfile={userProfile} onLogout={handleLogout}><Analytics onLogout={handleLogout} /></Layout> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/dashboard/themes"
+            element={isAuthenticated ? <Navigate to="/dashboard/trees" /> : <Navigate to="/login" />}
           />
           <Route
             path="/dashboard/themes"

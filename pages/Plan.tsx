@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserProfile, PlanType } from '../types';
 import client from '../src/api/client';
+import { CreditCard, Check, Star } from 'lucide-react';
 
 const Plan: React.FC = () => {
     const [profile, setProfile] = useState<UserProfile | null>(null);
