@@ -68,6 +68,7 @@ try {
             sort_order INT DEFAULT 0,
             scheduled_start DATETIME NULL,
             scheduled_end DATETIME NULL,
+            password VARCHAR(100) NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -111,6 +112,9 @@ try {
     }
     if (!in_array('icon', $link_columns)) {
         $pdo->exec("ALTER TABLE links ADD icon VARCHAR(50) NULL AFTER url");
+    }
+    if (!in_array('password', $link_columns)) {
+        $pdo->exec("ALTER TABLE links ADD password VARCHAR(100) NULL AFTER scheduled_end");
     }
 
     // 3. Ensure default Admin exists

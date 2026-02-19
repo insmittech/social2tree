@@ -18,12 +18,13 @@ if (!empty($data['url']) && !empty($data['title'])) {
     $type = isset($data['type']) ? sanitize_input($data['type']) : 'social';
     $scheduled_start = !empty($data['scheduledStart']) ? sanitize_input($data['scheduledStart']) : null;
     $scheduled_end = !empty($data['scheduledEnd']) ? sanitize_input($data['scheduledEnd']) : null;
+    $password = !empty($data['password']) ? sanitize_input($data['password']) : null;
 
     // Auto-calculate sort order (append to end)
     // Could optionally query MAX(sort_order) + 1
 
     try {
-        $query = "INSERT INTO links (user_id, title, url, type, sort_order, scheduled_start, scheduled_end) VALUES (:user_id, :title, :url, :type, 0, :scheduled_start, :scheduled_end)";
+        $query = "INSERT INTO links (user_id, title, url, type, sort_order, scheduled_start, scheduled_end, password) VALUES (:user_id, :title, :url, :type, 0, :scheduled_start, :scheduled_end, :password)";
         $stmt = $pdo->prepare($query);
         $stmt->execute([
             ':user_id' => $user_id,
@@ -31,7 +32,8 @@ if (!empty($data['url']) && !empty($data['title'])) {
             ':url' => $url,
             ':type' => $type,
             ':scheduled_start' => $scheduled_start,
-            ':scheduled_end' => $scheduled_end
+            ':scheduled_end' => $scheduled_end,
+            ':password' => $password
         ]);
 
         $link_id = $pdo->lastInsertId();
@@ -46,7 +48,8 @@ if (!empty($data['url']) && !empty($data['title'])) {
                 "active" => true,
                 "clicks" => 0,
                 "scheduledStart" => $scheduled_start,
-                "scheduledEnd" => $scheduled_end
+                "scheduledEnd" => $scheduled_end,
+                "password" => $password
             ]
         ], 201);
     } catch (PDOException $e) {

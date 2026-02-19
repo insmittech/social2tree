@@ -47,6 +47,10 @@ if (!empty($data['id'])) {
         $fields[] = "scheduled_end = ?";
         $params[] = !empty($data['scheduled_end']) ? sanitize_input($data['scheduled_end']) : null;
     }
+    if (isset($data['password'])) {
+        $fields[] = "password = ?";
+        $params[] = !empty($data['password']) ? sanitize_input($data['password']) : null;
+    }
 
     if (empty($fields)) {
         json_response(["message" => "No fields to update."], 400);

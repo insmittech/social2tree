@@ -1,25 +1,53 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import AdminSidebar from '../components/AdminSidebar';
 import MobileNav from '../components/MobileNav';
 import { UserProfile, PlanType } from '../types';
 import { Search, Filter, MoreHorizontal, UserCheck, ShieldAlert, CreditCard, ExternalLink, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import client from '../src/api/client';
+import { useToast } from '../src/context/ToastContext';
 
 interface AdminUsersProps {
   onLogout: () => void;
 }
 
 const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
-  // TODO: Fetch from API
-  const [users, setUsers] = useState<UserProfile[]>([]);
+  const { showToast } = useToast();
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await client.get('/admin/users/list.php');
+        if (res.data.users) {
+          setUsers(res.data.users);
+        }
+      } catch (err) {
+        console.error('Failed to fetch admin users:', err);
+        showToast('Failed to load users', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUsers();
+  }, [showToast]);
 
   const filteredUsers = users.filter(u =>
     u.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     u.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
+      </div>
+    );
+  }
 
   const handlePlanChange = async (userId: string, plan: PlanType) => {
     // TODO: Call API to update user plan

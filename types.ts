@@ -12,6 +12,7 @@ export interface Link {
   type?: 'social' | 'payment' | 'custom' | 'social_icon';
   scheduledStart?: string | null;
   scheduledEnd?: string | null;
+  password?: string | null;
 }
 
 export interface UserTheme {

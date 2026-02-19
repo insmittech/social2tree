@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import AdminSidebar from '../components/AdminSidebar';
+import MobileNav from '../components/MobileNav';
 import { Shield, ShieldAlert, Lock, Fingerprint, Eye, History, UserMinus, Globe, ShieldCheck, AlertTriangle } from 'lucide-react';
 
 interface AdminSecurityProps {
@@ -23,11 +24,11 @@ const AdminSecurity: React.FC<AdminSecurityProps> = ({ onLogout }) => {
   return (
     <div className="min-h-screen bg-slate-50">
       <Navbar isDashboard onLogout={onLogout} />
-      
+
       <div className="max-w-[1600px] mx-auto flex">
         <AdminSidebar />
-        
-        <main className="flex-grow p-4 sm:p-8 lg:p-12 overflow-hidden">
+
+        <main className="flex-grow p-4 sm:p-8 lg:p-12 overflow-hidden pb-32 lg:pb-12">
           <header className="mb-10">
             <h1 className="text-3xl font-black text-slate-900">Security & Compliance</h1>
             <p className="text-slate-500 font-medium">Manage platform access, audit logs, and global security policies</p>
@@ -72,9 +73,9 @@ const AdminSecurity: React.FC<AdminSecurityProps> = ({ onLogout }) => {
                       <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">High Security</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        className="sr-only peer" 
+                      <input
+                        type="checkbox"
+                        className="sr-only peer"
                         checked={mfaEnabled}
                         onChange={(e) => setMfaEnabled(e.target.checked)}
                       />
@@ -98,8 +99,8 @@ const AdminSecurity: React.FC<AdminSecurityProps> = ({ onLogout }) => {
                 <div className="space-y-6">
                   <div>
                     <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Session Timeout (Minutes)</label>
-                    <input 
-                      type="number" 
+                    <input
+                      type="number"
                       value={sessionLimit}
                       onChange={(e) => setSessionLimit(parseInt(e.target.value))}
                       className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-3 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-bold text-slate-700"
@@ -154,10 +155,9 @@ const AdminSecurity: React.FC<AdminSecurityProps> = ({ onLogout }) => {
                         <span className="text-sm text-slate-500 font-medium">{log.time}</span>
                       </td>
                       <td className="px-8 py-5 text-center">
-                        <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider ${
-                          log.status === 'success' ? 'bg-emerald-50 text-emerald-600' :
-                          log.status === 'warning' ? 'bg-amber-50 text-amber-600' : 'bg-rose-50 text-rose-600'
-                        }`}>
+                        <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider ${log.status === 'success' ? 'bg-emerald-50 text-emerald-600' :
+                            log.status === 'warning' ? 'bg-amber-50 text-amber-600' : 'bg-rose-50 text-rose-600'
+                          }`}>
                           {log.status}
                         </span>
                       </td>
@@ -169,6 +169,7 @@ const AdminSecurity: React.FC<AdminSecurityProps> = ({ onLogout }) => {
           </div>
         </main>
       </div>
+      <MobileNav isAdmin />
     </div>
   );
 };

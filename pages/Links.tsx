@@ -6,7 +6,7 @@ import PhonePreview from '../components/PhonePreview';
 import { useNavigate } from 'react-router-dom';
 import client from '../src/api/client';
 import { UserProfile, Link } from '../types';
-import { Plus, Trash2, X, Wand2, QrCode, Download, Share2, Eye, Link as LinkIcon, Check, ShieldAlert, Zap, Star } from 'lucide-react';
+import { Plus, Trash2, X, Wand2, QrCode, Download, Share2, Eye, Link as LinkIcon, Check, ShieldAlert, Zap, Star, Lock } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { useToast } from '../src/context/ToastContext';
 import { getSocialIcon } from '../src/utils/socialIcons';
@@ -43,6 +43,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
     const [newUrl, setNewUrl] = useState('');
     const [newScheduledStart, setNewScheduledStart] = useState('');
     const [newScheduledEnd, setNewScheduledEnd] = useState('');
+    const [newPassword, setNewPassword] = useState('');
     const [newSocialUrl, setNewSocialUrl] = useState('');
     const [isDownloading, setIsDownloading] = useState(false);
     const [copied, setCopied] = useState(false);
@@ -131,6 +132,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
             if (type === 'social') {
                 payload.scheduledStart = newScheduledStart || null;
                 payload.scheduledEnd = newScheduledEnd || null;
+                payload.password = newPassword || null;
             }
 
             const res = await client.post('/links/create.php', payload);
@@ -148,6 +150,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
                 setNewUrl('');
                 setNewScheduledStart('');
                 setNewScheduledEnd('');
+                setNewPassword('');
                 setShowAddForm(false);
             }
             showToast('Link added successfully!', 'success');
@@ -267,7 +270,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
                                     className={`px-4 sm:px-6 py-2.5 rounded-full font-bold flex items-center gap-2 transition-all shadow-lg active:scale-95 text-sm ${hasReachedLimit ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 text-white'
                                         }`}
                                 >
-                                    <Plus size={18} /> Add New Link
+                                    <Plus size={18} /> <span className="hidden xs:inline">Add New Link</span>
                                 </button>
                             </div>
 
@@ -318,6 +321,19 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
                                                     value={newScheduledEnd}
                                                     onChange={(e) => setNewScheduledEnd(e.target.value)}
                                                 />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Password Protection (Optional)</label>
+                                            <div className="relative">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Set a password to lock this link"
+                                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 pl-10 focus:ring-2 focus:ring-amber-500 outline-none transition-all text-sm"
+                                                    value={newPassword}
+                                                    onChange={(e) => setNewPassword(e.target.value)}
+                                                />
+                                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                             </div>
                                         </div>
                                         <div className="flex justify-end gap-3">

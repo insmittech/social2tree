@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Trash2, ExternalLink } from 'lucide-react';
+import { GripVertical, Trash2, ExternalLink, Lock } from 'lucide-react';
 import { Link } from '../types';
 
 interface SortableLinkProps {
@@ -47,6 +47,7 @@ const SortableLink: React.FC<SortableLinkProps> = ({ link, getSocialIcon, handle
                         <div className="flex items-center gap-2">
                             {getSocialIcon(link.url)}
                             <h4 className="font-bold text-slate-800 text-sm sm:text-base truncate">{link.title}</h4>
+                            {link.password && <Lock size={12} className="text-amber-500 fill-amber-50" />}
                         </div>
                         <a
                             href={link.url}
