@@ -118,8 +118,49 @@ try {
         echo "<span class='success'>✅ Proper</span><br>";
     }
 
-    // 3. Data Migration to Pages
-    echo "<h2>3. Migrating profile data to 'pages' table...</h2>";
+    // 3. Refining table structures
+    echo "<h2>3. Refining table structures...</h2>";
+    $stmt = $pdo->query("DESCRIBE links");
+    $link_columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    
+    $links_refinements = [
+        'page_id' => "INT NULL AFTER user_id",
+        'icon' => "VARCHAR(50) NULL AFTER url",
+        'type' => "VARCHAR(50) DEFAULT 'social' AFTER clicks",
+        'sort_order' => "INT DEFAULT 0 AFTER type",
+        'scheduled_start' => "DATETIME NULL AFTER sort_order",
+        'scheduled_end' => "DATETIME NULL AFTER scheduled_start",
+        'password' => "VARCHAR(100) NULL AFTER scheduled_end"
+    ];
+
+    foreach ($links_refinements as $column => $definition) {
+        if (!in_array($column, $link_columns)) {
+            echo "Adding missing column <code>$column</code> to <code>links</code>... ";
+            $pdo->exec("ALTER TABLE links ADD $column $definition");
+            echo "<span class='success'>✅ Fixed</span><br>";
+        }
+    }
+    
+    // Ensure indices and foreign keys
+    try {
+        $pdo->exec("ALTER TABLE links ADD INDEX idx_page_links (page_id)");
+        $pdo->exec("ALTER TABLE links ADD CONSTRAINT fk_page_links FOREIGN KEY (page_id) REFERENCES pages(id) ON DELETE CASCADE");
+    } catch (Exception $e) { /* Probably already exists */ }
+
+    $stmt = $pdo->query("DESCRIBE analytics");
+    $ana_columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    if (!in_array('page_id', $ana_columns)) {
+        echo "Adding missing column <code>page_id</code> to <code>analytics</code>... ";
+        $pdo->exec("ALTER TABLE analytics ADD page_id INT NULL AFTER user_id");
+        echo "<span class='success'>✅ Fixed</span><br>";
+    }
+    
+    try {
+        $pdo->exec("ALTER TABLE analytics ADD CONSTRAINT fk_page_analytics FOREIGN KEY (page_id) REFERENCES pages(id) ON DELETE CASCADE");
+    } catch (Exception $e) { /* Probably already exists */ }
+
+    // 4. Data Migration to Pages
+    echo "<h2>4. Migrating profile data to 'pages' table...</h2>";
     $stmt = $pdo->query("SELECT id, username, display_name, bio, avatar_url, theme, button_style, custom_domain FROM users");
     $all_users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -133,12 +174,12 @@ try {
             $insert->execute([
                 $user['id'], 
                 $user['username'], 
-                $user['display_name'], 
-                $user['bio'], 
-                $user['avatar_url'], 
-                $user['theme'], 
-                $user['button_style'], 
-                $user['custom_domain']
+                $user['display_name'] ?? $user['username'], 
+                $user['bio'] ?? '', 
+                $user['avatar_url'] ?? '', 
+                $user['theme'] ?? 'default', 
+                $user['button_style'] ?? 'rounded-lg', 
+                $user['custom_domain'] ?? null
             ]);
             $page_id = $pdo->lastInsertId();
 
@@ -148,22 +189,6 @@ try {
 
             echo "<span class='success'>✅ Done</span><br>";
         }
-    }
-
-    // 4. Ensure additional columns
-    echo "<h2>4. Refining table structures...</h2>";
-    $stmt = $pdo->query("DESCRIBE links");
-    $link_columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    if (!in_array('page_id', $link_columns)) {
-        $pdo->exec("ALTER TABLE links ADD page_id INT NULL AFTER user_id");
-        $pdo->exec("ALTER TABLE links ADD CONSTRAINT fk_page_links FOREIGN KEY (page_id) REFERENCES pages(id) ON DELETE CASCADE");
-    }
-
-    $stmt = $pdo->query("DESCRIBE analytics");
-    $ana_columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    if (!in_array('page_id', $ana_columns)) {
-        $pdo->exec("ALTER TABLE analytics ADD page_id INT NULL AFTER user_id");
-        $pdo->exec("ALTER TABLE analytics ADD CONSTRAINT fk_page_analytics FOREIGN KEY (page_id) REFERENCES pages(id) ON DELETE CASCADE");
     }
 
     // 5. Seed default settings
