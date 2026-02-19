@@ -27,6 +27,8 @@ import {
 } from '@dnd-kit/sortable';
 import SortableLink from '../components/SortableLink';
 
+import { usePageSelector } from '../src/hooks/usePageSelector';
+
 interface LinksPageProps {
     onLogout: () => void;
 }
@@ -36,6 +38,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
     const { showToast } = useToast();
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
+    const { selectedPageId, setSelectedPageId } = usePageSelector();
 
     const [showAddForm, setShowAddForm] = useState(false);
     const [showSocialForm, setShowSocialForm] = useState(false);
@@ -48,6 +51,9 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
     const [isDownloading, setIsDownloading] = useState(false);
     const [copied, setCopied] = useState(false);
     const [showMobilePreview, setShowMobilePreview] = useState(false);
+
+    // Derived active page
+    const activePage = profile?.pages.find(p => p.id === selectedPageId) || profile?.pages[0] || null;
 
     // DnD Sensors
     const sensors = useSensors(
@@ -63,6 +69,9 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
                 const res = await client.get('/auth/me.php');
                 if (res.data.user) {
                     setProfile(res.data.user);
+                    if (!selectedPageId && res.data.user.pages.length > 0) {
+                        setSelectedPageId(res.data.user.pages[0].id);
+                    }
                 } else {
                     navigate('/login');
                 }
@@ -74,17 +83,17 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
             }
         };
         fetchProfile();
-    }, [navigate]);
+    }, [navigate, selectedPageId, setSelectedPageId]);
 
-    if (loading || !profile) {
+    if (loading || !profile || !activePage) {
         return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div></div>;
     }
 
     const isFreePlan = profile.plan === 'free';
     const linkLimit = isFreePlan ? 3 : Infinity;
-    const hasReachedLimit = (profile.links?.length || 0) >= linkLimit;
+    const hasReachedLimit = (activePage.links?.length || 0) >= linkLimit;
 
-    const publicUrl = `${window.location.origin}/${profile.username}`;
+    const publicUrl = `${window.location.origin}/${activePage.slug}`;
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(publicUrl)}&bgcolor=ffffff&color=0f172a&margin=2`;
 
     const handleDownloadQR = async () => {
@@ -95,7 +104,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `s2t-qr-${profile.username}.png`;
+            link.download = `s2t-qr-${activePage.slug}.png`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -128,7 +137,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
         }
 
         try {
-            const payload: any = { title, url, type };
+            const payload: any = { title, url, type, pageId: activePage.id };
             if (type === 'social') {
                 payload.scheduledStart = newScheduledStart || null;
                 payload.scheduledEnd = newScheduledEnd || null;
@@ -137,10 +146,16 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
 
             const res = await client.post('/links/create.php', payload);
 
-            setProfile(prev => prev ? {
-                ...prev,
-                links: [...prev.links, res.data.link]
-            } : null);
+            setProfile(prev => {
+                if (!prev) return null;
+                return {
+                    ...prev,
+                    pages: prev.pages.map(p => p.id === activePage.id ? {
+                        ...p,
+                        links: [...p.links, res.data.link]
+                    } : p)
+                };
+            });
 
             if (type === 'social_icon') {
                 setNewSocialUrl('');
@@ -164,10 +179,16 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
         if (!confirm("Are you sure you want to delete this link?")) return;
         try {
             await client.post('/links/delete.php', { id });
-            setProfile(prev => prev ? {
-                ...prev,
-                links: prev.links.filter(l => l.id !== id)
-            } : null);
+            setProfile(prev => {
+                if (!prev) return null;
+                return {
+                    ...prev,
+                    pages: prev.pages.map(p => p.id === activePage.id ? {
+                        ...p,
+                        links: p.links.filter(l => l.id !== id)
+                    } : p)
+                };
+            });
             showToast('Link deleted', 'info');
         } catch (err) {
             console.error("Failed to delete link", err);
@@ -176,10 +197,16 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
     };
 
     const handleToggleActive = async (id: string, active: boolean) => {
-        setProfile(prev => prev ? {
-            ...prev,
-            links: prev.links.map(l => l.id === id ? { ...l, active } : l)
-        } : null);
+        setProfile(prev => {
+            if (!prev) return null;
+            return {
+                ...prev,
+                pages: prev.pages.map(p => p.id === activePage.id ? {
+                    ...p,
+                    links: p.links.map(l => l.id === id ? { ...l, active } : l)
+                } : p)
+            };
+        });
 
         try {
             await client.post('/links/update.php', { id, is_active: active ? 1 : 0 });
@@ -194,12 +221,18 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
         const { active, over } = event;
 
         if (over && active.id !== over.id) {
-            const oldIndex = profile.links.findIndex(l => l.id === active.id);
-            const newIndex = profile.links.findIndex(l => l.id === over.id);
+            const oldIndex = activePage.links.findIndex(l => l.id === active.id);
+            const newIndex = activePage.links.findIndex(l => l.id === over.id);
 
-            const newLinks = arrayMove(profile.links, oldIndex, newIndex);
+            const newLinks = arrayMove(activePage.links, oldIndex, newIndex);
 
-            setProfile(prev => prev ? { ...prev, links: newLinks } : null);
+            setProfile(prev => {
+                if (!prev) return null;
+                return {
+                    ...prev,
+                    pages: prev.pages.map(p => p.id === activePage.id ? { ...p, links: newLinks } : p)
+                };
+            });
 
             try {
                 await client.post('/links/reorder.php', {
@@ -209,14 +242,20 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
             } catch (err) {
                 console.error("Failed to reorder links", err);
                 showToast('Failed to save link order', 'error');
-                // Rollback on error
-                setProfile(prev => prev ? { ...prev, links: profile.links } : null);
+                // Rollback
+                setProfile(prev => {
+                    if (!prev) return null;
+                    return {
+                        ...prev,
+                        pages: prev.pages.map(p => p.id === activePage.id ? { ...p, links: activePage.links } : p)
+                    };
+                });
             }
         }
     };
 
-    const mainLinks = profile.links.filter(l => l.type !== 'social_icon');
-    const socialIcons = profile.links.filter(l => l.type === 'social_icon');
+    const mainLinks = activePage.links.filter(l => l.type !== 'social_icon');
+    const socialIcons = activePage.links.filter(l => l.type === 'social_icon');
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -483,7 +522,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
                     </div>
 
                     <div className="hidden lg:block sticky top-24">
-                        <PhonePreview profile={profile} />
+                        <PhonePreview page={activePage} />
                     </div>
                 </div>
             </main>

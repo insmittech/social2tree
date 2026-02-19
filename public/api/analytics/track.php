@@ -9,14 +9,15 @@ if (isset($data['link_id'])) {
     $link_id = (int)$data['link_id'];
     
     try {
-        // 1. Get the user_id (profile owner) for this link
-        $query = "SELECT user_id FROM links WHERE id = ? LIMIT 1";
+        // 1. Get the user_id and page_id for this link
+        $query = "SELECT user_id, page_id FROM links WHERE id = ? LIMIT 1";
         $stmt = $pdo->prepare($query);
         $stmt->execute([$link_id]);
         $link = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($link) {
             $user_id = $link['user_id'];
+            $page_id = $link['page_id'];
 
             // 2. Increment clicks in links table
             $update_sql = "UPDATE links SET clicks = clicks + 1 WHERE id = ?";
@@ -28,9 +29,9 @@ if (isset($data['link_id'])) {
             $ua = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
             $visitor_id = hash('sha256', $ip . $ua . date('Y-m-d'));
             
-            $track_sql = "INSERT INTO analytics (user_id, link_id, visitor_id, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)";
+            $track_sql = "INSERT INTO analytics (user_id, page_id, link_id, visitor_id, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?)";
             $track_stmt = $pdo->prepare($track_sql);
-            $track_stmt->execute([$user_id, $link_id, $visitor_id, $ip, $ua]);
+            $track_stmt->execute([$user_id, $page_id, $link_id, $visitor_id, $ip, $ua]);
 
             json_response(["message" => "Click tracked."]);
         } else {

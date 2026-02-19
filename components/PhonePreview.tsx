@@ -1,15 +1,15 @@
 
 import React from 'react';
-import { UserProfile, THEMES, ButtonStyle } from '../types';
+import { LinkPage, THEMES, ButtonStyle } from '../types';
 import { Share2, TreePine } from 'lucide-react';
 import { getSocialIcon } from '../src/utils/socialIcons';
 
 interface PhonePreviewProps {
-  profile: UserProfile;
+  page: LinkPage;
 }
 
-const PhonePreview: React.FC<PhonePreviewProps> = ({ profile }) => {
-  const theme = THEMES[profile.theme] || THEMES.default;
+const PhonePreview: React.FC<PhonePreviewProps> = ({ page }) => {
+  const theme = THEMES[page.theme] || THEMES.default;
 
   const getButtonStyle = (baseClass: string, style?: ButtonStyle) => {
     const filteredBase = baseClass.split(' ').filter(c => !c.startsWith('rounded-')).join(' ');
@@ -32,21 +32,21 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({ profile }) => {
         {/* Content Container */}
         <div className={`w-full h-full overflow-y-auto no-scrollbar ${theme.background} p-6 flex flex-col items-center pt-12`}>
           <img
-            src={profile.avatarUrl}
-            alt={profile.displayName}
+            src={page.avatarUrl}
+            alt={page.displayName}
             className="w-20 h-20 rounded-full border-2 border-white/50 mb-3 object-cover shadow-sm"
           />
-          <h2 className={`text-lg font-bold mb-1 ${theme.textClass}`}>{profile.displayName}</h2>
-          <p className={`text-xs text-center opacity-80 mb-6 ${theme.textClass}`}>{profile.bio}</p>
+          <h2 className={`text-lg font-bold mb-1 ${theme.textClass}`}>{page.displayName}</h2>
+          <p className={`text-xs text-center opacity-80 mb-6 ${theme.textClass}`}>{page.bio}</p>
 
           <div className="w-full space-y-3 mb-6">
-            {profile.links.filter(l => l.active && l.type !== 'social_icon').map(link => (
+            {page.links.filter(l => l.active && l.type !== 'social_icon').map(link => (
               <a
                 key={link.id}
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`block w-full text-center py-3 px-4 text-sm font-medium transition-all transform active:scale-95 ${getButtonStyle(theme.buttonClass, profile.buttonStyle)}`}
+                className={`block w-full text-center py-3 px-4 text-sm font-medium transition-all transform active:scale-95 ${getButtonStyle(theme.buttonClass, page.buttonStyle)}`}
               >
                 {link.title}
               </a>
@@ -54,7 +54,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({ profile }) => {
           </div>
 
           <div className="w-full flex flex-wrap justify-center gap-4 mb-8">
-            {profile.links.filter(l => l.active && l.type === 'social_icon').map(link => (
+            {page.links.filter(l => l.active && l.type === 'social_icon').map(link => (
               <a
                 key={link.id}
                 href={link.url}

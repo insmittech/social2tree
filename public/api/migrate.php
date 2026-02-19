@@ -56,9 +56,25 @@ try {
     echo "<h2>2. Checking for missing tables...</h2>";
     
     $tables = [
+        'pages' => "CREATE TABLE IF NOT EXISTS pages (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            slug VARCHAR(100) NOT NULL UNIQUE,
+            display_name VARCHAR(100),
+            bio TEXT,
+            avatar_url VARCHAR(255),
+            theme VARCHAR(50) DEFAULT 'default',
+            button_style VARCHAR(50) DEFAULT 'rounded-lg',
+            custom_domain VARCHAR(255) NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
         'links' => "CREATE TABLE IF NOT EXISTS links (
             id INT AUTO_INCREMENT PRIMARY KEY,
             user_id INT NOT NULL,
+            page_id INT NULL,
             title VARCHAR(255) NOT NULL,
             url TEXT NOT NULL,
             icon VARCHAR(50) NULL,
@@ -78,6 +94,7 @@ try {
         'analytics' => "CREATE TABLE IF NOT EXISTS analytics (
             id INT AUTO_INCREMENT PRIMARY KEY,
             user_id INT NOT NULL,
+            page_id INT NULL,
             link_id INT NULL,
             visitor_id VARCHAR(64),
             ip_address VARCHAR(45),
@@ -101,39 +118,56 @@ try {
         echo "<span class='success'>✅ Proper</span><br>";
     }
 
-    // Ensure links table has scheduled columns if it already exists
+    // 3. Data Migration to Pages
+    echo "<h2>3. Migrating profile data to 'pages' table...</h2>";
+    $stmt = $pdo->query("SELECT id, username, display_name, bio, avatar_url, theme, button_style, custom_domain FROM users");
+    $all_users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($all_users as $user) {
+        // Check if user already has at least one page
+        $check = $pdo->prepare("SELECT COUNT(*) FROM pages WHERE user_id = ?");
+        $check->execute([$user['id']]);
+        if ($check->fetchColumn() == 0) {
+            echo "Migrating user <code>{$user['username']}</code> to pages... ";
+            $insert = $pdo->prepare("INSERT INTO pages (user_id, slug, display_name, bio, avatar_url, theme, button_style, custom_domain) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $insert->execute([
+                $user['id'], 
+                $user['username'], 
+                $user['display_name'], 
+                $user['bio'], 
+                $user['avatar_url'], 
+                $user['theme'], 
+                $user['button_style'], 
+                $user['custom_domain']
+            ]);
+            $page_id = $pdo->lastInsertId();
+
+            // Link existing data to this new page
+            $pdo->prepare("UPDATE links SET page_id = ? WHERE user_id = ?")->execute([$page_id, $user['id']]);
+            $pdo->prepare("UPDATE analytics SET page_id = ? WHERE user_id = ?")->execute([$page_id, $user['id']]);
+
+            echo "<span class='success'>✅ Done</span><br>";
+        }
+    }
+
+    // 4. Ensure additional columns
+    echo "<h2>4. Refining table structures...</h2>";
     $stmt = $pdo->query("DESCRIBE links");
     $link_columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    if (!in_array('scheduled_start', $link_columns)) {
-        $pdo->exec("ALTER TABLE links ADD scheduled_start DATETIME NULL AFTER sort_order");
-    }
-    if (!in_array('scheduled_end', $link_columns)) {
-        $pdo->exec("ALTER TABLE links ADD scheduled_end DATETIME NULL AFTER scheduled_start");
-    }
-    if (!in_array('icon', $link_columns)) {
-        $pdo->exec("ALTER TABLE links ADD icon VARCHAR(50) NULL AFTER url");
-    }
-    if (!in_array('password', $link_columns)) {
-        $pdo->exec("ALTER TABLE links ADD password VARCHAR(100) NULL AFTER scheduled_end");
+    if (!in_array('page_id', $link_columns)) {
+        $pdo->exec("ALTER TABLE links ADD page_id INT NULL AFTER user_id");
+        $pdo->exec("ALTER TABLE links ADD CONSTRAINT fk_page_links FOREIGN KEY (page_id) REFERENCES pages(id) ON DELETE CASCADE");
     }
 
-    // 3. Ensure default Admin exists
-    echo "<h2>3. Verifying Administrator account...</h2>";
-    $stmt = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'admin'");
-    $adminCount = $stmt->fetchColumn();
-
-    if ($adminCount == 0) {
-        echo "Creating default admin (admin@social2tree.com)... ";
-        $passHash = password_hash('password123', PASSWORD_BCRYPT);
-        $pdo->exec("INSERT INTO users (username, email, password_hash, role, display_name) VALUES ('admin', 'admin@social2tree.com', '$passHash', 'admin', 'System Admin')");
-        echo "<span class='success'>✅ Created</span><br>";
-        echo "<span class='info'>(Login: <code>admin</code> / <code>password123</code>)</span><br>";
-    } else {
-        echo "Admin account... <span class='info'>Already exists</span><br>";
+    $stmt = $pdo->query("DESCRIBE analytics");
+    $ana_columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    if (!in_array('page_id', $ana_columns)) {
+        $pdo->exec("ALTER TABLE analytics ADD page_id INT NULL AFTER user_id");
+        $pdo->exec("ALTER TABLE analytics ADD CONSTRAINT fk_page_analytics FOREIGN KEY (page_id) REFERENCES pages(id) ON DELETE CASCADE");
     }
 
-    // 4. Seed default settings
-    echo "<h2>4. Seeding system settings...</h2>";
+    // 5. Seed default settings
+    echo "<h2>5. Seeding system settings...</h2>";
     $seedSql = "INSERT IGNORE INTO settings (setting_key, setting_value) VALUES 
         ('site_name', 'Social2Tree'), 
         ('maintenance_mode', 'false'),

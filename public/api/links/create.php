@@ -11,8 +11,9 @@ if (!isset($_SESSION['user_id'])) {
 
 $data = get_json_input();
 
-if (!empty($data['url']) && !empty($data['title'])) {
+if (!empty($data['url']) && !empty($data['title']) && !empty($data['pageId'])) {
     $user_id = $_SESSION['user_id'];
+    $page_id = (int)$data['pageId'];
     $title = sanitize_input($data['title']);
     $url = sanitize_input($data['url']);
     $type = isset($data['type']) ? sanitize_input($data['type']) : 'social';
@@ -20,14 +21,21 @@ if (!empty($data['url']) && !empty($data['title'])) {
     $scheduled_end = !empty($data['scheduledEnd']) ? sanitize_input($data['scheduledEnd']) : null;
     $password = !empty($data['password']) ? sanitize_input($data['password']) : null;
 
-    // Auto-calculate sort order (append to end)
-    // Could optionally query MAX(sort_order) + 1
-
     try {
-        $query = "INSERT INTO links (user_id, title, url, type, sort_order, scheduled_start, scheduled_end, password) VALUES (:user_id, :title, :url, :type, 0, :scheduled_start, :scheduled_end, :password)";
+        // 1. Verify page ownership
+        $check = $pdo->prepare("SELECT COUNT(*) FROM pages WHERE id = ? AND user_id = ?");
+        $check->execute([$page_id, $user_id]);
+        if ($check->fetchColumn() == 0) {
+            json_response(["message" => "Invalid page ID or access denied."], 403);
+            exit();
+        }
+
+        // 2. Insert link
+        $query = "INSERT INTO links (user_id, page_id, title, url, type, sort_order, scheduled_start, scheduled_end, password) VALUES (:user_id, :page_id, :title, :url, :type, 0, :scheduled_start, :scheduled_end, :password)";
         $stmt = $pdo->prepare($query);
         $stmt->execute([
             ':user_id' => $user_id,
+            ':page_id' => $page_id,
             ':title' => $title,
             ':url' => $url,
             ':type' => $type,

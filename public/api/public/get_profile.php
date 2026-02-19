@@ -3,31 +3,36 @@ include_once __DIR__ . '/../utils.php';
 json_response();
 include_once __DIR__ . '/../db.php';
 
-if (!isset($_GET['username'])) {
-    json_response(["message" => "Username required."], 400);
-    exit();
-}
-
-$username = sanitize_input($_GET['username']);
+$slug = isset($_GET['username']) ? sanitize_input($_GET['username']) : null;
+$host = $_SERVER['HTTP_HOST'] ?? '';
 
 try {
-    // 1. Fetch User Data
-    $query = "SELECT id, username, display_name, bio, avatar_url, theme, button_style, plan, role FROM users WHERE username = ? LIMIT 1";
+    // 1. Fetch Page and Owner Data
+    if ($slug) {
+        $query = "SELECT p.*, u.plan, u.role FROM pages p JOIN users u ON p.user_id = u.id WHERE p.slug = ? LIMIT 1";
+        $params = [$slug];
+    } else {
+        // Try identifying by custom domain
+        $query = "SELECT p.*, u.plan, u.role FROM pages p JOIN users u ON p.user_id = u.id WHERE p.custom_domain = ? LIMIT 1";
+        $params = [$host];
+    }
+    
     $stmt = $pdo->prepare($query);
-    $stmt->execute([$username]);
+    $stmt->execute($params);
 
     if ($stmt->rowCount() == 0) {
-        json_response(["message" => "User not found."], 404);
+        json_response(["message" => "Profile not found."], 404);
         exit();
     }
 
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-    $user_id = $user['id'];
+    $page = $stmt->fetch(PDO::FETCH_ASSOC);
+    $page_id = $page['id'];
+    $user_id = $page['user_id'];
 
     // 2. Fetch Links
-    $query = "SELECT id, title, url, type, is_active, clicks FROM links WHERE user_id = ? AND is_active = 1 ORDER BY sort_order ASC, created_at DESC";
+    $query = "SELECT id, title, url, type, is_active, clicks, scheduled_start, scheduled_end, password FROM links WHERE page_id = ? AND is_active = 1 ORDER BY sort_order ASC, created_at DESC";
     $stmt = $pdo->prepare($query);
-    $stmt->execute([$user_id]);
+    $stmt->execute([$page_id]);
     $links = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // 3. Track View
@@ -36,24 +41,24 @@ try {
     $visitor_id = hash('sha256', $ip . $ua . date('Y-m-d'));
     
     try {
-        $track_sql = "INSERT INTO analytics (user_id, visitor_id, ip_address, user_agent) VALUES (?, ?, ?, ?)";
+        $track_sql = "INSERT INTO analytics (user_id, page_id, visitor_id, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)";
         $track_stmt = $pdo->prepare($track_sql);
-        $track_stmt->execute([$user_id, $visitor_id, $ip, $ua]);
+        $track_stmt->execute([$user_id, $page_id, $visitor_id, $ip, $ua]);
     } catch (PDOException $e) {
         // Silently fail analytics
     }
 
     // 4. Map Data to standard structure
     $profile = [
-        'id' => (string) $user['id'],
-        'username' => $user['username'],
-        'displayName' => $user['display_name'] ?? $user['username'],
-        'bio' => $user['bio'] ?? '',
-        'avatarUrl' => $user['avatar_url'] ?? 'https://ui-avatars.com/api/?name=' . urlencode($user['username']),
-        'theme' => $user['theme'] ?? 'default',
-        'buttonStyle' => $user['button_style'] ?? 'rounded-lg',
-        'plan' => $user['plan'],
-        'role' => $user['role'],
+        'id' => (string) $page['id'],
+        'username' => $page['slug'], // For backward compatibility in frontend
+        'displayName' => $page['display_name'] ?? $page['slug'],
+        'bio' => $page['bio'] ?? '',
+        'avatarUrl' => $page['avatar_url'] ?? 'https://ui-avatars.com/api/?name=' . urlencode($page['slug']),
+        'theme' => $page['theme'] ?? 'default',
+        'buttonStyle' => $page['button_style'] ?? 'rounded-lg',
+        'plan' => $page['plan'],
+        'role' => $page['role'],
         'links' => array_map(function ($link) {
             return [
                 'id' => (string) $link['id'],
@@ -61,7 +66,10 @@ try {
                 'url' => $link['url'],
                 'active' => (bool) $link['is_active'],
                 'clicks' => (int) $link['clicks'],
-                'type' => $link['type'] ?? 'social'
+                'type' => $link['type'] ?? 'social',
+                'scheduledStart' => $link['scheduled_start'] ?? null,
+                'scheduledEnd' => $link['scheduled_end'] ?? null,
+                'password' => $link['password'] ?? null
             ];
         }, $links)
     ];

@@ -46,29 +46,49 @@ if (isset($_SESSION['user_id'])) {
                 'plan' => $user['plan'],
                 'status' => $user['status'],
                 'createdAt' => $user['created_at'],
-                // Analytics defaults
-                'views' => 0, // aggregate query needed if we want real stats here
+                'views' => 0,
                 'qrScans' => 0
             ];
 
-            // 2. Fetch Links
-            $stmt = $pdo->prepare("SELECT * FROM links WHERE user_id = ? ORDER BY sort_order ASC, created_at DESC");
+            // 2. Fetch Pages
+            $stmt = $pdo->prepare("SELECT * FROM pages WHERE user_id = ? ORDER BY created_at ASC");
             $stmt->execute([$user_id]);
-            $links = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Map links to frontend structure
-            $profile['links'] = array_map(function ($link) {
+            $profile['pages'] = array_map(function ($page) use ($pdo) {
+                // Fetch links for each page
+                $stmt = $pdo->prepare("SELECT * FROM links WHERE page_id = ? ORDER BY sort_order ASC, created_at DESC");
+                $stmt->execute([$page['id']]);
+                $links = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
                 return [
-                    'id' => (string) $link['id'],
-                    'title' => $link['title'],
-                    'url' => $link['url'],
-                    'active' => (bool) $link['is_active'],
-                    'clicks' => (int) $link['clicks'],
-                    'type' => $link['type'] ?? 'social',
-                    'scheduledStart' => $link['scheduled_start'] ?? null,
-                    'scheduledEnd' => $link['scheduled_end'] ?? null
+                    'id' => (string)$page['id'],
+                    'slug' => $page['slug'],
+                    'displayName' => $page['display_name'],
+                    'bio' => $page['bio'],
+                    'avatarUrl' => $page['avatar_url'] ?? 'https://ui-avatars.com/api/?name=' . urlencode($page['slug']),
+                    'theme' => $page['theme'],
+                    'buttonStyle' => $page['button_style'],
+                    'customDomain' => $page['custom_domain'],
+                    'links' => array_map(function ($link) {
+                        return [
+                            'id' => (string)$link['id'],
+                            'title' => $link['title'],
+                            'url' => $link['url'],
+                            'active' => (bool)$link['is_active'],
+                            'clicks' => (int)$link['clicks'],
+                            'type' => $link['type'] ?? 'social',
+                            'scheduledStart' => $link['scheduled_start'] ?? null,
+                            'scheduledEnd' => $link['scheduled_end'] ?? null
+                        ];
+                    }, $links)
                 ];
-            }, $links);
+            }, $pages);
+
+            // Fetch aggregate stats
+            $stmt = $pdo->prepare("SELECT count(*) FROM analytics WHERE user_id = ? AND link_id IS NULL");
+            $stmt->execute([$user_id]);
+            $profile['views'] = (int)$stmt->fetchColumn();
 
             // 3. Fetch Analytics Counts (Optional, for dashboard stats)
             // Total views

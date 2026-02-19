@@ -24,21 +24,29 @@ export interface UserTheme {
   cardClass?: string;
 }
 
-export interface UserProfile {
+export interface LinkPage {
   id: string;
-  username: string;
+  slug: string;
   displayName: string;
   bio: string;
   avatarUrl: string;
   theme: string;
-  buttonStyle?: ButtonStyle;
+  buttonStyle: ButtonStyle;
+  customDomain?: string | null;
   links: Link[];
-  views: number;
-  qrScans: number;
-  plan: PlanType;
+}
+
+export interface UserProfile {
+  id: string;
+  username: string;
+  displayName: string;
+  avatarUrl: string;
   role: UserRole;
+  plan: PlanType;
   status: 'active' | 'suspended';
   createdAt: string;
+  pages: LinkPage[];
+  views: number;
 }
 
 export interface AdminStats {
