@@ -39,7 +39,9 @@ export interface LinkPage {
 export interface UserProfile {
   id: string;
   username: string;
+  email?: string;
   displayName: string;
+  bio?: string;
   avatarUrl: string;
   role: UserRole;
   plan: PlanType;

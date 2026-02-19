@@ -5,6 +5,7 @@ import { UserProfile } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { Users, MousePointer2, QrCode, TrendingUp, ArrowUpRight, BarChart2 } from 'lucide-react';
 import { usePageSelector } from '../src/hooks/usePageSelector';
+import { useAuth } from '../src/context/AuthContext';
 import PageManager from '../components/PageManager';
 
 interface AnalyticsProps {
@@ -12,31 +13,17 @@ interface AnalyticsProps {
 }
 
 const Analytics: React.FC<AnalyticsProps> = ({ onLogout }) => {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-
+  const { user: profile, updateUser } = useAuth();
   const { selectedPageId, setSelectedPageId } = usePageSelector();
-  const [loading, setLoading] = useState(true);
+
+  // Derived active page
+  const activePage = profile?.pages.find(p => p.id === selectedPageId) || profile?.pages[0] || null;
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await client.get('/auth/me.php');
-        if (res.data.user) {
-          setProfile(res.data.user);
-          if (!selectedPageId && res.data.user.pages.length > 0) {
-            setSelectedPageId(res.data.user.pages[0].id);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to fetch profile', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, [selectedPageId, setSelectedPageId]);
-
-  const activePage = profile?.pages.find(p => p.id === selectedPageId) || profile?.pages[0] || null;
+    if (profile && !selectedPageId && profile.pages.length > 0) {
+      setSelectedPageId(profile.pages[0].id);
+    }
+  }, [profile, selectedPageId, setSelectedPageId]);
 
   const chartData = useMemo(() => [
     { name: 'Mon', views: 120, clicks: 80 },
@@ -50,7 +37,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ onLogout }) => {
 
   const totalClicks = activePage?.links.reduce((acc, l) => acc + l.clicks, 0) || 0;
 
-  if (loading || !profile || !activePage) {
+  if (!profile || !activePage) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
@@ -59,10 +46,9 @@ const Analytics: React.FC<AnalyticsProps> = ({ onLogout }) => {
   }
 
   const onPageCreated = (page: any) => {
-    setProfile(prev => prev ? {
-      ...prev,
-      pages: [...prev.pages, page]
-    } : null);
+    if (profile) {
+      updateUser({ pages: [...profile.pages, page] });
+    }
   };
 
   return (

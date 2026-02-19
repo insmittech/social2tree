@@ -4,40 +4,23 @@ import { Globe, Plus, Search, Filter, ExternalLink, Settings, MoreVertical, Layo
 import client from '../src/api/client';
 import { UserProfile } from '../types';
 import { useToast } from '../src/context/ToastContext';
+import { useAuth } from '../src/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { usePageSelector } from '../src/hooks/usePageSelector';
 
 const BioTrees: React.FC = () => {
     const navigate = useNavigate();
     const { showToast } = useToast();
+    const { user: profile } = useAuth();
     const { setSelectedPageId } = usePageSelector();
-    const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
-
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const res = await client.get('/auth/me.php');
-                if (res.data.user) {
-                    setProfile(res.data.user);
-                }
-            } catch (err) {
-                console.error("Failed to fetch profile", err);
-                showToast("Failed to load your trees", "error");
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchProfile();
-    }, []);
 
     const handleEditTree = (pageId: string) => {
         setSelectedPageId(pageId);
         navigate(`/dashboard/trees/${pageId}`);
     };
 
-    if (loading) {
+    if (!profile) {
         return (
             <div className="min-h-[60vh] flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>

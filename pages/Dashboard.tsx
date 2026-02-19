@@ -7,6 +7,7 @@ import { UserProfile } from '../types';
 import { Plus, Trash2, ExternalLink, Edit2, X, Wand2, QrCode, Download, Share2, Globe, Star, Zap, ShieldAlert, Check, Eye, Settings } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { useToast } from '../src/context/ToastContext';
+import { useAuth } from '../src/context/AuthContext';
 import { getSocialIcon } from '../src/utils/socialIcons';
 import { usePageSelector } from '../src/hooks/usePageSelector';
 import {
@@ -34,8 +35,12 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user: profile, updateUser, refreshProfile } = useAuth();
+
+  // We don't need local loading state for profile as AuthContext handles it, 
+  // but we might want to ensure profile is present.
+  // App.tsx handles redirection if not authenticated.
+
   const { selectedPageId, setSelectedPageId } = usePageSelector();
 
   const [showAddForm, setShowAddForm] = useState(false);
@@ -67,27 +72,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     })
   );
 
-  // Fetch profile on mount
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await client.get('/auth/me.php');
-        if (res.data.user) {
-          setProfile(res.data.user);
-        } else {
-          navigate('/login');
-        }
-      } catch (err) {
-        console.error("Failed to fetch profile", err);
-        navigate('/login');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, [navigate]);
+  // No fetchProfile useEffect needed anymore
 
-  if (loading || !profile || !activePage) {
+  if (!profile || !activePage) {
     return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div></div>;
   }
 
@@ -147,16 +134,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
       const res = await client.post('/links/create.php', payload);
 
-      setProfile(prev => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          pages: prev.pages.map(p => p.id === activePage.id ? {
-            ...p,
-            links: [...p.links, res.data.link]
-          } : p)
-        };
-      });
+      if (profile) {
+        const newPages = profile.pages.map(p => p.id === activePage.id ? {
+          ...p,
+          links: [...p.links, res.data.link]
+        } : p);
+        updateUser({ pages: newPages });
+      }
 
       if (type === 'social_icon') {
         setNewSocialUrl('');
@@ -179,16 +163,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     if (!confirm("Are you sure you want to delete this link?")) return;
     try {
       await client.post('/links/delete.php', { id });
-      setProfile(prev => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          pages: prev.pages.map(p => p.id === activePage.id ? {
-            ...p,
-            links: p.links.filter(l => l.id !== id)
-          } : p)
-        };
-      });
+      if (profile) {
+        const newPages = profile.pages.map(p => p.id === activePage.id ? {
+          ...p,
+          links: p.links.filter(l => l.id !== id)
+        } : p);
+        updateUser({ pages: newPages });
+      }
       showToast('Link deleted', 'info');
     } catch (err) {
       console.error("Failed to delete link", err);
@@ -197,13 +178,10 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   };
 
   const handleToggleActive = async (id: string, active: boolean) => {
-    setProfile(prev => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        pages: prev.pages.map(p => p.id === activePage.id ? { ...p, links: p.links.map(l => l.id === id ? { ...l, active } : l) } : p)
-      };
-    });
+    if (profile) {
+      const newPages = profile.pages.map(p => p.id === activePage.id ? { ...p, links: p.links.map(l => l.id === id ? { ...l, active } : l) } : p);
+      updateUser({ pages: newPages });
+    }
 
     try {
       await client.post('/links/update.php', { id, is_active: active ? 1 : 0 });
@@ -215,13 +193,10 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   };
 
   const handleProfileUpdate = async (updates: any) => {
-    setProfile(prev => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        pages: prev.pages.map(p => p.id === activePage.id ? { ...p, ...updates } : p)
-      };
-    });
+    if (profile) {
+      const newPages = profile.pages.map(p => p.id === activePage.id ? { ...p, ...updates } : p);
+      updateUser({ pages: newPages });
+    }
 
     try {
       await client.post('/pages/update.php', { id: activePage.id, ...updates });
@@ -232,10 +207,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   };
 
   const onPageCreated = (page: any) => {
-    setProfile(prev => prev ? {
-      ...prev,
-      pages: [...prev.pages, page]
-    } : null);
+    if (profile) {
+      updateUser({ pages: [...profile.pages, page] });
+    }
   };
 
   const handleUpgrade = () => {
@@ -251,13 +225,10 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
       const newLinks = arrayMove(activePage.links, oldIndex, newIndex);
 
-      setProfile(prev => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          pages: prev.pages.map(p => p.id === activePage.id ? { ...p, links: newLinks } : p)
-        };
-      });
+      if (profile) {
+        const newPages = profile.pages.map(p => p.id === activePage.id ? { ...p, links: newLinks } : p);
+        updateUser({ pages: newPages });
+      }
 
       try {
         await client.post('/links/reorder.php', {
@@ -268,13 +239,10 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         console.error("Failed to reorder links", err);
         showToast('Failed to save link order', 'error');
         // Rollback on error
-        setProfile(prev => {
-          if (!prev) return null;
-          return {
-            ...prev,
-            pages: prev.pages.map(p => p.id === activePage.id ? { ...p, links: activePage.links } : p)
-          };
-        });
+        if (profile) {
+          const originalPages = profile.pages.map(p => p.id === activePage.id ? { ...p, links: activePage.links } : p);
+          updateUser({ pages: originalPages });
+        }
       }
     }
   };

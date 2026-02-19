@@ -3,28 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { UserProfile, PlanType } from '../types';
 import client from '../src/api/client';
 import { CreditCard, Check, Star } from 'lucide-react';
+import { useAuth } from '../src/context/AuthContext';
 
 const Plan: React.FC = () => {
-    const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { user: profile } = useAuth();
+    // No local profile state or useEffect needed
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const res = await client.get('/auth/me.php');
-                if (res.data.user) {
-                    setProfile(res.data.user);
-                }
-            } catch (err) {
-                console.error('Failed to fetch profile:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchProfile();
-    }, []);
-
-    if (loading || !profile) {
+    if (!profile) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>

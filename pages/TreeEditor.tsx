@@ -19,6 +19,7 @@ import {
 import client from '../src/api/client';
 import { UserProfile } from '../types';
 import { useToast } from '../src/context/ToastContext';
+import { useAuth } from '../src/context/AuthContext';
 import PhonePreview from '../components/PhonePreview';
 
 import TreeLinks from '../components/tree-editor/TreeLinks';
@@ -30,33 +31,16 @@ const TreeEditor: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { showToast } = useToast();
+    const { user: profile, updateUser } = useAuth();
 
-    const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'links' | 'social' | 'themes' | 'share'>('links');
     const [showMobilePreview, setShowMobilePreview] = useState(false);
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const res = await client.get('/auth/me.php');
-                if (res.data.user) {
-                    setProfile(res.data.user);
-                }
-            } catch (err) {
-                console.error("Failed to fetch profile", err);
-                showToast("Failed to load tree data", "error");
-                navigate('/dashboard/trees');
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchProfile();
-    }, [id, navigate]);
+    // No fetchProfile useEffect needed
 
     const activePage = profile?.pages.find(p => p.id === id) || null;
 
-    if (loading) {
+    if (!profile) {
         return (
             <div className="min-h-[60vh] flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
@@ -82,10 +66,8 @@ const TreeEditor: React.FC = () => {
 
     const handleProfileUpdate = (updatedPage: any) => {
         if (!profile) return;
-        setProfile({
-            ...profile,
-            pages: profile.pages.map(p => p.id === id ? { ...p, ...updatedPage } : p)
-        });
+        const newPages = profile.pages.map(p => p.id === id ? { ...p, ...updatedPage } : p);
+        updateUser({ pages: newPages });
     };
 
     return (

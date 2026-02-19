@@ -4,11 +4,11 @@ import { User, Mail, Lock, Shield, Calendar, UserCircle, Save, CheckCircle2, Ale
 import client from '../src/api/client';
 import { UserProfile } from '../types';
 import { useToast } from '../src/context/ToastContext';
+import { useAuth } from '../src/context/AuthContext';
 
 const Profile: React.FC = () => {
     const { showToast } = useToast();
-    const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { user: profile, updateUser, refreshProfile } = useAuth();
     const [saving, setSaving] = useState(false);
 
     // Form states
@@ -26,28 +26,16 @@ const Profile: React.FC = () => {
     });
 
     useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const res = await client.get('/auth/me.php');
-                if (res.data.user) {
-                    setProfile(res.data.user);
-                    setFormData({
-                        username: res.data.user.username || '',
-                        email: res.data.user.email || '',
-                        displayName: res.data.user.displayName || '',
-                        bio: res.data.user.bio || '',
-                        avatarUrl: res.data.user.avatarUrl || ''
-                    });
-                }
-            } catch (err) {
-                console.error("Failed to fetch profile", err);
-                showToast("Failed to load profile data", "error");
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchProfile();
-    }, []);
+        if (profile) {
+            setFormData({
+                username: profile.username || '',
+                email: profile.email || '',
+                displayName: profile.displayName || '',
+                bio: profile.bio || '',
+                avatarUrl: profile.avatarUrl || ''
+            });
+        }
+    }, [profile]);
 
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -55,10 +43,8 @@ const Profile: React.FC = () => {
         try {
             await client.post('/auth/update_profile.php', formData);
             showToast("Profile updated successfully!", "success");
-            // Update local profile state
-            if (profile) {
-                setProfile({ ...profile, ...formData });
-            }
+            // Update global profile state
+            updateUser(formData);
         } catch (err: any) {
             console.error("Failed to update profile", err);
             showToast(err.response?.data?.message || "Failed to update profile", "error");
@@ -86,13 +72,6 @@ const Profile: React.FC = () => {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="min-h-[60vh] flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
-            </div>
-        );
-    }
 
     if (!profile) {
         return (

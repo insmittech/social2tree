@@ -5,11 +5,7 @@ import { UserProfile, THEMES, ButtonStyle } from '../types';
 import { CheckCircle2, Palette, Eye, X, Globe, Plus } from 'lucide-react';
 import client from '../src/api/client';
 import PageManager from '../components/PageManager';
-
-interface ThemesProps {
-  onLogout: () => void;
-}
-
+import { useAuth } from '../src/context/AuthContext';
 import { usePageSelector } from '../src/hooks/usePageSelector';
 
 interface ThemesProps {
@@ -17,8 +13,7 @@ interface ThemesProps {
 }
 
 const Themes: React.FC<ThemesProps> = ({ onLogout }) => {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user: profile, updateUser } = useAuth();
   const [showMobilePreview, setShowMobilePreview] = useState(false);
   const { selectedPageId, setSelectedPageId } = usePageSelector();
 
@@ -26,34 +21,16 @@ const Themes: React.FC<ThemesProps> = ({ onLogout }) => {
   const activePage = profile?.pages.find(p => p.id === selectedPageId) || profile?.pages[0] || null;
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await client.get('/auth/me.php');
-        if (res.data.user) {
-          setProfile(res.data.user);
-          if (!selectedPageId && res.data.user.pages.length > 0) {
-            setSelectedPageId(res.data.user.pages[0].id);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to fetch profile', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, [selectedPageId, setSelectedPageId]);
+    if (profile && !selectedPageId && profile.pages.length > 0) {
+      setSelectedPageId(profile.pages[0].id);
+    }
+  }, [profile, selectedPageId, setSelectedPageId]);
 
   const handleThemeSelect = async (themeId: string) => {
     if (!profile || !activePage) return;
 
-    setProfile(prev => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        pages: prev.pages.map(p => p.id === activePage.id ? { ...p, theme: themeId } : p)
-      };
-    });
+    const newPages = profile.pages.map(p => p.id === activePage.id ? { ...p, theme: themeId } : p);
+    updateUser({ pages: newPages });
 
     try {
       await client.post('/pages/update.php', { id: activePage.id, theme: themeId });
@@ -63,22 +40,16 @@ const Themes: React.FC<ThemesProps> = ({ onLogout }) => {
   };
 
   const onPageCreated = (page: any) => {
-    setProfile(prev => prev ? {
-      ...prev,
-      pages: [...prev.pages, page]
-    } : null);
+    if (profile) {
+      updateUser({ pages: [...profile.pages, page] });
+    }
   };
 
   const handleButtonStyleSelect = async (style: ButtonStyle) => {
     if (!profile || !activePage) return;
 
-    setProfile(prev => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        pages: prev.pages.map(p => p.id === activePage.id ? { ...p, buttonStyle: style } : p)
-      };
-    });
+    const newPages = profile.pages.map(p => p.id === activePage.id ? { ...p, buttonStyle: style } : p);
+    updateUser({ pages: newPages });
 
     try {
       await client.post('/pages/update.php', { id: activePage.id, buttonStyle: style });
@@ -87,7 +58,7 @@ const Themes: React.FC<ThemesProps> = ({ onLogout }) => {
     }
   };
 
-  if (loading || !profile || !activePage) {
+  if (!profile || !activePage) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
