@@ -48,9 +48,9 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout, isAuthenticated,
                   </Link>
                 )}
 
-                {/* Desktop-only Links */}
+                {/* Desktop-only Links - Hidden when Sidebar is visible (lg+) */}
                 {isDashboard && !isAdminPath && (
-                  <div className="hidden lg:flex items-center gap-6">
+                  <div className="hidden items-center gap-6">
                     <Link to="/dashboard/links" className="flex items-center gap-1.5 text-slate-600 hover:text-indigo-600 font-medium text-sm transition-colors">
                       <Layout size={18} /> Links
                     </Link>

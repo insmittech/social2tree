@@ -13,6 +13,9 @@ import AdminSettings from './pages/AdminSettings';
 import AdminAnalytics from './pages/AdminAnalytics';
 import AdminSecurity from './pages/AdminSecurity';
 import LinksPage from './pages/Links';
+import Plan from './pages/Plan';
+import SavedLinks from './pages/SavedLinks';
+import Layout from './components/Layout';
 import { ToastProvider } from './src/context/ToastContext';
 import { ToastContainer } from './components/Toast';
 
@@ -84,41 +87,49 @@ const App: React.FC = () => {
           {/* Protected Dashboard Routes */}
           <Route
             path="/dashboard"
-            element={isAuthenticated ? <Dashboard onLogout={handleLogout} /> : <Navigate to="/login" />}
+            element={isAuthenticated ? <Layout userProfile={userProfile} onLogout={handleLogout}><Dashboard onLogout={handleLogout} /></Layout> : <Navigate to="/login" />}
           />
           <Route
             path="/dashboard/links"
-            element={isAuthenticated ? <LinksPage onLogout={handleLogout} /> : <Navigate to="/login" />}
+            element={isAuthenticated ? <Layout userProfile={userProfile} onLogout={handleLogout}><LinksPage onLogout={handleLogout} /></Layout> : <Navigate to="/login" />}
           />
           <Route
             path="/dashboard/analytics"
-            element={isAuthenticated ? <Analytics onLogout={handleLogout} /> : <Navigate to="/login" />}
+            element={isAuthenticated ? <Layout userProfile={userProfile} onLogout={handleLogout}><Analytics onLogout={handleLogout} /></Layout> : <Navigate to="/login" />}
           />
           <Route
             path="/dashboard/themes"
-            element={isAuthenticated ? <Themes onLogout={handleLogout} /> : <Navigate to="/login" />}
+            element={isAuthenticated ? <Layout userProfile={userProfile} onLogout={handleLogout}><Themes onLogout={handleLogout} /></Layout> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/dashboard/plan"
+            element={isAuthenticated ? <Layout userProfile={userProfile} onLogout={handleLogout}><Plan /></Layout> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/dashboard/saved"
+            element={isAuthenticated ? <Layout userProfile={userProfile} onLogout={handleLogout}><SavedLinks /></Layout> : <Navigate to="/login" />}
           />
 
           {/* Admin Routes */}
           <Route
             path="/admin"
-            element={isAuthenticated && isAdmin ? <AdminDashboard onLogout={handleLogout} /> : <Navigate to="/dashboard" />}
+            element={isAuthenticated && isAdmin ? <Layout userProfile={userProfile} onLogout={handleLogout} isAdmin><AdminDashboard onLogout={handleLogout} /></Layout> : <Navigate to="/dashboard" />}
           />
           <Route
             path="/admin/users"
-            element={isAuthenticated && isAdmin ? <AdminUsers onLogout={handleLogout} /> : <Navigate to="/dashboard" />}
+            element={isAuthenticated && isAdmin ? <Layout userProfile={userProfile} onLogout={handleLogout} isAdmin><AdminUsers onLogout={handleLogout} /></Layout> : <Navigate to="/dashboard" />}
           />
           <Route
             path="/admin/analytics"
-            element={isAuthenticated && isAdmin ? <AdminAnalytics onLogout={handleLogout} /> : <Navigate to="/dashboard" />}
+            element={isAuthenticated && isAdmin ? <Layout userProfile={userProfile} onLogout={handleLogout} isAdmin><AdminAnalytics onLogout={handleLogout} /></Layout> : <Navigate to="/dashboard" />}
           />
           <Route
             path="/admin/security"
-            element={isAuthenticated && isAdmin ? <AdminSecurity onLogout={handleLogout} /> : <Navigate to="/dashboard" />}
+            element={isAuthenticated && isAdmin ? <Layout userProfile={userProfile} onLogout={handleLogout} isAdmin><AdminSecurity onLogout={handleLogout} /></Layout> : <Navigate to="/dashboard" />}
           />
           <Route
             path="/admin/settings"
-            element={isAuthenticated && isAdmin ? <AdminSettings onLogout={handleLogout} /> : <Navigate to="/dashboard" />}
+            element={isAuthenticated && isAdmin ? <Layout userProfile={userProfile} onLogout={handleLogout} isAdmin><AdminSettings onLogout={handleLogout} /></Layout> : <Navigate to="/dashboard" />}
           />
 
           {/* Public Profile View */}
