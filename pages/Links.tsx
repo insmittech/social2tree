@@ -26,7 +26,7 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import SortableLink from '../components/SortableLink';
-
+import PageManager from '../components/PageManager';
 import { usePageSelector } from '../src/hooks/usePageSelector';
 
 interface LinksPageProps {
@@ -254,6 +254,13 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
         }
     };
 
+    const onPageCreated = (page: any) => {
+        setProfile(prev => prev ? {
+            ...prev,
+            pages: [...prev.pages, page]
+        } : null);
+    };
+
     const mainLinks = activePage.links.filter(l => l.type !== 'social_icon');
     const socialIcons = activePage.links.filter(l => l.type === 'social_icon');
 
@@ -270,6 +277,11 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
                 <div className="grid lg:grid-cols-[1fr,320px] gap-8 items-start">
 
                     <div className="space-y-6">
+                        <PageManager
+                            pages={profile.pages}
+                            onPageCreated={onPageCreated}
+                        />
+
                         {/* Plan Info Bar */}
                         <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-4 transition-all ${isFreePlan ? 'bg-amber-50 border-amber-200' : 'bg-indigo-600 text-white border-indigo-700 shadow-lg shadow-indigo-100'
                             }`}>

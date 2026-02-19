@@ -6,12 +6,13 @@ import { TreePine, LogOut, BarChart2, Palette, Shield, Layout, Settings, User } 
 interface NavbarProps {
   isDashboard?: boolean;
   onLogout?: () => void;
+  isAuthenticated?: boolean;
+  userProfile?: any;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout }) => {
-  // TODO: Get profile from context or props if needed for display
-  const isAdmin = false; // Placeholder - would be determined by auth context
-  const defaultAvatar = 'https://ui-avatars.com/api/?name=User&background=6366f1&color=fff';
+const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout, isAuthenticated, userProfile }) => {
+  const isAdmin = userProfile?.role === 'admin';
+  const defaultAvatar = userProfile?.avatarUrl || 'https://ui-avatars.com/api/?name=User&background=6366f1&color=fff';
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/admin');
 
@@ -30,15 +31,15 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout }) => {
           </Link>
 
           <div className="flex items-center gap-2 sm:gap-6">
-            {isDashboard ? (
+            {isDashboard || isAuthenticated ? (
               <>
                 {/* Mode Switcher */}
-                {isAdmin && (
+                {isAdmin && isDashboard && (
                   <Link
                     to={isAdminPath ? "/dashboard" : "/admin"}
                     className={`flex items-center gap-1.5 font-bold text-[10px] sm:text-xs px-2 sm:px-3 py-2 rounded-xl transition-all ${isAdminPath
-                        ? 'bg-white/10 text-white hover:bg-white/20'
-                        : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'
+                      ? 'bg-white/10 text-white hover:bg-white/20'
+                      : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'
                       }`}
                   >
                     {isAdminPath ? <User size={14} /> : <Shield size={14} />}
@@ -48,7 +49,7 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout }) => {
                 )}
 
                 {/* Desktop-only Links */}
-                {!isAdminPath && (
+                {isDashboard && !isAdminPath && (
                   <div className="hidden lg:flex items-center gap-6">
                     <Link to="/dashboard/links" className="flex items-center gap-1.5 text-slate-600 hover:text-indigo-600 font-medium text-sm transition-colors">
                       <Layout size={18} /> Links
@@ -62,15 +63,28 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout }) => {
                   </div>
                 )}
 
+                {!isDashboard && isAuthenticated && (
+                  <Link to="/dashboard" className="hidden sm:flex items-center gap-1.5 text-slate-600 hover:text-indigo-600 font-bold text-sm transition-colors mr-2">
+                    <Layout size={18} /> Dashboard
+                  </Link>
+                )}
+
                 {/* Profile / Logout */}
                 <div className="flex items-center gap-2 sm:gap-3 ml-2 sm:pl-4 border-l border-slate-200/20">
-                  <img src={defaultAvatar} className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-indigo-500" />
-                  <button
-                    onClick={onLogout}
-                    className={`flex items-center gap-1.5 font-medium text-sm transition-colors ${isAdminPath ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-red-600'}`}
-                  >
-                    <LogOut size={18} /> <span className="hidden md:inline">Logout</span>
-                  </button>
+                  <div className="hidden xs:flex flex-col items-end mr-1">
+                    <span className={`text-[10px] font-black uppercase tracking-widest ${isAdminPath ? 'text-indigo-300' : 'text-indigo-600'}`}>
+                      {userProfile?.username || 'User'}
+                    </span>
+                  </div>
+                  <img src={defaultAvatar} className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-indigo-500" alt="Avatar" />
+                  {isDashboard && (
+                    <button
+                      onClick={onLogout}
+                      className={`flex items-center gap-1.5 font-medium text-sm transition-colors ${isAdminPath ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-red-600'}`}
+                    >
+                      <LogOut size={18} /> <span className="hidden md:inline">Logout</span>
+                    </button>
+                  )}
                 </div>
               </>
             ) : (

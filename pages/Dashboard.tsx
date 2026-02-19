@@ -3,10 +3,10 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import MobileNav from '../components/MobileNav';
 import PhonePreview from '../components/PhonePreview';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import client from '../src/api/client';
 import { UserProfile } from '../types';
-import { Plus, Trash2, GripVertical, ExternalLink, Edit2, X, Wand2, QrCode, Download, Share2, Globe, Instagram, Github, Twitter, Youtube, Star, Zap, ShieldAlert, Check, Eye, Link as LinkIcon, Facebook, Linkedin } from 'lucide-react';
+import { Plus, Trash2, ExternalLink, Edit2, X, Wand2, QrCode, Download, Share2, Globe, Star, Zap, ShieldAlert, Check, Eye, Settings } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { useToast } from '../src/context/ToastContext';
 import { getSocialIcon } from '../src/utils/socialIcons';
@@ -27,6 +27,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import SortableLink from '../components/SortableLink';
+import PageManager from '../components/PageManager';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -41,15 +42,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [showSocialForm, setShowSocialForm] = useState(false);
-  const [showCreatePage, setShowCreatePage] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newUrl, setNewUrl] = useState('');
   const [newScheduledStart, setNewScheduledStart] = useState('');
   const [newScheduledEnd, setNewScheduledEnd] = useState('');
   const [newSocialUrl, setNewSocialUrl] = useState('');
-  const [newPageSlug, setNewPageSlug] = useState('');
-  const [newPageName, setNewPageName] = useState('');
-  const [newPageCustomDomain, setNewPageCustomDomain] = useState('');
   const [isGeneratingBio, setIsGeneratingBio] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -62,7 +59,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     if (profile && !selectedPageId && profile.pages.length > 0) {
       setSelectedPageId(profile.pages[0].id);
     }
-  }, [profile, selectedPageId]);
+  }, [profile, selectedPageId, setSelectedPageId]);
 
   // DnD Sensors
   const sensors = useSensors(
@@ -206,10 +203,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       if (!prev) return null;
       return {
         ...prev,
-        pages: prev.pages.map(p => p.id === activePage.id ? {
-          ...p,
-          links: p.links.map(l => l.id === id ? { ...l, active } : l)
-        } : p)
+        pages: prev.pages.map(p => p.id === activePage.id ? { ...p, links: p.links.map(l => l.id === id ? { ...l, active } : l) } : p)
       };
     });
 
@@ -239,32 +233,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     }
   };
 
-  const handleCreatePage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newPageSlug || !newPageName) return;
-
-    try {
-      const res = await client.post('/pages/create.php', {
-        slug: newPageSlug,
-        displayName: newPageName,
-        customDomain: newPageCustomDomain || null
-      });
-
-      setProfile(prev => prev ? {
-        ...prev,
-        pages: [...prev.pages, res.data.page]
-      } : null);
-
-      setSelectedPageId(res.data.page.id);
-      setNewPageSlug('');
-      setNewPageName('');
-      setNewPageCustomDomain('');
-      setShowCreatePage(false);
-      showToast('Page created!', 'success');
-    } catch (err: any) {
-      console.error("Failed to create page", err);
-      showToast(err.response?.data?.message || "Failed to create page", "error");
-    }
+  const onPageCreated = (page: any) => {
+    setProfile(prev => prev ? {
+      ...prev,
+      pages: [...prev.pages, page]
+    } : null);
   };
 
   const handleUpgrade = () => {
@@ -340,91 +313,10 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         <div className="grid lg:grid-cols-[1fr,320px] gap-8 items-start">
 
           <div className="space-y-6">
-            {/* Page Switcher */}
-            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-4 w-full sm:w-auto">
-                <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
-                  <Globe size={20} />
-                </div>
-                <div className="flex-grow sm:flex-grow-0 min-w-[200px]">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Your Pages</p>
-                  <select
-                    value={selectedPageId || ''}
-                    onChange={(e) => setSelectedPageId(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-bold text-slate-700"
-                  >
-                    {profile.pages.map(page => (
-                      <option key={page.id} value={page.id}>{page.displayName} (@{page.slug})</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowCreatePage(true)}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition-all active:scale-95"
-              >
-                <Plus size={18} /> New Page
-              </button>
-            </div>
-
-            {showCreatePage && (
-              <div className="bg-white p-6 rounded-2xl shadow-xl border-2 border-indigo-100 animate-in fade-in slide-in-from-top-4 duration-300">
-                <div className="flex justify-between mb-4">
-                  <h3 className="font-bold">Create New Page</h3>
-                  <button onClick={() => setShowCreatePage(false)} className="text-slate-400 hover:text-slate-600"><X size={18} /></button>
-                </div>
-                <form onSubmit={handleCreatePage} className="space-y-4">
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Page Name</label>
-                      <input
-                        placeholder="e.g. My Portfolio"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                        value={newPageName}
-                        onChange={(e) => setNewPageName(e.target.value)}
-                        autoFocus
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Slug (URL)</label>
-                      <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-sm">/</span>
-                        <input
-                          placeholder="username"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-8 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono text-sm"
-                          value={newPageSlug}
-                          onChange={(e) => setNewPageSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, ''))}
-                        />
-                      </div>
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Custom Domain (Optional)</label>
-                      <input
-                        placeholder="e.g. links.mybrand.com"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono text-sm"
-                        value={newPageCustomDomain}
-                        onChange={(e) => setNewPageCustomDomain(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex justify-end gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setShowCreatePage(false)}
-                      className="px-6 py-2 rounded-lg text-slate-500 font-semibold hover:bg-slate-100 transition-all"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="bg-indigo-600 text-white px-10 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-all shadow-md"
-                    >
-                      Create Page
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
+            <PageManager
+              pages={profile.pages}
+              onPageCreated={onPageCreated}
+            />
 
             {/* Plan Info Bar */}
             <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-4 transition-all ${isFreePlan ? 'bg-amber-50 border-amber-200' : 'bg-indigo-600 text-white border-indigo-700 shadow-lg shadow-indigo-100'
@@ -553,7 +445,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 <div className="flex items-center gap-3">
                   <h2 className="text-xl font-bold text-slate-900">Links</h2>
                   <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${hasReachedLimit ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-500'}`}>
-                    {activePage.links.length} / {isFreePlan ? '3' : '∞'}
+                    {mainLinks.length} / {isFreePlan ? '3' : '∞'}
                   </span>
                 </div>
                 <button
@@ -619,13 +511,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                       <button
                         type="button"
                         onClick={() => setShowAddForm(false)}
-                        className="px-4 py-2 rounded-lg text-slate-500 font-semibold hover:bg-slate-100 transition-all"
+                        className="px-4 py-2 rounded-lg text-slate-500 font-semibold hover:bg-slate-100 transition-all font-mono"
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
-                        className="bg-indigo-600 text-white px-8 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-all shadow-md"
+                        className="bg-indigo-600 text-white px-10 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-all shadow-md font-mono"
                       >
                         Add Link
                       </button>
@@ -695,13 +587,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                       <button
                         type="button"
                         onClick={() => setShowSocialForm(false)}
-                        className="px-4 py-2 rounded-lg text-slate-500 font-semibold hover:bg-slate-100 transition-all"
+                        className="px-4 py-2 rounded-lg text-slate-500 font-semibold hover:bg-slate-100 transition-all font-mono"
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
-                        className="bg-indigo-600 text-white px-8 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-all shadow-md"
+                        className="bg-indigo-600 text-white px-10 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-all shadow-md font-mono"
                       >
                         Add Icon
                       </button>
@@ -749,13 +641,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
       <div className="lg:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-40 w-full px-4 flex gap-2">
         <button
-          className="flex-grow bg-slate-900 text-white px-4 py-3 rounded-xl font-bold shadow-2xl flex items-center justify-center gap-2 border border-slate-700 active:scale-95 transition-all text-xs"
+          className="flex-grow bg-slate-900 text-white px-4 py-3 rounded-xl font-bold shadow-2xl flex items-center justify-center gap-2 border border-slate-700 active:scale-95 transition-all text-xs font-mono"
           onClick={handleShare}
         >
           <Share2 size={16} /> {copied ? 'Copied!' : 'Copy Link'}
         </button>
         <button
-          className="bg-white text-indigo-600 px-4 py-3 rounded-xl font-bold shadow-2xl flex items-center justify-center gap-2 border border-slate-200 active:scale-95 transition-all text-xs"
+          className="bg-white text-indigo-600 px-4 py-3 rounded-xl font-bold shadow-2xl flex items-center justify-center gap-2 border border-slate-200 active:scale-95 transition-all text-xs font-mono"
           onClick={() => setShowMobilePreview(true)}
         >
           <Eye size={16} /> Preview

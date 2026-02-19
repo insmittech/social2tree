@@ -6,17 +6,23 @@ import client from '../src/api/client';
 import { useToast } from '../src/context/ToastContext';
 
 interface LoginProps {
-  onLogin: (isAdmin: boolean) => void;
+  onLogin: (isAdmin: boolean, user: any) => void;
+  isAuthenticated: boolean;
 }
 
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
+const Login: React.FC<LoginProps> = ({ onLogin, isAuthenticated }) => {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isAdminMode, setIsAdminMode] = useState(false);
-
   const [loading, setLoading] = useState(false);
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +41,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       // You might want to store user info in context/store here
 
       showToast('Welcome back!', 'success');
-      onLogin(user.role === 'admin');
+      onLogin(user.role === 'admin', user);
       navigate(user.role === 'admin' ? '/admin' : '/dashboard');
     } catch (err: any) {
       console.error(err);
@@ -114,8 +120,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           <button
             type="submit"
             className={`w-full py-4 rounded-2xl text-lg font-black transition-all shadow-xl active:scale-[0.98] ${isAdminMode
-                ? 'bg-slate-900 text-white hover:bg-slate-800 shadow-slate-200'
-                : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-100'
+              ? 'bg-slate-900 text-white hover:bg-slate-800 shadow-slate-200'
+              : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-100'
               }`}
           >
             {isAdminMode ? 'Access Admin Panel' : 'Log In'}

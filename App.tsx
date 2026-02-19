@@ -19,6 +19,7 @@ import { ToastContainer } from './components/Toast';
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   // Check authentication status on mount
@@ -32,6 +33,7 @@ const App: React.FC = () => {
         if (response.data.user) {
           setIsAuthenticated(true);
           setIsAdmin(response.data.user.role === 'admin');
+          setUserProfile(response.data.user);
         }
       } catch (err) {
         // Not authenticated
@@ -45,9 +47,10 @@ const App: React.FC = () => {
     checkAuth();
   }, []);
 
-  const handleLogin = (isAdminUser: boolean = false) => {
+  const handleLogin = (isAdminUser: boolean = false, user: any = null) => {
     setIsAuthenticated(true);
     setIsAdmin(isAdminUser);
+    if (user) setUserProfile(user);
   };
 
   const handleLogout = async () => {
@@ -59,6 +62,7 @@ const App: React.FC = () => {
     }
     setIsAuthenticated(false);
     setIsAdmin(false);
+    setUserProfile(null);
   };
 
   if (loading) {
@@ -73,9 +77,9 @@ const App: React.FC = () => {
     <ToastProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<Login onLogin={handleLogin} />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/" element={<LandingPage isAuthenticated={isAuthenticated} userProfile={userProfile} />} />
+          <Route path="/login" element={<Login onLogin={handleLogin} isAuthenticated={isAuthenticated} />} />
+          <Route path="/register" element={<Register isAuthenticated={isAuthenticated} />} />
 
           {/* Protected Dashboard Routes */}
           <Route

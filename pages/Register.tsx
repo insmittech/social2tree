@@ -5,12 +5,22 @@ import { TreePine, ArrowLeft, User, Mail, Lock } from 'lucide-react';
 import client from '../src/api/client';
 import { useToast } from '../src/context/ToastContext';
 
-const Register: React.FC = () => {
+interface RegisterProps {
+  isAuthenticated: boolean;
+}
+
+const Register: React.FC<RegisterProps> = ({ isAuthenticated }) => {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
 
   const [loading, setLoading] = useState(false);
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -4,8 +4,9 @@ import Navbar from '../components/Navbar';
 import MobileNav from '../components/MobileNav';
 import PhonePreview from '../components/PhonePreview';
 import { UserProfile, THEMES, ButtonStyle } from '../types';
-import { CheckCircle2, Palette, Eye, X, Globe } from 'lucide-react';
+import { CheckCircle2, Palette, Eye, X, Globe, Plus } from 'lucide-react';
 import client from '../src/api/client';
+import PageManager from '../components/PageManager';
 
 interface ThemesProps {
   onLogout: () => void;
@@ -63,6 +64,13 @@ const Themes: React.FC<ThemesProps> = ({ onLogout }) => {
     }
   };
 
+  const onPageCreated = (page: any) => {
+    setProfile(prev => prev ? {
+      ...prev,
+      pages: [...prev.pages, page]
+    } : null);
+  };
+
   const handleButtonStyleSelect = async (style: ButtonStyle) => {
     if (!profile || !activePage) return;
 
@@ -96,8 +104,13 @@ const Themes: React.FC<ThemesProps> = ({ onLogout }) => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-32 lg:pb-8">
         <div className="grid lg:grid-cols-[1fr,auto] gap-12 items-start">
           <div className="space-y-8">
-            <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div className="flex items-center gap-4">
+            <header className="flex flex-col gap-6">
+              <PageManager
+                pages={profile.pages}
+                onPageCreated={onPageCreated}
+                className="mb-4"
+              />
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                   <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
                     <Palette size={28} className="text-indigo-600" />
@@ -105,26 +118,13 @@ const Themes: React.FC<ThemesProps> = ({ onLogout }) => {
                   </h1>
                   <p className="text-slate-500 mt-1">Customize the look and feel of your profile</p>
                 </div>
-                {/* Page Switcher */}
-                <div className="bg-white border-2 border-slate-100 rounded-xl px-4 py-2 flex items-center gap-3 shadow-sm">
-                  <Globe className="text-indigo-600" size={18} />
-                  <select
-                    className="bg-transparent font-bold text-sm outline-none cursor-pointer pr-4"
-                    value={selectedPageId || ''}
-                    onChange={(e) => setSelectedPageId(e.target.value)}
-                  >
-                    {profile.pages.map(page => (
-                      <option key={page.id} value={page.id}>{page.displayName} (@{page.slug})</option>
-                    ))}
-                  </select>
-                </div>
+                <button
+                  onClick={() => setShowMobilePreview(true)}
+                  className="lg:hidden bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl font-bold flex items-center gap-2 border border-indigo-100 text-sm"
+                >
+                  <Eye size={18} /> Preview
+                </button>
               </div>
-              <button
-                onClick={() => setShowMobilePreview(true)}
-                className="lg:hidden bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl font-bold flex items-center gap-2 border border-indigo-100 text-sm"
-              >
-                <Eye size={18} /> Preview
-              </button>
             </header>
 
             <section className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
