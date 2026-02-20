@@ -6,9 +6,10 @@ json_response();
 include_once __DIR__ . '/../db.php';
 
 $data = get_json_input();
+$identifier = !empty($data['username']) ? $data['username'] : (!empty($data['email']) ? $data['email'] : null);
 
-if (!empty($data['username']) && !empty($data['password'])) {
-    $username = sanitize_input($data['username']);
+if ($identifier && !empty($data['password'])) {
+    $username = sanitize_input($identifier);
     $password = $data['password'];
 
     try {

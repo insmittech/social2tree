@@ -14,14 +14,17 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ onLogout }) => {
   const [isSaving, setIsSaving] = useState(false);
 
   // Settings state
-  const [settings, setSettings] = useState({
+  const [settings, setSettings] = useState<Record<string, string>>({
     site_name: 'Social2Tree',
     maintenance_mode: 'false',
     free_link_limit: '3',
     pro_link_limit: '100',
     pro_price: '15.00',
     enable_custom_domains: 'true',
-    available_themes: '["default", "dark", "glass", "minimal"]'
+    available_themes: '["default", "dark", "glass", "minimal"]',
+    navbar_links: '[]',
+    footer_explore_links: '[]',
+    footer_legal_links: '[]'
   });
 
   useEffect(() => {
@@ -199,6 +202,42 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ onLogout }) => {
                   {t}
                 </span>
               ))}
+            </div>
+          </div>
+        </section>
+        {/* Navigation Menu Management */}
+        <section className="bg-white p-6 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-slate-200 shadow-sm space-y-6 lg:col-span-2">
+          <h2 className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2 mb-2">
+            <Layout className="text-indigo-600" size={22} /> Navigation Menu Management
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Navbar Links (JSON)</label>
+              <textarea
+                value={settings.navbar_links || '[]'}
+                onChange={(e) => handleUpdateSetting('navbar_links', e.target.value)}
+                placeholder='[{"label": "Home", "to": "/"}]'
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-mono text-sm h-48"
+              />
+              <p className="text-[10px] text-slate-400 px-2 italic font-medium">Format: Array of {"{label: string, to: string}"}</p>
+            </div>
+
+            <div className="space-y-4">
+              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Footer Explore Links (JSON)</label>
+              <textarea
+                value={settings.footer_explore_links || '[]'}
+                onChange={(e) => handleUpdateSetting('footer_explore_links', e.target.value)}
+                placeholder='[{"label": "Pricing", "to": "/pricing"}]'
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-mono text-sm h-48"
+              />
+              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Footer Legal Links (JSON)</label>
+              <textarea
+                value={settings.footer_legal_links || '[]'}
+                onChange={(e) => handleUpdateSetting('footer_legal_links', e.target.value)}
+                placeholder='[{"label": "Privacy", "to": "/privacy"}]'
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-mono text-sm h-48"
+              />
             </div>
           </div>
         </section>

@@ -33,7 +33,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, isAuthenticated }) => {
     setLoading(true);
 
     try {
-      const response = await client.post('/auth/login.php', { email, password });
+      const response = await client.post('/auth/login.php', { username: email, password });
       const { user, token } = response.data;
 
       localStorage.setItem('token', token);
@@ -74,16 +74,16 @@ const Login: React.FC<LoginProps> = ({ onLogin, isAuthenticated }) => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Email address</label>
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Email or Username</label>
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <input
-                type="email"
+                type="text"
                 required
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 className="w-full bg-white border border-slate-200 rounded-lg pl-12 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-slate-700"
-                placeholder="alex@example.com"
+                placeholder="alex@example.com or username"
               />
             </div>
           </div>
