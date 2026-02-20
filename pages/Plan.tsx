@@ -1,119 +1,187 @@
-
 import React, { useState, useEffect } from 'react';
-import { UserProfile, PlanType } from '../types';
-import client from '../src/api/client';
-import { CreditCard, Check, Star } from 'lucide-react';
+import axios from 'axios';
+import { CreditCard, Check, Star, ArrowRight, Zap } from 'lucide-react';
 import { useAuth } from '../src/context/AuthContext';
+
+interface DbPlan {
+    id: string;
+    name: string;
+    priceMonthly: number;
+    priceYearly: number;
+    description: string;
+    features: string[];
+    isPopular: boolean;
+    sortOrder: number;
+}
 
 const Plan: React.FC = () => {
     const { user: profile } = useAuth();
-    // No local profile state or useEffect needed
+    const [plans, setPlans] = useState<DbPlan[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [billing, setBilling] = useState<'monthly' | 'yearly'>('monthly');
 
-    if (!profile) {
+    useEffect(() => {
+        const fetchPlans = async () => {
+            try {
+                const res = await axios.get('/api/public/plans.php');
+                setPlans(res.data.plans || []);
+            } catch (err) {
+                console.error('Failed to fetch plans', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchPlans();
+    }, []);
+
+    if (!profile || loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-[400px] flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
             </div>
         );
     }
 
-    const currentPlan = profile.plan;
+    const currentPlan = (profile.plan || 'free').toLowerCase();
 
-    const planHierarchy: Record<PlanType, number> = {
-        'free': 0,
-        'pro': 1,
-        'business': 2
+    // Determine the plan rank for showing "upgrade" vs "active" vs "downgrade"
+    const getPlanRank = (planName: string) => {
+        const order = plans.map((p) => p.name.toLowerCase());
+        return order.indexOf(planName.toLowerCase());
     };
 
+    const currentRank = getPlanRank(currentPlan);
+
     return (
-        <div className="p-8 max-w-4xl mx-auto">
-            <header className="mb-8">
-                <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3">
-                    <CreditCard size={32} className="text-indigo-600" />
-                    Manage Plan
-                </h1>
-                <p className="text-slate-500 font-medium mt-1">Choose the plan that's right for you</p>
-            </header>
+        <div className="max-w-5xl mx-auto p-4 md:p-8">
+            <div className="mb-10">
+                <h1 className="text-4xl font-black uppercase tracking-tighter text-slate-900 italic mb-2">Your Plan</h1>
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Manage your subscription & upgrade for more features</p>
+            </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-                {/* Free Plan */}
-                <div className="bg-white p-8 rounded-3xl border-2 border-slate-100 shadow-sm relative overflow-hidden">
-                    <div className="flex justify-between items-start mb-6">
-                        <div>
-                            <h2 className="text-2xl font-black text-slate-900">Free</h2>
-                            <p className="text-slate-500 font-medium text-sm">Best for personal use</p>
-                        </div>
-                        {currentPlan === 'free' && (
-                            <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Active Plan</span>
-                        )}
-                    </div>
-                    <div className="mb-8">
-                        <span className="text-4xl font-black text-slate-900">$0</span>
-                        <span className="text-slate-400 font-bold ml-2">/ month</span>
-                    </div>
-                    <ul className="space-y-4 mb-8">
-                        {[
-                            'Up to 3 bio links',
-                            'Basic analytics (7 days)',
-                            'Standard themes',
-                            'S2T branding'
-                        ].map((feature, i) => (
-                            <li key={i} className="flex items-center gap-3 text-slate-600 font-medium text-sm">
-                                <div className="p-1 bg-emerald-50 text-emerald-600 rounded-full">
-                                    <Check size={14} />
-                                </div>
-                                {feature}
-                            </li>
-                        ))}
-                    </ul>
+            {/* Current Plan Badge */}
+            <div className="bg-white rounded-[2rem] border border-slate-100 shadow-xl p-6 mb-8 flex flex-wrap items-center gap-4">
+                <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center">
+                    <CreditCard className="text-indigo-600 w-6 h-6" />
                 </div>
-
-                {/* Pro Plan */}
-                <div className="bg-indigo-600 p-8 rounded-3xl border-2 border-indigo-500 shadow-xl shadow-indigo-100 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 bg-amber-400 text-amber-900 font-black text-[10px] uppercase tracking-[0.2em] px-8 py-2 rotate-45 translate-x-10 translate-y-3">
-                        Popular
-                    </div>
-                    <div className="flex justify-between items-start mb-6 text-white">
-                        <div>
-                            <h2 className="text-2xl font-black">Pro</h2>
-                            <p className="text-indigo-100 font-medium text-sm">For creators & businesses</p>
-                        </div>
-                        <div className="p-2 bg-white/20 rounded-xl text-white">
-                            <Star size={20} />
-                        </div>
-                    </div>
-                    <div className="mb-8 text-white">
-                        <span className="text-4xl font-black">$12</span>
-                        <span className="text-indigo-100 font-bold ml-2">/ month</span>
-                    </div>
-                    <ul className="space-y-4 mb-8">
-                        {[
-                            'Unlimited bio links',
-                            'Advanced analytics (Lifetime)',
-                            'Premium themes & colors',
-                            'Custom domains',
-                            'Priority support',
-                            'Remove S2T branding'
-                        ].map((feature, i) => (
-                            <li key={i} className="flex items-center gap-3 text-indigo-50 font-medium text-sm">
-                                <div className="p-1 bg-white/20 text-white rounded-full">
-                                    <Check size={14} />
-                                </div>
-                                {feature}
-                            </li>
-                        ))}
-                    </ul>
-                    {currentPlan === 'free' ? (
-                        <button className="w-full bg-white text-indigo-600 py-4 rounded-2xl font-black transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-indigo-700/20">
-                            Upgrade Now
-                        </button>
-                    ) : (
-                        <div className="w-full bg-white/20 backdrop-blur-md text-white py-4 rounded-2xl font-black text-center">
-                            Your Active Plan
-                        </div>
-                    )}
+                <div>
+                    <p className="text-xs font-black uppercase tracking-widest text-slate-400">Current Plan</p>
+                    <p className="text-2xl font-black text-slate-900 capitalize">{currentPlan}</p>
+                </div>
+                <div className="ml-auto">
+                    <span className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest">
+                        <Zap size={12} /> Active
+                    </span>
                 </div>
             </div>
+
+            {/* Billing Toggle */}
+            <div className="flex justify-center mb-8">
+                <div className="bg-slate-100 inline-flex p-1 rounded-2xl gap-1">
+                    <button
+                        onClick={() => setBilling('monthly')}
+                        className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${billing === 'monthly' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}
+                    >
+                        Monthly
+                    </button>
+                    <button
+                        onClick={() => setBilling('yearly')}
+                        className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${billing === 'yearly' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}
+                    >
+                        Yearly
+                        <span className="ml-2 bg-emerald-500 text-white text-[9px] px-1.5 py-0.5 rounded-full">Save 20%</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* Plans Grid */}
+            {plans.length === 0 ? (
+                <div className="text-center py-12 text-slate-400 font-bold">No plans available.</div>
+            ) : (
+                <div className={`grid gap-6 ${plans.length === 2 ? 'md:grid-cols-2' : plans.length >= 3 ? 'md:grid-cols-3' : 'md:grid-cols-1'}`}>
+                    {plans.map((plan) => {
+                        const planRank = getPlanRank(plan.name);
+                        const isCurrentPlan = plan.name.toLowerCase() === currentPlan;
+                        const isUpgrade = planRank > currentRank;
+                        const price = billing === 'monthly' ? plan.priceMonthly : plan.priceYearly;
+
+                        return (
+                            <div
+                                key={plan.id}
+                                className={`relative rounded-[2rem] p-8 border-2 transition-all flex flex-col
+                                    ${isCurrentPlan
+                                        ? 'border-indigo-600 bg-indigo-600 text-white shadow-2xl shadow-indigo-200'
+                                        : plan.isPopular && isUpgrade
+                                            ? 'border-indigo-200 bg-white shadow-xl'
+                                            : 'border-slate-100 bg-white shadow-sm'
+                                    }`}
+                            >
+                                {plan.isPopular && isUpgrade && (
+                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                                        <span className="bg-amber-400 text-amber-900 font-black text-[10px] uppercase tracking-widest px-4 py-1 rounded-full flex items-center gap-1">
+                                            <Star size={10} fill="currentColor" /> Popular
+                                        </span>
+                                    </div>
+                                )}
+
+                                {isCurrentPlan && (
+                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                                        <span className="bg-white text-indigo-600 border border-indigo-100 font-black text-[10px] uppercase tracking-widest px-4 py-1 rounded-full shadow-md">
+                                            Your Plan
+                                        </span>
+                                    </div>
+                                )}
+
+                                <div className="mb-6">
+                                    <h2 className={`text-2xl font-black uppercase tracking-tight mb-1 ${isCurrentPlan ? 'text-white' : 'text-slate-900'}`}>
+                                        {plan.name}
+                                    </h2>
+                                    <p className={`text-sm font-medium ${isCurrentPlan ? 'text-indigo-100' : 'text-slate-500'}`}>
+                                        {plan.description}
+                                    </p>
+                                </div>
+
+                                <div className="mb-8">
+                                    <span className={`text-5xl font-black ${isCurrentPlan ? 'text-white' : 'text-slate-900'}`}>
+                                        ${price % 1 === 0 ? price.toFixed(0) : price.toFixed(2)}
+                                    </span>
+                                    <span className={`font-bold ml-2 text-sm ${isCurrentPlan ? 'text-indigo-100' : 'text-slate-400'}`}>
+                                        / {billing === 'monthly' ? 'month' : 'year'}
+                                    </span>
+                                </div>
+
+                                <ul className="space-y-3 mb-8 flex-1">
+                                    {(plan.features || []).map((feature, i) => (
+                                        <li key={i} className={`flex items-start gap-3 text-sm font-medium ${isCurrentPlan ? 'text-indigo-50' : 'text-slate-600'}`}>
+                                            <div className={`mt-0.5 p-1 rounded-full flex-shrink-0 ${isCurrentPlan ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-600'}`}>
+                                                <Check size={12} />
+                                            </div>
+                                            {feature}
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                <div>
+                                    {isCurrentPlan ? (
+                                        <div className="w-full py-4 bg-white/20 text-white text-center rounded-2xl text-xs font-black uppercase tracking-widest">
+                                            Active Plan
+                                        </div>
+                                    ) : isUpgrade ? (
+                                        <button className="w-full py-4 bg-indigo-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2 group">
+                                            Upgrade to {plan.name}
+                                            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                                        </button>
+                                    ) : (
+                                        <button className="w-full py-4 bg-slate-100 text-slate-500 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 transition-all">
+                                            Downgrade
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
         </div>
     );
 };

@@ -108,7 +108,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
 
     return (
         <aside
-            className={`hidden lg:flex flex-col border-r sticky top-0 h-screen transition-all duration-300 ease-in-out relative
+            className={`hidden lg:flex flex-col border-r sticky top-0 h-screen transition-all duration-300 ease-in-out relative overflow-visible
                 ${isCollapsed ? 'w-20' : 'w-72'} 
                 ${isAdmin ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-100 text-slate-900 shadow-xl shadow-slate-200/50'}
             `}
@@ -121,7 +121,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                 {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
             </button>
 
-            <div className="flex flex-col h-full overflow-hidden">
+            <div className="flex flex-col h-full overflow-visible">
                 {/* Logo Section */}
                 <div className={`p-6 mb-2 flex items-center transition-all duration-300 ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
                     <div className="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-200 flex-shrink-0">
@@ -244,8 +244,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
 
                 {/* Footer Section */}
                 <div className="p-4 mt-auto border-t border-slate-100">
-                    <div className={`p-4 rounded-3xl border transition-all duration-300 ${isAdmin ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'} ${isCollapsed ? 'items-center justify-center p-2' : ''}`}>
-                        <div className={`flex items-center gap-3 ${isCollapsed ? 'flex-col justify-center' : 'mb-4'}`}>
+                    <div className={`rounded-3xl border transition-all duration-300 ${isAdmin ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'} ${isCollapsed ? 'p-2 flex flex-col items-center gap-2' : 'p-4'}`}>
+                        <div className={`flex items-center gap-3 ${isCollapsed ? 'flex-col' : 'mb-4'}`}>
                             <img
                                 src={userProfile?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile?.displayName || 'User')}&background=6366f1&color=fff`}
                                 className="w-9 h-9 rounded-2xl border-2 border-white shadow-sm object-cover flex-shrink-0"
