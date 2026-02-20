@@ -91,6 +91,10 @@ const AppRoutes: React.FC = () => {
           path="/dashboard/saved"
           element={isAuthenticated ? <Layout userProfile={user} onLogout={handleLogout}><SavedLinks /></Layout> : <Navigate to="/login" />}
         />
+        <Route
+          path="/dashboard/verification"
+          element={isAuthenticated ? <Layout userProfile={user} onLogout={handleLogout}><RequestVerification /></Layout> : <Navigate to="/login" />}
+        />
 
         {/* Admin Routes */}
         <Route

@@ -2,16 +2,25 @@ import React, { useState } from 'react';
 import { ShieldCheck, Info, Clock, AlertCircle, CheckCircle2, Send } from 'lucide-react';
 import axios from 'axios';
 import { UserProfile } from '../types';
+import { useAuth } from '../src/context/AuthContext';
 
 interface RequestVerificationProps {
-    user: UserProfile;
 }
 
-const RequestVerification: React.FC<RequestVerificationProps> = ({ user }) => {
+const RequestVerification: React.FC<RequestVerificationProps> = () => {
+    const { user } = useAuth();
     const [details, setDetails] = useState('');
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState('');
+
+    if (!user) {
+        return (
+            <div className="min-h-[400px] flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-indigo-600 border-t-transparent"></div>
+            </div>
+        );
+    }
 
     const canApplyInstantly = user.plan === 'pro' || user.plan === 'vip' || user.plan === 'business';
 
