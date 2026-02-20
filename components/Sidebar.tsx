@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import client from '../src/api/client';
 import {
@@ -39,6 +39,16 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCollapsed, setIsCollapsed }) => {
     const [dynamicUserLinks, setDynamicUserLinks] = React.useState<any[]>([]);
+    const [tooltip, setTooltip] = useState<{ label: string; y: number } | null>(null);
+
+    const handleMouseEnter = (label: string, e: React.MouseEvent) => {
+        if (isCollapsed) {
+            const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+            setTooltip({ label, y: rect.top + rect.height / 2 });
+        }
+    };
+
+    const handleMouseLeave = () => setTooltip(null);
 
     React.useEffect(() => {
         if (!isAdmin) {
@@ -106,9 +116,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
         icon: <LayoutDashboard size={18} /> // Default icon for dynamic links
     })) : userLinks);
 
+    const sidebarWidth = isCollapsed ? 80 : 288;
+
     return (
         <aside
-            className={`hidden lg:flex flex-col border-r sticky top-0 h-screen transition-all duration-300 ease-in-out relative overflow-visible
+            className={`hidden lg:flex flex-col border-r sticky top-0 h-screen transition-all duration-300 ease-in-out relative
                 ${isCollapsed ? 'w-20' : 'w-72'} 
                 ${isAdmin ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-100 text-slate-900 shadow-xl shadow-slate-200/50'}
             `}
@@ -121,7 +133,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                 {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
             </button>
 
-            <div className="flex flex-col h-full overflow-visible">
+            <div className="flex flex-col h-full overflow-hidden">
                 {/* Logo Section */}
                 <div className={`p-6 mb-2 flex items-center transition-all duration-300 ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
                     <div className="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-200 flex-shrink-0">
@@ -164,6 +176,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                                         key={link.to}
                                         to={link.to}
                                         end={link.to === '/dashboard' || link.to === '/admin'}
+                                        onMouseEnter={(e) => handleMouseEnter(link.label, e)}
+                                        onMouseLeave={handleMouseLeave}
                                         className={({ isActive }) => `
                                             flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all relative group
                                             ${isActive
@@ -184,11 +198,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                                                 )}
                                             </>
                                         )}
-                                        {isCollapsed && (
-                                            <div className="absolute left-full ml-4 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-[100]">
-                                                {link.label}
-                                            </div>
-                                        )}
                                     </NavLink>
                                 );
                             })
@@ -206,6 +215,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                                                 key={link.to}
                                                 to={link.to}
                                                 end={link.to === '/admin'}
+                                                onMouseEnter={(e) => handleMouseEnter(link.label, e)}
+                                                onMouseLeave={handleMouseLeave}
                                                 className={({ isActive }) => `
                                                     flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all relative group
                                                     ${isActive
@@ -217,11 +228,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                                             >
                                                 <span className={`${isCollapsed ? 'scale-110' : ''} transition-transform`}>{link.icon}</span>
                                                 {!isCollapsed && <span className="flex-1">{link.label}</span>}
-                                                {isCollapsed && (
-                                                    <div className="absolute left-full ml-4 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-[100]">
-                                                        {link.label}
-                                                    </div>
-                                                )}
                                             </NavLink>
                                         ))}
                                     </div>
@@ -278,6 +284,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                     </div>
                 </div>
             </div>
+
+            {/* Fixed tooltip — renders outside all overflow contexts */}
+            {tooltip && isCollapsed && (
+                <div
+                    className="fixed z-[999] px-3 py-2 bg-slate-900 text-white text-xs font-bold rounded-lg whitespace-nowrap shadow-xl pointer-events-none"
+                    style={{ top: tooltip.y - 12, left: sidebarWidth + 12 }}
+                >
+                    {tooltip.label}
+                    <div className="absolute top-1/2 -translate-y-1/2 -left-1 w-2 h-2 bg-slate-900 rotate-45" />
+                </div>
+            )}
         </aside>
     );
 };
