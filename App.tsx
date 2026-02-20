@@ -17,6 +17,9 @@ import SavedLinks from './pages/SavedLinks';
 import Profile from './pages/Profile';
 import BioTrees from './pages/BioTrees';
 import TreeEditor from './pages/TreeEditor';
+import Features from './pages/Features';
+import Pricing from './pages/Pricing';
+import Contact from './pages/Contact';
 import Layout from './components/Layout';
 import { ToastProvider } from './src/context/ToastContext';
 import { ToastContainer } from './components/Toast';
@@ -41,6 +44,9 @@ const AppRoutes: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage isAuthenticated={isAuthenticated} userProfile={user} />} />
+        <Route path="/features" element={<Features />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login onLogin={() => { }} isAuthenticated={isAuthenticated} />} />
         <Route path="/register" element={<Register isAuthenticated={isAuthenticated} />} />
 

@@ -4,7 +4,7 @@ import PhonePreview from '../components/PhonePreview';
 import { useNavigate } from 'react-router-dom';
 import client from '../src/api/client';
 import { UserProfile } from '../types';
-import { Plus, Trash2, ExternalLink, Edit2, X, Wand2, QrCode, Download, Share2, Globe, Star, Zap, ShieldAlert, Check, Eye, Settings } from 'lucide-react';
+import { Plus, Trash2, ExternalLink, Edit2, X, Wand2, QrCode, Download, Share2, Globe, Star, Zap, ShieldAlert, Check, Eye, Settings, MousePointer2, TrendingUp, ArrowRight } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { useToast } from '../src/context/ToastContext';
 import { useAuth } from '../src/context/AuthContext';
@@ -84,6 +84,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
   const publicUrl = `${window.location.origin}/${activePage.slug}`;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(publicUrl)}&bgcolor=ffffff&color=0f172a&margin=2`;
+
+  const totalClicks = activePage?.links?.reduce((acc, link) => acc + (link.clicks || 0), 0) || 0;
+  const ctr = profile.views > 0 ? ((totalClicks / profile.views) * 100).toFixed(1) : '0';
 
   const handleDownloadQR = async () => {
     setIsDownloading(true);
@@ -272,132 +275,184 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const socialIcons = activePage.links.filter(l => l.type === 'social_icon');
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full pb-32 lg:pb-8">
-      <div className="grid lg:grid-cols-[1fr,320px] gap-8 items-start">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full pb-32 lg:pb-12 bg-slate-50/30">
+      <div className="grid lg:grid-cols-[1fr,340px] gap-12 items-start">
+        <div className="space-y-10">
 
-        <div className="space-y-6">
-          <PageManager
-            pages={profile.pages}
-            onPageCreated={onPageCreated}
-          />
-
-          {/* Plan Info Bar */}
-          <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-4 transition-all ${isFreePlan ? 'bg-amber-50 border-amber-200' : 'bg-indigo-600 text-white border-indigo-700 shadow-lg shadow-indigo-100'
-            }`}>
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-xl ${isFreePlan ? 'bg-amber-200 text-amber-800' : 'bg-white/20 text-white'}`}>
-                {isFreePlan ? <Zap size={20} /> : <Star size={20} />}
+          {/* Header Section */}
+          <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 italic">
+                Dashboard / Overview
               </div>
-              <div>
-                <p className={`text-xs font-bold uppercase tracking-widest ${isFreePlan ? 'text-amber-700' : 'text-indigo-100'}`}>Current Plan</p>
-                <h3 className="text-lg font-black capitalize">{profile.plan}</h3>
-              </div>
+              <h1 className="text-5xl font-black text-slate-900 tracking-tighter italic">
+                {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, {profile.displayName.split(' ')[0]}
+              </h1>
+              <p className="text-slate-500 font-bold mt-2 flex items-center gap-2">
+                Managing your digital corner at <span className="text-indigo-600 font-black bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-100">s2t.me/{activePage.slug}</span>
+              </p>
             </div>
-            {isFreePlan && (
+            <div className="flex gap-3 w-full sm:w-auto">
               <button
-                onClick={handleUpgrade}
-                className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded-xl font-black text-sm transition-all shadow-md active:scale-95"
+                onClick={() => setShowMobilePreview(true)}
+                className="lg:hidden flex-1 bg-white text-slate-900 px-6 py-4 rounded-2xl font-black flex items-center justify-center gap-2 border-2 border-slate-100 shadow-sm active:scale-95"
               >
-                Upgrade to PRO
+                <Eye size={20} /> Preview
               </button>
-            )}
-          </div>
-
-          {/* QR Code Quick Access */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row items-center gap-6">
-            <button
-              onClick={handleDownloadQR}
-              className="p-2 bg-white border border-slate-100 rounded-xl shadow-sm hover:border-indigo-200 transition-colors group relative"
-              title="Click to download QR Code"
-            >
-              <img
-                src={qrUrl}
-                alt="Your QR Code"
-                className={`w-24 h-24 group-hover:opacity-90 transition-opacity ${isDownloading ? 'opacity-30' : 'opacity-100'}`}
-              />
-              {isDownloading && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-indigo-600 border-t-transparent"></div>
-                </div>
-              )}
-            </button>
-            <div className="text-center sm:text-left flex-grow">
-              <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2 justify-center sm:justify-start">
-                <QrCode size={20} className="text-indigo-600" /> Your QR Code
-              </h2>
-              <p className="text-slate-500 text-xs sm:text-sm mt-1">One code. Complete digital identity.</p>
-              <div className="mt-4 flex flex-wrap gap-2 justify-center sm:justify-start">
-                <button
-                  onClick={handleDownloadQR}
-                  disabled={isDownloading}
-                  className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-[10px] sm:text-xs font-bold rounded-lg hover:bg-slate-800 transition-all disabled:opacity-50"
-                >
-                  <Download size={14} /> {isDownloading ? '...' : 'Download'}
-                </button>
+              <div className="flex gap-2">
                 <button
                   onClick={handleShare}
-                  className={`flex items-center gap-2 px-4 py-2 border text-[10px] sm:text-xs font-bold rounded-lg transition-all ${copied
-                    ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
-                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
-                    }`}
+                  className="p-4 bg-white text-slate-400 border-2 border-slate-100 rounded-2xl hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm active:scale-95"
+                  title="Copy Link"
                 >
-                  {copied ? <><Check size={14} /> Copied!</> : <><Share2 size={14} /> Copy Link</>}
+                  {copied ? <Check size={24} className="text-emerald-500" /> : <Share2 size={24} />}
                 </button>
+                <button
+                  onClick={handleDownloadQR}
+                  className="p-4 bg-white text-slate-400 border-2 border-slate-100 rounded-2xl hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm active:scale-95"
+                  title="Download QR"
+                >
+                  {isDownloading ? <div className="animate-spin h-6 w-6 border-2 border-indigo-600 border-t-transparent rounded-full" /> : <QrCode size={24} />}
+                </button>
+                <a
+                  href={publicUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-4 bg-slate-900 text-white rounded-2xl hover:bg-indigo-600 transition-all shadow-2xl shadow-indigo-100/20 active:scale-95"
+                  title="Open Live Site"
+                >
+                  <ExternalLink size={24} />
+                </a>
               </div>
+            </div>
+          </header>
+
+          {/* Stats Overview Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                label: "Total Views",
+                value: profile.views.toLocaleString(),
+                icon: <Eye size={20} />,
+                trend: "+12%",
+                color: "indigo",
+                chart: "M5 35 Q 25 5 45 30 T 85 15 T 145 25"
+              },
+              {
+                label: "Total Clicks",
+                value: totalClicks.toLocaleString(),
+                icon: <MousePointer2 size={20} />,
+                trend: "+5%",
+                color: "emerald",
+                chart: "M5 30 Q 35 10 65 35 T 145 15"
+              },
+              {
+                label: "CTR",
+                value: `${ctr}%`,
+                icon: <Zap size={20} />,
+                trend: "Avg",
+                color: "amber",
+                chart: "M5 20 Q 75 40 145 10"
+              }
+            ].map((stat, i) => (
+              <div key={i} className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col justify-between h-44 hover:border-indigo-100 hover:shadow-xl hover:shadow-indigo-500/5 transition-all group overflow-hidden relative">
+                <div className="flex justify-between items-start relative z-10">
+                  <div className={`p-3 bg-${stat.color}-50 text-${stat.color}-600 rounded-2xl group-hover:bg-indigo-600 group-hover:text-white transition-colors`}>
+                    {stat.icon}
+                  </div>
+                  <span className={`text-[10px] font-black bg-${stat.color === 'indigo' ? 'emerald' : stat.color}-50 text-${stat.color === 'indigo' ? 'emerald' : stat.color}-600 px-3 py-1.5 rounded-full uppercase tracking-widest`}>{stat.trend}</span>
+                </div>
+                <div className="relative z-10">
+                  <h3 className="text-4xl font-black text-slate-900 tracking-tighter tabular-nums mb-1">{stat.value}</h3>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">{stat.label}</p>
+                </div>
+                {/* Visual Chart Mockup */}
+                <div className="absolute bottom-0 left-0 right-0 h-16 opacity-10 group-hover:opacity-30 transition-opacity">
+                  <svg width="100%" height="100%" viewBox="0 0 150 40" preserveAspectRatio="none">
+                    <path d={stat.chart} strokeLinecap="round" strokeWidth="4" fill="none" className={`stroke-${stat.color}-600`} />
+                  </svg>
+                </div>
+              </div>
+            ))}
+
+            <div
+              className="bg-slate-900 p-6 rounded-[2.5rem] shadow-2xl flex flex-col justify-between h-44 text-white relative overflow-hidden group cursor-pointer active:scale-95 transition-all"
+              onClick={() => navigate('/dashboard/analytics')}
+            >
+              <div className="relative z-10 flex justify-between items-start">
+                <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-xl border border-white/10">
+                  <TrendingUp size={20} />
+                </div>
+                <div className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors">
+                  <ArrowRight size={20} />
+                </div>
+              </div>
+              <div className="relative z-10">
+                <h3 className="text-2xl font-black leading-none mb-2 tracking-tighter italic">Deep Insights</h3>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Full Performance Logic &rarr;</p>
+              </div>
+              <div className="absolute -right-8 -bottom-8 bg-indigo-500/30 w-40 h-40 rounded-full blur-[60px] group-hover:bg-indigo-500/40 transition-all"></div>
+              <div className="absolute top-[20%] left-[10%] w-24 h-24 bg-purple-500/10 rounded-full blur-[50px]"></div>
             </div>
           </div>
 
-          {/* Profile Section */}
-          <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
-              <Edit2 size={18} className="text-indigo-600" /> Page Editor
-            </h2>
-            <div className="flex flex-col sm:flex-row gap-6 items-start">
-              <div className="relative group self-center sm:self-start">
-                <img src={activePage.avatarUrl} className="w-24 h-24 rounded-full object-cover border-4 border-slate-50 shadow-inner" />
-                <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                  <Edit2 size={20} className="text-white" />
-                </div>
+          {/* Profile Settings Section */}
+          <section className="bg-white/60 backdrop-blur-xl p-10 rounded-[3rem] border border-white shadow-sm space-y-10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/50 rounded-full blur-[100px] -z-10 group-hover:bg-indigo-100/50 transition-colors duration-1000"></div>
+
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-3xl font-black text-slate-900 tracking-tighter flex items-center gap-3">
+                  <div className="p-2 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-100"><Settings size={24} /></div>
+                  Profile Station
+                </h2>
+                <p className="text-slate-400 text-sm font-bold mt-2">Customize how the world sees your digital identity.</p>
               </div>
-              <div className="flex-grow w-full space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Display Name</label>
-                    <input
-                      type="text"
-                      value={activePage.displayName}
-                      onChange={(e) => handleProfileUpdate({ displayName: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Custom Domain (Optional)</label>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-10">
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Display Name</label>
+                  <input
+                    type="text"
+                    value={activePage.displayName}
+                    placeholder="Your Public Name"
+                    onChange={(e) => handleProfileUpdate({ displayName: e.target.value })}
+                    className="w-full bg-slate-100/50 border-2 border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white focus:border-indigo-600 outline-none transition-all font-black text-slate-700 placeholder:text-slate-200"
+                  />
+                </div>
+                <div className="space-y-2 group">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Custom Hub Domain</label>
+                  <div className="relative">
+                    <Globe className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors" size={20} />
                     <input
                       type="text"
                       value={activePage.customDomain || ''}
-                      placeholder="links.brand.com"
+                      placeholder="links.mybrand.com"
                       onChange={(e) => handleProfileUpdate({ customDomain: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium text-sm"
+                      className="w-full bg-slate-100/50 border-2 border-slate-100 rounded-2xl pl-14 pr-6 py-4 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white focus:border-indigo-600 outline-none transition-all font-black text-slate-700 placeholder:text-slate-200"
                     />
                   </div>
                 </div>
-                <div>
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block flex justify-between items-center">
-                    Bio
-                    <button
-                      onClick={generateAIBio}
-                      disabled={isGeneratingBio}
-                      className="bg-indigo-50 text-indigo-600 px-2 py-1 rounded text-[10px] flex items-center gap-1 normal-case font-bold hover:bg-indigo-100 disabled:opacity-50 transition-colors"
-                    >
-                      <Wand2 size={10} /> {isGeneratingBio ? 'Thinking...' : 'AI Enhance'}
-                    </button>
-                  </label>
-                  <textarea
-                    value={activePage.bio}
-                    onChange={(e) => handleProfileUpdate({ bio: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm h-20 resize-none"
-                  />
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Bio / About</label>
+                  <button
+                    onClick={generateAIBio}
+                    disabled={isGeneratingBio}
+                    className="px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-indigo-600 hover:text-white disabled:opacity-50 transition-all shadow-sm"
+                  >
+                    <Wand2 size={12} fill="currentColor" /> {isGeneratingBio ? 'Refining...' : 'AI Magic'}
+                  </button>
                 </div>
+                <textarea
+                  value={activePage.bio}
+                  placeholder="Describe your essence in a few powerful words..."
+                  onChange={(e) => handleProfileUpdate({ bio: e.target.value })}
+                  className="w-full bg-slate-100/50 border-2 border-slate-100 rounded-[2rem] px-6 py-5 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white focus:border-indigo-600 outline-none transition-all font-bold text-slate-600 text-sm h-[132px] resize-none placeholder:text-slate-200 leading-relaxed"
+                />
               </div>
             </div>
           </section>

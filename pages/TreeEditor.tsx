@@ -72,67 +72,74 @@ const TreeEditor: React.FC = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full pb-32 lg:pb-12">
-            {/* Header / Breadcrumbs */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                <div className="flex items-center gap-4">
-                    <button
-                        onClick={() => navigate('/dashboard/trees')}
-                        className="p-2.5 bg-white border border-slate-100 rounded-xl text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all"
-                    >
-                        <ArrowLeft size={20} />
-                    </button>
-                    <div>
-                        <div className="flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">
-                            <span>My Trees</span>
-                            <ChevronRight size={12} />
-                            <span className="text-indigo-600">Editor</span>
+            {/* Upper Navigation / Breadcrumbs - Glassmorphism */}
+            <div className="relative sticky top-0 z-30 mb-8 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 py-4 bg-white/60 backdrop-blur-xl border-b border-white/20">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => navigate('/dashboard/trees')}
+                            className="p-2.5 bg-white shadow-sm border border-slate-100 rounded-xl text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all hover:shadow-md active:scale-95"
+                        >
+                            <ArrowLeft size={20} />
+                        </button>
+                        <div>
+                            <div className="flex items-center gap-2 text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-1">
+                                <span>My Trees</span>
+                                <ChevronRight size={10} className="text-slate-300" />
+                                <span className="text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">Editor</span>
+                            </div>
+                            <h1 className="text-2xl font-black text-slate-900 flex items-center gap-3">
+                                {activePage.displayName}
+                                <span className="text-slate-300 font-mono text-sm font-medium">/{activePage.slug}</span>
+                            </h1>
                         </div>
-                        <h1 className="text-2xl font-black text-slate-900 flex items-center gap-3">
-                            {activePage.displayName}
-                            <span className="text-slate-300 font-mono text-sm font-medium">/{activePage.slug}</span>
-                        </h1>
                     </div>
-                </div>
-                <div className="flex items-center gap-3">
-                    <a
-                        href={`${window.location.origin}/${activePage.slug}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-white border border-slate-200 text-slate-600 px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all flex items-center gap-2"
-                    >
-                        <ExternalLink size={18} /> <span className="hidden sm:inline">Preview Live</span>
-                    </a>
-                    <button
-                        onClick={() => setActiveTab('share')}
-                        className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg active:scale-95"
-                    >
-                        <Share2 size={18} /> <span className="hidden sm:inline">Share</span>
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <a
+                            href={`${window.location.origin}/${activePage.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-white border border-slate-200 text-slate-600 px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all flex items-center gap-2 hover:shadow-sm"
+                        >
+                            <ExternalLink size={18} /> <span className="hidden sm:inline">Preview Live</span>
+                        </a>
+                        <button
+                            onClick={() => setActiveTab('share')}
+                            className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-lg shadow-indigo-100 active:scale-95"
+                        >
+                            <Share2 size={18} /> <span className="hidden sm:inline">Share Tree</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div className="grid lg:grid-cols-[1fr,340px] gap-10 items-start">
+            <div className="grid lg:grid-cols-[1fr,360px] gap-10 items-start">
                 {/* Main Content Area */}
-                <div className="space-y-6">
-                    {/* Tab Navigation */}
-                    <div className="bg-white p-2 rounded-2xl shadow-sm border border-slate-100 flex gap-1 overflow-x-auto no-scrollbar">
+                <div className="space-y-8">
+                    {/* Tab Navigation - Premium Pill Style */}
+                    <div className="bg-slate-100/50 p-1.5 rounded-2xl border border-slate-200/60 flex gap-1 overflow-x-auto no-scrollbar backdrop-blur-sm">
                         {tabs.map(tab => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as any)}
-                                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-sm whitespace-nowrap transition-all ${activeTab === tab.id
-                                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100'
-                                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-sm whitespace-nowrap transition-all relative group ${activeTab === tab.id
+                                    ? 'bg-white text-indigo-600 shadow-md ring-1 ring-slate-200'
+                                    : 'text-slate-500 hover:text-slate-900'
                                     }`}
                             >
-                                {tab.icon}
+                                <span className={`${activeTab === tab.id ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500'} transition-colors`}>
+                                    {tab.icon}
+                                </span>
                                 {tab.label}
+                                {activeTab === tab.id && (
+                                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-indigo-600 rounded-full animate-bounce"></span>
+                                )}
                             </button>
                         ))}
                     </div>
 
                     {/* Tab Panels */}
-                    <div className="min-h-[500px] animate-in fade-in slide-in-from-bottom-2 duration-500">
+                    <div className="min-h-[500px] animate-in fade-in slide-in-from-bottom-4 duration-700">
                         {activeTab === 'links' && (
                             <TreeLinks
                                 page={activePage}
@@ -160,21 +167,35 @@ const TreeEditor: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Live Preview Sidebar */}
-                <div className="hidden lg:block sticky top-24">
-                    <div className="bg-slate-900 p-8 rounded-[3rem] shadow-2xl relative overflow-hidden group">
-                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-white font-black text-xs uppercase tracking-[0.2em]">Live Preview</h3>
-                            <div className="flex gap-1">
-                                <div className="w-2 h-2 rounded-full bg-slate-700"></div>
-                                <div className="w-2 h-2 rounded-full bg-slate-700"></div>
-                                <div className="w-2 h-2 rounded-full bg-slate-700"></div>
+                {/* Live Preview Sidebar - iPhone Style Enhancement */}
+                <div className="hidden lg:block sticky top-32">
+                    <div className="bg-slate-950 p-8 rounded-[3.5rem] shadow-2xl relative overflow-hidden ring-8 ring-slate-900 border-4 border-slate-800">
+                        {/* iPhone Top Notch/Speaker */}
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-900 rounded-b-2xl z-20"></div>
+
+                        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 z-10"></div>
+
+                        <div className="flex items-center justify-between mb-8 relative z-10">
+                            <div className="flex items-center gap-2">
+                                <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <h3 className="text-white font-black text-[10px] uppercase tracking-[0.2em] opacity-80">Live Preview</h3>
+                            </div>
+                            <div className="flex gap-1.5">
+                                <div className="w-1.5 h-1.5 rounded-full bg-slate-800"></div>
+                                <div className="w-1.5 h-1.5 rounded-full bg-slate-800"></div>
+                                <div className="w-1.5 h-1.5 rounded-full bg-slate-800"></div>
                             </div>
                         </div>
-                        <PhonePreview page={activePage} />
-                        <div className="mt-8 text-center">
-                            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Auto-saving enabled</p>
+
+                        <div className="relative rounded-[2rem] overflow-hidden bg-slate-900 min-h-[550px] border border-white/5">
+                            <PhonePreview page={activePage} />
+                        </div>
+
+                        <div className="mt-8 text-center bg-slate-900/50 py-3 rounded-2xl border border-white/5">
+                            <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2">
+                                <Sparkles size={12} className="text-amber-500" />
+                                Auto-saving changes
+                            </p>
                         </div>
                     </div>
                 </div>

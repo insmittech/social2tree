@@ -140,77 +140,80 @@ const TreeLinks: React.FC<TreeLinksProps> = ({ page, onUpdate, plan }) => {
             )}
 
             {showAddForm && (
-                <div className="bg-white p-8 rounded-[2rem] shadow-xl border-2 border-indigo-100 animate-in fade-in slide-in-from-top-4 duration-300">
-                    <div className="flex justify-between mb-6">
-                        <h3 className="font-black text-lg">New Link</h3>
-                        <button onClick={() => setShowAddForm(false)} className="text-slate-400 hover:text-slate-600 p-2"><X size={20} /></button>
+                <div className="bg-white p-8 rounded-[2rem] shadow-2xl shadow-indigo-100/50 border border-slate-100 animate-in fade-in slide-in-from-top-4 duration-500">
+                    <div className="flex justify-between mb-8">
+                        <div>
+                            <h3 className="font-black text-xl text-slate-900">Add New Link</h3>
+                            <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mt-1">Fill in the details below</p>
+                        </div>
+                        <button onClick={() => setShowAddForm(false)} className="text-slate-300 hover:text-slate-900 p-2 bg-slate-50 rounded-full transition-all hover:rotate-90"><X size={20} /></button>
                     </div>
-                    <form onSubmit={handleAddLink} className="space-y-6">
-                        <div className="grid gap-6 sm:grid-cols-2">
-                            <div>
-                                <label className="text-xs font-black uppercase text-slate-400 tracking-widest mb-2 block">Link Title</label>
+                    <form onSubmit={handleAddLink} className="space-y-8">
+                        <div className="grid gap-8 sm:grid-cols-2">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] ml-1">Display Title</label>
                                 <input
-                                    placeholder="e.g. My Website"
-                                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-bold"
+                                    placeholder="e.g. Visit My Portfolio"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white outline-none transition-all font-bold placeholder:text-slate-300 shadow-sm"
                                     value={newTitle}
                                     onChange={(e) => setNewTitle(e.target.value)}
                                     autoFocus
                                 />
                             </div>
-                            <div>
-                                <label className="text-xs font-black uppercase text-slate-400 tracking-widest mb-2 block">Destination URL</label>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] ml-1">Destination URL</label>
                                 <input
-                                    placeholder="https://"
-                                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono text-sm"
+                                    placeholder="https://yourwebsite.com"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white outline-none transition-all font-mono text-sm placeholder:text-slate-300 shadow-sm"
                                     value={newUrl}
                                     onChange={(e) => setNewUrl(e.target.value)}
                                 />
                             </div>
                         </div>
-                        <div className="grid gap-6 sm:grid-cols-2">
-                            <div>
-                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2 block">Start Date (Optional)</label>
+                        <div className="grid gap-8 sm:grid-cols-2">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] ml-1">Schedule Start</label>
                                 <input
                                     type="datetime-local"
-                                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-bold"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-3.5 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white outline-none transition-all text-sm font-bold shadow-sm"
                                     value={newScheduledStart}
                                     onChange={(e) => setNewScheduledStart(e.target.value)}
                                 />
                             </div>
-                            <div>
-                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2 block">End Date (Optional)</label>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] ml-1">Schedule End</label>
                                 <input
                                     type="datetime-local"
-                                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-bold"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-3.5 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white outline-none transition-all text-sm font-bold shadow-sm"
                                     value={newScheduledEnd}
                                     onChange={(e) => setNewScheduledEnd(e.target.value)}
                                 />
                             </div>
                         </div>
-                        <div>
-                            <label className="text-xs font-black uppercase text-slate-400 tracking-widest mb-2 block">Password Protection (Optional)</label>
-                            <div className="relative">
-                                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] ml-1">Access Control</label>
+                            <div className="relative group">
+                                <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-amber-500 transition-colors" size={18} />
                                 <input
-                                    type="text"
-                                    placeholder="Set a password to lock this link"
-                                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-12 py-4 focus:ring-2 focus:ring-amber-500 outline-none transition-all text-sm font-bold"
+                                    type="password"
+                                    placeholder="Set a password to lock this link (Wait list access etc.)"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-14 py-4 focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 focus:bg-white outline-none transition-all text-sm font-bold placeholder:text-slate-300 shadow-sm"
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
                                 />
                             </div>
                         </div>
-                        <div className="flex justify-end gap-3 pt-4">
+                        <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
                             <button
                                 type="button"
                                 onClick={() => setShowAddForm(false)}
-                                className="px-6 py-4 rounded-2xl text-slate-500 font-black hover:bg-slate-50 transition-all"
+                                className="px-8 py-4 rounded-2xl text-slate-500 font-black hover:bg-slate-50 transition-all active:scale-95"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
-                                className="bg-slate-900 text-white px-10 py-4 rounded-2xl font-black hover:bg-indigo-600 transition-all shadow-xl active:scale-95"
+                                className="bg-slate-950 text-white px-12 py-4 rounded-2xl font-black hover:bg-indigo-600 transition-all shadow-xl shadow-indigo-100 active:scale-95"
                             >
                                 Create Link
                             </button>
@@ -223,12 +226,20 @@ const TreeLinks: React.FC<TreeLinksProps> = ({ page, onUpdate, plan }) => {
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                     <SortableContext items={mainLinks.map((l: any) => l.id)} strategy={verticalListSortingStrategy}>
                         {mainLinks.length === 0 ? (
-                            <div className="bg-white p-20 rounded-[3rem] border-4 border-dashed border-slate-50 text-center space-y-4">
-                                <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto text-slate-200">
-                                    <Plus size={40} />
+                            <div className="bg-white p-20 rounded-[3rem] border-2 border-slate-100 text-center space-y-6 shadow-sm">
+                                <div className="w-24 h-24 bg-indigo-50 rounded-[2rem] flex items-center justify-center mx-auto text-indigo-400 group hover:scale-110 transition-transform duration-500">
+                                    <Plus size={40} className="group-hover:rotate-180 transition-transform duration-1000" />
                                 </div>
-                                <h3 className="font-black text-slate-900 text-2xl">No links yet</h3>
-                                <p className="text-slate-400 font-medium max-w-sm mx-auto">Add your first custom link to start growing your tree!</p>
+                                <div>
+                                    <h3 className="font-black text-slate-900 text-3xl tracking-tight">Your tree is empty</h3>
+                                    <p className="text-slate-400 font-bold mt-2 max-w-sm mx-auto leading-relaxed">Add social proof, websites, and more to start connecting with your audience.</p>
+                                </div>
+                                <button
+                                    onClick={() => setShowAddForm(true)}
+                                    className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95"
+                                >
+                                    Add Your First Link
+                                </button>
                             </div>
                         ) : (
                             mainLinks.map((link: any) => (
