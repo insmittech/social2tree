@@ -1,49 +1,59 @@
 <?php
 include_once __DIR__ . '/../utils.php';
-session_start();
+
+// Auth check
+$user_id = require_auth();
 json_response();
+
 include_once __DIR__ . '/../db.php';
 
-if (!isset($_SESSION['user_id'])) {
-    json_response(["message" => "Unauthorized."], 401);
-    exit();
-}
-
 $data = get_json_input();
-$user_id = $_SESSION['user_id'];
 
 if (!empty($data['slug']) && !empty($data['displayName'])) {
-    $slug = strtolower(sanitize_input($data['slug']));
-    $displayName = sanitize_input($data['displayName']);
-    $bio = isset($data['bio']) ? sanitize_input($data['bio']) : '';
-    $theme = isset($data['theme']) ? sanitize_input($data['theme']) : 'default';
-    $customDomain = isset($data['customDomain']) ? sanitize_input($data['customDomain']) : null;
-
-    // ... (Checks)
+    $slug = sanitize_input($data['slug']);
+    $display_name = sanitize_input($data['displayName']);
+    
+    // Simple slug validation
+    if (!preg_match('/^[a-z0-9-]+$/', $slug)) {
+        json_response(["message" => "Slug can only contain lowercase letters, numbers, and hyphens."], 400);
+        exit();
+    }
 
     try {
-        $query = "INSERT INTO pages (user_id, slug, display_name, bio, theme, custom_domain) VALUES (?, ?, ?, ?, ?, ?)";
+        // Check if slug taken
+        $check = $pdo->prepare("SELECT COUNT(*) FROM pages WHERE slug = ?");
+        $check->execute([$slug]);
+        if ($check->fetchColumn() > 0) {
+            json_response(["message" => "This slug is already taken."], 400);
+            exit();
+        }
+
+        $query = "INSERT INTO pages (user_id, slug, display_name, theme, button_style) VALUES (:user_id, :slug, :display_name, 'default', 'rounded-lg')";
         $stmt = $pdo->prepare($query);
-        $stmt->execute([$user_id, $slug, $displayName, $bio, $theme, $customDomain]);
+        $stmt->execute([
+            ':user_id' => $user_id,
+            ':slug' => $slug,
+            ':display_name' => $display_name
+        ]);
 
         $page_id = $pdo->lastInsertId();
-
+        
         json_response([
             "message" => "Page created successfully.",
             "page" => [
                 "id" => (string)$page_id,
                 "slug" => $slug,
-                "displayName" => $displayName,
-                "bio" => $bio,
-                "theme" => $theme,
-                "customDomain" => $customDomain,
+                "displayName" => $display_name,
+                "theme" => "default",
+                "buttonStyle" => "rounded-lg",
                 "links" => []
             ]
         ], 201);
+
     } catch (PDOException $e) {
         json_response(["message" => "Database error: " . $e->getMessage()], 500);
     }
 } else {
-    json_response(["message" => "Slug and Display Name are required."], 400);
+    json_response(["message" => "Slug and display name are required."], 400);
 }
 ?>

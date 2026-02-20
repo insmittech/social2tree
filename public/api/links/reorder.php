@@ -1,37 +1,30 @@
 <?php
 include_once __DIR__ . '/../utils.php';
-session_start();
-json_response();
-include_once __DIR__ . '/../db.php';
 
-if (!isset($_SESSION['user_id'])) {
-    json_response(["message" => "Unauthorized."], 401);
-    exit();
-}
+// Auth check
+$user_id = require_auth();
+json_response();
+
+include_once __DIR__ . '/../db.php';
 
 $data = get_json_input();
 
 if (!empty($data['ids']) && is_array($data['ids'])) {
-    $user_id = $_SESSION['user_id'];
-    $ids = $data['ids'];
-
     try {
         $pdo->beginTransaction();
+        $stmt = $pdo->prepare("UPDATE links SET sort_order = ? WHERE id = ? AND user_id = ?");
         
-        $query = "UPDATE links SET sort_order = ? WHERE id = ? AND user_id = ?";
-        $stmt = $pdo->prepare($query);
-
-        foreach ($ids as $index => $id) {
+        foreach ($data['ids'] as $index => $id) {
             $stmt->execute([$index, $id, $user_id]);
         }
-
+        
         $pdo->commit();
-        json_response(["message" => "Links reordered successfully."]);
+        json_response(["message" => "Link order updated successfully."]);
     } catch (PDOException $e) {
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) $pdo->rollBack();
         json_response(["message" => "Database error: " . $e->getMessage()], 500);
     }
 } else {
-    json_response(["message" => "Invalid data. Expected an array of IDs."], 400);
+    json_response(["message" => "Invalid link IDs provided."], 400);
 }
 ?>

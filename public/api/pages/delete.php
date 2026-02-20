@@ -1,45 +1,45 @@
 <?php
 include_once __DIR__ . '/../utils.php';
-session_start();
+
+// Auth check
+$user_id = require_auth();
 json_response();
+
 include_once __DIR__ . '/../db.php';
 
-if (!isset($_SESSION['user_id'])) {
-    json_response(["message" => "Unauthorized."], 401);
-    exit();
-}
-
 $data = get_json_input();
-$user_id = $_SESSION['user_id'];
 
 if (!empty($data['id'])) {
-    $id = (int)$data['id'];
-
-    // 1. Verify ownership and ensure it's not the last page
-    $stmt = $pdo->prepare("SELECT user_id FROM pages WHERE id = ?");
-    $stmt->execute([$id]);
-    $page = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$page || $page['user_id'] != $user_id) {
-        json_response(["message" => "Page not found or access denied."], 403);
-        exit();
-    }
-
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM pages WHERE user_id = ?");
-    $stmt->execute([$user_id]);
-    if ($stmt->fetchColumn() <= 1) {
-        json_response(["message" => "Cannot delete your only page."], 400);
-        exit();
-    }
+    $page_id = $data['id'];
 
     try {
-        $stmt = $pdo->prepare("DELETE FROM pages WHERE id = ?");
-        $stmt->execute([$id]);
-        json_response(["message" => "Page deleted successfully."]);
+        // Verify ownership
+        $check = $pdo->prepare("SELECT COUNT(*) FROM pages WHERE id = ? AND user_id = ?");
+        $check->execute([$page_id, $user_id]);
+        
+        if ($check->fetchColumn() > 0) {
+            // Transaction to delete links too? 
+            // Assume DB has cascade delete or do it manually
+            $pdo->beginTransaction();
+            
+            $pdo->prepare("DELETE FROM links WHERE page_id = ?")->execute([$page_id]);
+            $stmt = $pdo->prepare("DELETE FROM pages WHERE id = ?");
+            
+            if ($stmt->execute([$page_id])) {
+                $pdo->commit();
+                json_response(["message" => "Page deleted successfully."]);
+            } else {
+                $pdo->rollBack();
+                json_response(["message" => "Unable to delete page."], 500);
+            }
+        } else {
+            json_response(["message" => "Access denied or page not found."], 403);
+        }
     } catch (PDOException $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
         json_response(["message" => "Database error: " . $e->getMessage()], 500);
     }
 } else {
-    json_response(["message" => "Page ID required."], 400);
+    json_response(["message" => "Page ID is required."], 400);
 }
 ?>

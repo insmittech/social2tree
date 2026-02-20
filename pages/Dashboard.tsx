@@ -1,10 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import PhonePreview from '../components/PhonePreview';
 import { useNavigate } from 'react-router-dom';
 import client from '../src/api/client';
-import { UserProfile } from '../types';
-import { Plus, Trash2, ExternalLink, Edit2, X, Wand2, QrCode, Download, Share2, Globe, Star, Zap, ShieldAlert, Check, Eye, Settings, MousePointer2, TrendingUp, ArrowRight } from 'lucide-react';
+import { Plus, Trash2, Check, Share2, QrCode, Eye, ArrowRight, ShieldAlert, X } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { useToast } from '../src/context/ToastContext';
 import { useAuth } from '../src/context/AuthContext';
@@ -26,7 +24,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import SortableLink from '../components/SortableLink';
-import PageManager from '../components/PageManager';
+import { THEMES } from '../types';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -35,12 +33,7 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { user: profile, updateUser, refreshProfile } = useAuth();
-
-  // We don't need local loading state for profile as AuthContext handles it, 
-  // but we might want to ensure profile is present.
-  // App.tsx handles redirection if not authenticated.
-
+  const { user: profile, updateUser } = useAuth();
   const { selectedPageId, setSelectedPageId } = usePageSelector();
 
   const [showAddForm, setShowAddForm] = useState(false);
@@ -55,7 +48,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [copied, setCopied] = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
 
-  // Derived active page
   const activePage = profile?.pages?.find(p => p.id === selectedPageId) || profile?.pages?.[0] || null;
 
   useEffect(() => {
@@ -64,7 +56,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     }
   }, [profile, selectedPageId, setSelectedPageId]);
 
-  // DnD Sensors
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -72,10 +63,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     })
   );
 
-  // No fetchProfile useEffect needed anymore
-
   if (!profile || !activePage) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div></div>;
+    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-2 border-indigo-600 border-t-transparent"></div></div>;
   }
 
   const isFreePlan = profile.plan === 'free';
@@ -209,16 +198,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     }
   };
 
-  const onPageCreated = (page: any) => {
-    if (profile) {
-      updateUser({ pages: [...profile.pages, page] });
-    }
-  };
-
-  const handleUpgrade = () => {
-    showToast("Payment gateway integration pending.", "info");
-  };
-
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
 
@@ -241,7 +220,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       } catch (err) {
         console.error("Failed to reorder links", err);
         showToast('Failed to save link order', 'error');
-        // Rollback on error
         if (profile) {
           const originalPages = profile.pages.map(p => p.id === activePage.id ? { ...p, links: activePage.links } : p);
           updateUser({ pages: originalPages });
@@ -255,7 +233,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     try {
       const genAI = new GoogleGenAI({ apiKey: process.env.API_KEY || '' } as any);
       const model = (genAI as any).getGenerativeModel({ model: "gemini-1.5-flash" });
-      const result = await model.generateContent(`Write a compelling, professional one-sentence social media bio for ${activePage.displayName} who is ${activePage.bio || 'a digital creator'}. Focus on authority and personality. Max 80 characters.`);
+      const result = await model.generateContent(`Write a professional one-sentence bio for ${activePage.displayName}. Max 80 characters.`);
       const response = await result.response;
       const text = response.text();
 
@@ -275,222 +253,144 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const socialIcons = activePage.links.filter(l => l.type === 'social_icon');
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full pb-32 lg:pb-12 bg-slate-50/30">
-      <div className="grid lg:grid-cols-[1fr,340px] gap-12 items-start">
-        <div className="space-y-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full pb-24">
+      <div className="grid lg:grid-cols-[1fr,320px] gap-10 items-start">
+        <div className="space-y-8">
 
-          {/* Header Section */}
-          <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          {/* Header */}
+          <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                Dashboard
-              </div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
-                {new Date().getHours() < 12 ? 'Good Morning' : new Date().getHours() < 18 ? 'Good Afternoon' : 'Good Evening'}, {profile.displayName.split(' ')[0]}
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Overview</p>
+              <h1 className="text-2xl font-bold text-slate-900">
+                Welcome back, {profile.displayName.split(' ')[0]}
               </h1>
-              <p className="text-slate-500 text-sm mt-1">
-                Your page is live at <span className="text-indigo-600 font-medium">s2t.me/{activePage.slug}</span>
+              <p className="text-slate-500 text-xs mt-1">
+                Your profile: <span className="text-indigo-600 font-bold">s2t.me/{activePage.slug}</span>
               </p>
             </div>
-            <div className="flex gap-2 w-full sm:w-auto">
+            <div className="flex gap-2">
               <button
-                onClick={() => setShowMobilePreview(true)}
-                className="lg:hidden flex-1 bg-white text-slate-700 px-4 py-3 rounded-lg font-bold flex items-center justify-center gap-2 border border-slate-200"
+                onClick={handleShare}
+                className="p-2.5 bg-white border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50"
+                title="Copy Link"
               >
-                <Eye size={18} /> Preview
+                {copied ? <Check size={18} className="text-green-600" /> : <Share2 size={18} />}
               </button>
-              <div className="flex gap-2">
-                <button
-                  onClick={handleShare}
-                  className="p-3 bg-white text-slate-500 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-                  title="Copy Link"
-                >
-                  {copied ? <Check size={20} className="text-green-500" /> : <Share2 size={20} />}
-                </button>
-                <button
-                  onClick={handleDownloadQR}
-                  className="p-3 bg-white text-slate-500 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
-                  title="Download QR"
-                >
-                  {isDownloading ? <div className="animate-spin h-5 w-5 border-2 border-indigo-600 border-t-transparent rounded-full" /> : <QrCode size={20} />}
-                </button>
-              </div>
+              <button
+                onClick={handleDownloadQR}
+                className="p-2.5 bg-white border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50"
+                title="Download QR"
+              >
+                {isDownloading ? <div className="animate-spin h-4.5 w-4.5 border-2 border-indigo-600 border-t-transparent rounded-full" /> : <QrCode size={18} />}
+              </button>
             </div>
           </header>
 
-          {/* Stats Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: "Views", value: profile.views.toLocaleString(), color: "blue" },
-              { label: "Clicks", value: totalClicks.toLocaleString(), color: "green" },
-              { label: "CTR", value: `${ctr}%`, color: "orange" }
+              { label: "Views", value: profile.views.toLocaleString() },
+              { label: "Clicks", value: totalClicks.toLocaleString() },
+              { label: "CTR", value: `${ctr}%` },
+              { label: "Plan", value: profile.plan.toUpperCase() }
             ].map((stat, i) => (
-              <div key={i} className="bg-white p-6 rounded-xl border border-slate-200">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{stat.label}</p>
-                <h3 className="text-2xl font-bold text-slate-900 tracking-tight">{stat.value}</h3>
+              <div key={i} className="bg-white p-5 rounded-lg border border-slate-200">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{stat.label}</p>
+                <h3 className="text-xl font-bold text-slate-900">{stat.value}</h3>
               </div>
             ))}
-
-            <div
-              className="bg-indigo-600 p-6 rounded-xl shadow-md text-white cursor-pointer hover:bg-indigo-700 transition"
-              onClick={() => navigate('/dashboard/analytics')}
-            >
-              <p className="text-xs font-bold text-indigo-100 uppercase tracking-wider mb-1">Analytics</p>
-              <div className="flex justify-between items-center">
-                <h3 className="text-xl font-bold">View Insights</h3>
-                <ArrowRight size={20} />
-              </div>
-            </div>
           </div>
 
-          {/* Profile Settings Section */}
-          <section className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-8">
-            <div>
-              <h2 className="text-xl font-bold text-slate-900">Profile Settings</h2>
-              <p className="text-slate-500 text-sm">Update your public profile details.</p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8">
+          {/* Profile Section */}
+          <div className="bg-white p-6 rounded-lg border border-slate-200 space-y-6">
+            <h2 className="text-lg font-bold text-slate-900">Profile Details</h2>
+            <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Display Name</label>
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Display Name</label>
                   <input
                     type="text"
                     value={activePage.displayName}
-                    placeholder="Your Name"
                     onChange={(e) => handleProfileUpdate({ displayName: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-indigo-500 outline-none"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Custom Domain</label>
-                  <input
-                    type="text"
-                    value={activePage.customDomain || ''}
-                    placeholder="links.yourbrand.com"
-                    onChange={(e) => handleProfileUpdate({ customDomain: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                  <div className="flex justify-between items-center">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bio</label>
+                    <button onClick={generateAIBio} disabled={isGeneratingBio} className="text-[10px] font-bold text-indigo-600 hover:underline">
+                      {isGeneratingBio ? '...' : 'AI Bio'}
+                    </button>
+                  </div>
+                  <textarea
+                    value={activePage.bio}
+                    onChange={(e) => handleProfileUpdate({ bio: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm focus:ring-1 focus:ring-indigo-500 outline-none h-24 resize-none"
                   />
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="flex justify-between items-center">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Bio</label>
-                  <button
-                    onClick={generateAIBio}
-                    disabled={isGeneratingBio}
-                    className="text-[10px] font-bold text-indigo-600 uppercase hover:underline disabled:opacity-50"
-                  >
-                    {isGeneratingBio ? 'Generating...' : 'AI Generate'}
-                  </button>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Base Color</label>
+                <div className="flex items-center gap-3">
+                  {(() => {
+                    const currentTheme = THEMES[activePage.theme] || THEMES.default;
+                    return (
+                      <>
+                        <div className={`w-10 h-10 rounded-lg border border-slate-200 ${currentTheme.background}`} />
+                        <p className="text-xs font-mono text-slate-500">{currentTheme.name}</p>
+                      </>
+                    );
+                  })()}
                 </div>
-                <textarea
-                  value={activePage.bio}
-                  placeholder="Tell your story..."
-                  onChange={(e) => handleProfileUpdate({ bio: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all h-32 resize-none text-sm"
-                />
               </div>
             </div>
-          </section>
+          </div>
 
           {/* Links Section */}
-          <section className="space-y-4">
+          <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <h2 className="text-xl font-bold text-slate-900">Links</h2>
-                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${hasReachedLimit ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-500'}`}>
-                  {mainLinks.length} / {isFreePlan ? '3' : '∞'}
-                </span>
-              </div>
+              <h2 className="text-lg font-bold text-slate-900">Active Links</h2>
               <button
                 onClick={() => setShowAddForm(true)}
                 disabled={hasReachedLimit}
-                className={`px-4 sm:px-6 py-2.5 rounded-full font-bold flex items-center gap-2 transition-all shadow-lg active:scale-95 text-sm ${hasReachedLimit ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                  }`}
+                className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 disabled:opacity-50"
               >
-                <Plus size={18} /> <span className="hidden xs:inline">Add Link</span>
+                Add Link
               </button>
             </div>
 
-            {hasReachedLimit && (
-              <div className="bg-red-50 border border-red-100 p-4 rounded-xl flex items-center gap-3 text-red-700">
-                <ShieldAlert size={18} />
-                <p className="text-sm font-medium">Link limit reached. <button onClick={handleUpgrade} className="font-bold underline">Upgrade to PRO</button></p>
-              </div>
-            )}
-
             {showAddForm && (
-              <div className="bg-white p-6 rounded-2xl shadow-xl border-2 border-indigo-100 animate-in fade-in slide-in-from-top-4 duration-300">
-                <div className="flex justify-between mb-4">
-                  <h3 className="font-bold">New Link</h3>
-                  <button onClick={() => setShowAddForm(false)} className="text-slate-400 hover:text-slate-600"><X size={18} /></button>
+              <div className="bg-white p-6 rounded-lg border border-indigo-100 shadow-sm space-y-4">
+                <div className="flex justify-between">
+                  <h3 className="font-bold text-sm">New Link</h3>
+                  <button onClick={() => setShowAddForm(false)} className="text-slate-400"><X size={16} /></button>
                 </div>
-                <form onSubmit={handleAddLink} className="space-y-4">
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <input
-                      placeholder="Title (e.g. My Website)"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                      value={newTitle}
-                      onChange={(e) => setNewTitle(e.target.value)}
-                      autoFocus
-                    />
-                    <input
-                      placeholder="URL (e.g. https://...)"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono text-sm"
-                      value={newUrl}
-                      onChange={(e) => setNewUrl(e.target.value)}
-                    />
-                  </div>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Start Date (Optional)</label>
-                      <input
-                        type="datetime-local"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm"
-                        value={newScheduledStart}
-                        onChange={(e) => setNewScheduledStart(e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">End Date (Optional)</label>
-                      <input
-                        type="datetime-local"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm"
-                        value={newScheduledEnd}
-                        onChange={(e) => setNewScheduledEnd(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex justify-end gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setShowAddForm(false)}
-                      className="px-4 py-2 rounded-lg text-slate-500 font-semibold hover:bg-slate-100 transition-all font-mono"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="bg-indigo-600 text-white px-10 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-all shadow-md font-mono"
-                    >
-                      Add Link
-                    </button>
-                  </div>
-                </form>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <input
+                    placeholder="Title"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm"
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                  />
+                  <input
+                    placeholder="URL"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm font-mono"
+                    value={newUrl}
+                    onChange={(e) => setNewUrl(e.target.value)}
+                  />
+                </div>
+                <button
+                  onClick={handleAddLink}
+                  className="w-full bg-indigo-600 text-white py-2 rounded-lg font-bold text-sm"
+                >
+                  Create Link
+                </button>
               </div>
             )}
 
-            <div className="space-y-4">
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={mainLinks.map(l => l.id)}
-                  strategy={verticalListSortingStrategy}
-                >
+            <div className="space-y-3">
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={mainLinks.map(l => l.id)} strategy={verticalListSortingStrategy}>
                   {mainLinks.map((link) => (
                     <SortableLink
                       key={link.id}
@@ -503,93 +403,16 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 </SortableContext>
               </DndContext>
             </div>
-          </section>
-
-          {/* Social Icons Section */}
-          <section className="space-y-4">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <h2 className="text-xl font-bold text-slate-900">Social Icons</h2>
-                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">
-                  {socialIcons.length}
-                </span>
-              </div>
-              <button
-                onClick={() => setShowSocialForm(true)}
-                className="px-4 py-2 rounded-full font-bold flex items-center gap-2 transition-all shadow-sm bg-white border border-slate-200 hover:border-indigo-300 text-indigo-600 text-sm"
-              >
-                <Plus size={18} /> Add Icon
-              </button>
-            </div>
-
-            {showSocialForm && (
-              <div className="bg-white p-6 rounded-2xl shadow-xl border-2 border-indigo-100 animate-in fade-in slide-in-from-top-4 duration-300">
-                <div className="flex justify-between mb-4">
-                  <h3 className="font-bold">New Social Icon</h3>
-                  <button onClick={() => setShowSocialForm(false)} className="text-slate-400 hover:text-slate-600"><X size={18} /></button>
-                </div>
-                <form onSubmit={(e) => handleAddLink(e, 'social_icon')} className="space-y-4">
-                  <div>
-                    <input
-                      placeholder="Social Profile URL (e.g. https://instagram.com/...)"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono text-sm"
-                      value={newSocialUrl}
-                      onChange={(e) => setNewSocialUrl(e.target.value)}
-                      autoFocus
-                    />
-                  </div>
-                  <div className="flex justify-end gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setShowSocialForm(false)}
-                      className="px-4 py-2 rounded-lg text-slate-500 font-semibold hover:bg-slate-100 transition-all font-mono"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="bg-indigo-600 text-white px-10 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-all shadow-md font-mono"
-                    >
-                      Add Icon
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {socialIcons.map((link) => (
-                <div key={link.id} className="bg-white p-3 rounded-xl border border-slate-200 flex items-center justify-between">
-                  <div className="flex items-center gap-3 overflow-hidden">
-                    <div className="p-2 bg-slate-50 rounded-lg">
-                      {getSocialIcon(link.url)}
-                    </div>
-                    <div className="overflow-hidden">
-                      <p className="text-xs font-mono text-slate-500 truncate">{link.url}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <label className="relative inline-flex items-center cursor-pointer scale-75">
-                      <input
-                        type="checkbox"
-                        className="sr-only peer"
-                        checked={link.active}
-                        onChange={(e) => handleToggleActive(link.id, e.target.checked)}
-                      />
-                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                    </label>
-                    <button onClick={() => handleDelete(link.id)} className="text-slate-300 hover:text-red-500 p-1">
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
+          </div>
         </div>
 
+        {/* Sidebar Preview */}
         <div className="hidden lg:block sticky top-24">
-          <PhonePreview page={activePage} />
+          <div className="bg-slate-900 p-4 rounded-xl border border-slate-800">
+            <div className="bg-white rounded-lg overflow-hidden min-h-[480px]">
+              <PhonePreview page={activePage} />
+            </div>
+          </div>
         </div>
       </div>
     </div>

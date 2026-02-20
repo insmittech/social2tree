@@ -1,36 +1,16 @@
 <?php
 include_once __DIR__ . '/../utils.php';
 
-// Handle CORS and preflight
+// Auth check
+$user_id = require_auth();
 json_response();
 
 include_once __DIR__ . '/../db.php';
 
-// Session check
-$is_secure = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') || 
-            (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
-
-session_set_cookie_params([
-    'lifetime' => 0,
-    'path' => '/',
-    'domain' => '',
-    'secure' => $is_secure,
-    'httponly' => true,
-    'samesite' => 'Lax'
-]);
-
-session_start();
-
-if (!isset($_SESSION['user_id'])) {
-    json_response(["message" => "Unauthorized"], 401);
-    exit();
-}
-
-$user_id = $_SESSION['user_id'];
 $data = get_json_input();
 
 if (!$data) {
-    json_response(["message" => "Invalid input"], 400);
+    json_response(["message" => "No changes provided."], 400);
     exit();
 }
 
@@ -41,7 +21,7 @@ try {
     $current_user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$current_user) {
-        json_response(["message" => "User not found"], 404);
+        json_response(["message" => "User record not found."], 404);
         exit();
     }
 
@@ -66,16 +46,20 @@ try {
                 $check = $pdo->prepare("SELECT id FROM users WHERE username = ? AND id != ?");
                 $check->execute([$value, $user_id]);
                 if ($check->rowCount() > 0) {
-                    json_response(["message" => "Username already taken"], 400);
+                    json_response(["message" => "Username already taken."], 400);
                     exit();
                 }
             }
 
             if ($json_key === 'email' && $value !== $current_user['email']) {
+                if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                    json_response(["message" => "Invalid email format."], 400);
+                    exit();
+                }
                 $check = $pdo->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
                 $check->execute([$value, $user_id]);
                 if ($check->rowCount() > 0) {
-                    json_response(["message" => "Email already registered"], 400);
+                    json_response(["message" => "Email already registered."], 400);
                     exit();
                 }
             }
@@ -87,13 +71,17 @@ try {
 
     // Handle Password Update
     if (!empty($data['password'])) {
+        if (strlen($data['password']) < 8) {
+            json_response(["message" => "New password must be at least 8 characters long."], 400);
+            exit();
+        }
         $password_hash = password_hash($data['password'], PASSWORD_BCRYPT);
         $updates[] = "password_hash = :password_hash";
         $params[":password_hash"] = $password_hash;
     }
 
     if (empty($updates)) {
-        json_response(["message" => "No changes provided"], 400);
+        json_response(["message" => "No valid changes provided."], 400);
         exit();
     }
 
@@ -103,9 +91,9 @@ try {
 
     $stmt = $pdo->prepare($query);
     if ($stmt->execute($params)) {
-        json_response(["message" => "Profile updated successfully"]);
+        json_response(["message" => "Profile updated successfully."]);
     } else {
-        json_response(["message" => "Failed to update profile"], 500);
+        json_response(["message" => "Unable to update profile. Please try again later."], 500);
     }
 
 } catch (PDOException $e) {

@@ -1,37 +1,36 @@
 <?php
 include_once __DIR__ . '/../utils.php';
-session_start();
-json_response();
-include_once __DIR__ . '/../db.php';
 
-if (!isset($_SESSION['user_id'])) {
-    json_response(["message" => "Unauthorized."], 401);
-    exit();
-}
+// Auth check
+$user_id = require_auth();
+json_response();
+
+include_once __DIR__ . '/../db.php';
 
 $data = get_json_input();
 
 if (!empty($data['id'])) {
-    $user_id = $_SESSION['user_id'];
-    $id = $data['id'];
+    $link_id = $data['id'];
 
     try {
-        $query = "DELETE FROM links WHERE id = ? AND user_id = ?";
-        $stmt = $pdo->prepare($query);
-
-        if ($stmt->execute([$id, $user_id])) {
-            if ($stmt->rowCount() > 0) {
-                json_response(["message" => "Link deleted."]);
+        // Verify ownership
+        $check = $pdo->prepare("SELECT COUNT(*) FROM links WHERE id = ? AND user_id = ?");
+        $check->execute([$link_id, $user_id]);
+        
+        if ($check->fetchColumn() > 0) {
+            $stmt = $pdo->prepare("DELETE FROM links WHERE id = ?");
+            if ($stmt->execute([$link_id])) {
+                json_response(["message" => "Link deleted successfully."]);
             } else {
-                json_response(["message" => "Link not found."], 404);
+                json_response(["message" => "Unable to delete link."], 500);
             }
         } else {
-            json_response(["message" => "Unable to delete link."], 503);
+            json_response(["message" => "Access denied or link not found."], 403);
         }
     } catch (PDOException $e) {
         json_response(["message" => "Database error: " . $e->getMessage()], 500);
     }
 } else {
-    json_response(["message" => "Incomplete data."], 400);
+    json_response(["message" => "Link ID is required."], 400);
 }
 ?>

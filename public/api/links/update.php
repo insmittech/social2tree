@@ -1,81 +1,66 @@
 <?php
 include_once __DIR__ . '/../utils.php';
-session_start();
-json_response();
-include_once __DIR__ . '/../db.php';
 
-if (!isset($_SESSION['user_id'])) {
-    json_response(["message" => "Unauthorized."], 401);
-    exit();
-}
+// Auth check
+$user_id = require_auth();
+json_response();
+
+include_once __DIR__ . '/../db.php';
 
 $data = get_json_input();
 
 if (!empty($data['id'])) {
-    $user_id = $_SESSION['user_id'];
-    $id = $data['id'];
+    $link_id = $data['id'];
+    
+    // Whitelist updateable fields
+    $mapping = [
+        'title' => 'title',
+        'url' => 'url',
+        'is_active' => 'is_active',
+        'active' => 'is_active',
+        'type' => 'type',
+        'scheduledStart' => 'scheduled_start',
+        'scheduledEnd' => 'scheduled_end'
+    ];
 
-    // Build dynamic update query
-    $fields = [];
+    $updates = [];
     $params = [];
 
-    if (isset($data['title'])) {
-        $fields[] = "title = ?";
-        $params[] = sanitize_input($data['title']);
-    }
-    if (isset($data['url'])) {
-        $fields[] = "url = ?";
-        $params[] = sanitize_input($data['url']);
-    }
-    if (isset($data['is_active'])) {
-        $fields[] = "is_active = ?";
-        $params[] = (int) $data['is_active'];
-    }
-    if (isset($data['sort_order'])) {
-        $fields[] = "sort_order = ?";
-        $params[] = (int) $data['sort_order'];
-    }
-    if (isset($data['type'])) {
-        $fields[] = "type = ?";
-        $params[] = sanitize_input($data['type']);
-    }
-    if (isset($data['scheduled_start'])) {
-        $fields[] = "scheduled_start = ?";
-        $params[] = !empty($data['scheduled_start']) ? sanitize_input($data['scheduled_start']) : null;
-    }
-    if (isset($data['scheduled_end'])) {
-        $fields[] = "scheduled_end = ?";
-        $params[] = !empty($data['scheduled_end']) ? sanitize_input($data['scheduled_end']) : null;
-    }
-    if (isset($data['password'])) {
-        $fields[] = "password = ?";
-        $params[] = !empty($data['password']) ? sanitize_input($data['password']) : null;
+    foreach ($mapping as $frontendKey => $dbField) {
+        if (isset($data[$frontendKey])) {
+            $updates[] = "$dbField = ?";
+            $val = $data[$frontendKey];
+            if ($dbField === 'is_active') $val = (int)$val;
+            $params[] = sanitize_input($val);
+        }
     }
 
-    if (empty($fields)) {
-        json_response(["message" => "No fields to update."], 400);
+    if (empty($updates)) {
+        json_response(["message" => "No valid changes provided."], 400);
         exit();
     }
 
-    // Add ID and User ID to params for WHERE clause
-    $params[] = $id;
-    $params[] = $user_id;
-
     try {
-        $query = "UPDATE links SET " . implode(", ", $fields) . " WHERE id = ? AND user_id = ?";
-        $stmt = $pdo->prepare($query);
-
-        if ($stmt->execute($params)) {
-             // Even if rowCount is 0, the record was found and potentially matched existing values.
-             // We consider this a success to avoid 404 errors in frontend on "no-change" saves.
-             json_response(["message" => "Link updated successfully."]);
+        // Verify ownership
+        $check = $pdo->prepare("SELECT COUNT(*) FROM links WHERE id = ? AND user_id = ?");
+        $check->execute([$link_id, $user_id]);
+        
+        if ($check->fetchColumn() > 0) {
+            $params[] = $link_id;
+            $query = "UPDATE links SET " . implode(", ", $updates) . " WHERE id = ?";
+            $stmt = $pdo->prepare($query);
+            if ($stmt->execute($params)) {
+                json_response(["message" => "Link updated successfully."]);
+            } else {
+                json_response(["message" => "Unable to update link."], 500);
+            }
         } else {
-             json_response(["message" => "Unable to update link."], 503);
+            json_response(["message" => "Access denied or link not found."], 403);
         }
     } catch (PDOException $e) {
         json_response(["message" => "Database error: " . $e->getMessage()], 500);
     }
 } else {
-    json_response(["message" => "Incomplete data."], 400);
+    json_response(["message" => "Link ID is required."], 400);
 }
 ?>

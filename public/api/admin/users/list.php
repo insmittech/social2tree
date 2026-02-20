@@ -1,30 +1,14 @@
 <?php
 include_once __DIR__ . '/../../utils.php';
+
+// Admin check
+require_admin();
+json_response();
+
 include_once __DIR__ . '/../../db.php';
-
-// Auth Check
-$is_secure = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') || 
-            (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
-
-session_set_cookie_params([
-    'lifetime' => 0,
-    'path' => '/',
-    'domain' => '',
-    'secure' => $is_secure,
-    'httponly' => true,
-    'samesite' => 'Lax'
-]);
-
-session_start();
-
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    json_response(["message" => "Unauthorized access."], 403);
-    exit;
-}
 
 try {
     // Fetch users with their primary stats
-    // We aggregate views from the analytics table
     $query = "
         SELECT 
             u.id, 
@@ -66,3 +50,4 @@ try {
 } catch (PDOException $e) {
     json_response(["message" => "Database error: " . $e->getMessage()], 500);
 }
+?>

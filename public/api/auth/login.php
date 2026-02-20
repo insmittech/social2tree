@@ -1,21 +1,8 @@
 <?php
 include_once __DIR__ . '/../utils.php';
-
-// Determine 'secure' flag consistently
-$is_secure = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') || 
-            (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
-
-session_set_cookie_params([
-    'lifetime' => 0,
-    'path' => '/',
-    'domain' => '',
-    'secure' => $is_secure,
-    'httponly' => true,
-    'samesite' => 'Lax'
-]);
-
-session_start();
+start_secure_session();
 json_response();
+
 include_once __DIR__ . '/../db.php';
 
 $data = get_json_input();
@@ -31,48 +18,33 @@ if (!empty($data['username']) && !empty($data['password'])) {
 
         if ($stmt->rowCount() > 0) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            $id = $row['id'];
-            $username = $row['username'];
-            $password_hash = $row['password_hash'];
-            $role = $row['role'];
-
-            if (password_verify($password, $password_hash)) {
-                // Determine 'secure' flag based on server protocol and proxies
-                $is_secure = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') || 
-                            (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
-
-                // Set session token
-                session_set_cookie_params([
-                    'lifetime' => 0, // Session cookie
-                    'path' => '/',
-                    'domain' => '', // Current domain
-                    'secure' => $is_secure,
-                    'httponly' => true,
-                    'samesite' => 'Lax' // Changed from Strict for better site navigation
-                ]);
-                session_start();
-                $_SESSION['user_id'] = $id;
-                $_SESSION['username'] = $username;
-                $_SESSION['role'] = $role;
+            
+            if (password_verify($password, $row['password_hash'])) {
+                // Regenerate session ID for security
+                session_regenerate_id(true);
+                
+                $_SESSION['user_id'] = $row['id'];
+                $_SESSION['username'] = $row['username'];
+                $_SESSION['role'] = $row['role'];
 
                 json_response([
                     "message" => "Login successful.",
                     "user" => [
-                        "id" => (string) $id,
-                        "username" => $username,
-                        "role" => $role
+                        "id" => (string) $row['id'],
+                        "username" => $row['username'],
+                        "role" => $row['role']
                     ]
                 ]);
             } else {
-                json_response(["message" => "Invalid password."], 401);
+                json_response(["message" => "Invalid username or password."], 401);
             }
         } else {
-            json_response(["message" => "User not found."], 404);
+            json_response(["message" => "Invalid username or password."], 401);
         }
     } catch (PDOException $e) {
         json_response(["message" => "Database error: " . $e->getMessage()], 500);
     }
 } else {
-    json_response(["message" => "Incomplete data."], 400);
+    json_response(["message" => "Please provide both username and password."], 400);
 }
 ?>

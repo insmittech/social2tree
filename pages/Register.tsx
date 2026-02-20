@@ -41,7 +41,7 @@ const Register: React.FC<RegisterProps> = ({ isAuthenticated }) => {
         <ArrowLeft size={16} /> Back
       </Link>
 
-      <div className="max-w-md w-full bg-white p-10 rounded-2xl border border-slate-200 shadow-sm">
+      <div className="max-w-md w-full bg-white p-8 rounded-lg border border-slate-200 shadow-sm">
         <div className="flex justify-center mb-8">
           <div className="bg-indigo-600 p-2.5 rounded-xl shadow-lg">
             <TreePine className="text-white w-8 h-8" />
@@ -106,7 +106,7 @@ const Register: React.FC<RegisterProps> = ({ isAuthenticated }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-lg bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-100 flex items-center justify-center disabled:opacity-50"
+            className="w-full py-3 rounded-lg bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition flex items-center justify-center disabled:opacity-50"
           >
             {loading ? (
               <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
@@ -115,6 +115,21 @@ const Register: React.FC<RegisterProps> = ({ isAuthenticated }) => {
             )}
           </button>
         </form>
+
+        <div className="mt-8">
+          <div className="relative flex items-center justify-center mb-6">
+            <div className="absolute w-full h-px bg-slate-100"></div>
+            <span className="relative bg-white px-4 text-xs font-medium text-slate-400 uppercase tracking-widest">Or continue with</span>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <button className="flex items-center justify-center gap-2 py-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition font-bold text-sm text-slate-600">
+              Google
+            </button>
+            <button className="flex items-center justify-center gap-2 py-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition font-bold text-sm text-slate-600">
+              Apple
+            </button>
+          </div>
+        </div>
 
         <div className="mt-10 text-center text-sm font-medium text-slate-500">
           Already a member? <Link to="/login" className="text-indigo-600 font-bold hover:underline">Log in</Link>
