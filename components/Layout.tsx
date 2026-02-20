@@ -30,12 +30,14 @@ const Layout: React.FC<LayoutProps> = ({ children, userProfile, onLogout, isAdmi
 
             <div className={`flex-1 flex flex-col min-w-0 h-screen overflow-hidden transition-all duration-300`}>
                 {/* Navbar at top */}
-                <Navbar
-                    isDashboard
-                    onLogout={onLogout}
-                    isAuthenticated={true}
-                    userProfile={userProfile}
-                />
+                <div className="lg:hidden">
+                    <Navbar
+                        isDashboard
+                        onLogout={onLogout}
+                        isAuthenticated={true}
+                        userProfile={userProfile}
+                    />
+                </div>
 
                 {/* Content Area */}
                 <main className="flex-1 overflow-y-auto no-scrollbar">

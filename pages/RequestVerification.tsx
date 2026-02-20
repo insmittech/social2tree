@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Info, Clock, AlertCircle, CheckCircle2, Send } from 'lucide-react';
 import axios from 'axios';
 import { UserProfile } from '../types';
@@ -11,10 +11,49 @@ const RequestVerification: React.FC<RequestVerificationProps> = () => {
     const { user } = useAuth();
     const [details, setDetails] = useState('');
     const [loading, setLoading] = useState(false);
-    const [submitted, setSubmitted] = useState(false);
+    const [status, setStatus] = useState<'none' | 'pending' | 'approved' | 'rejected' | 'more_info'>('none');
+    const [rejectionReason, setRejectionReason] = useState('');
     const [error, setError] = useState('');
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
 
-    if (!user) {
+    useEffect(() => {
+        fetchStatus();
+    }, []);
+
+    const fetchStatus = async () => {
+        try {
+            const response = await axios.get('/api/verification/status.php');
+            if (response.data) {
+                setStatus(response.data.status);
+                setRejectionReason(response.data.rejectionReason || '');
+                if (response.data.details) setDetails(response.data.details);
+            }
+        } catch (err) {
+            console.error('Failed to fetch verification status');
+        } finally {
+            setIsInitialLoading(false);
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        try {
+            const response = await axios.post('/api/verification/request.php', { details });
+            if (response.status === 201 || response.status === 200) {
+                setStatus('pending');
+                fetchStatus();
+            }
+        } catch (err: any) {
+            setError(err.response?.data?.message || 'Failed to submit request.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (isInitialLoading || !user) {
         return (
             <div className="min-h-[400px] flex items-center justify-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-2 border-indigo-600 border-t-transparent"></div>
@@ -24,24 +63,7 @@ const RequestVerification: React.FC<RequestVerificationProps> = () => {
 
     const canApplyInstantly = user.plan === 'pro' || user.plan === 'vip' || user.plan === 'business';
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
-
-        try {
-            const response = await axios.post('/api/verification/request.php', { details });
-            if (response.status === 201) {
-                setSubmitted(true);
-            }
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Failed to submit request.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    if (user.isVerified) {
+    if (user.isVerified || status === 'approved') {
         return (
             <div className="max-w-2xl mx-auto p-8">
                 <div className="bg-white rounded-[2rem] p-12 text-center shadow-xl border border-slate-100">
@@ -110,7 +132,7 @@ const RequestVerification: React.FC<RequestVerificationProps> = () => {
 
                 {/* Submit Column */}
                 <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-xl self-start">
-                    {submitted ? (
+                    {status === 'pending' ? (
                         <div className="text-center py-12">
                             <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <Clock className="text-emerald-600 w-10 h-10" />
@@ -118,14 +140,26 @@ const RequestVerification: React.FC<RequestVerificationProps> = () => {
                             <h3 className="text-xl font-black uppercase tracking-tight text-slate-900 mb-2">Request Pending</h3>
                             <p className="text-slate-500 text-sm font-medium mb-8">We've received your request! Our team will review your profile shortly.</p>
                             <button
-                                onClick={() => setSubmitted(false)}
+                                onClick={() => setStatus('none')}
                                 className="w-full py-4 bg-slate-100 text-slate-600 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-slate-200 transition-all"
                             >
-                                Go Back
+                                Edit Details
                             </button>
                         </div>
                     ) : (
                         <form onSubmit={handleSubmit} className="space-y-6">
+                            {(status === 'rejected' || status === 'more_info') && rejectionReason && (
+                                <div className={`p-6 rounded-2xl border-2 ${status === 'rejected' ? 'border-rose-100 bg-rose-50/30' : 'border-amber-100 bg-amber-50/30'}`}>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        {status === 'rejected' ? <AlertCircle className="text-rose-600" size={16} /> : <Info className="text-amber-600" size={16} />}
+                                        <span className={`text-[10px] font-black uppercase tracking-widest ${status === 'rejected' ? 'text-rose-600' : 'text-amber-600'}`}>
+                                            Admin Feedback ({status === 'rejected' ? 'Rejected' : 'Action Required'})
+                                        </span>
+                                    </div>
+                                    <p className="text-slate-700 text-sm font-bold italic">"{rejectionReason}"</p>
+                                </div>
+                            )}
+
                             <div className="space-y-2">
                                 <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Verification Details</label>
                                 <textarea
@@ -152,7 +186,7 @@ const RequestVerification: React.FC<RequestVerificationProps> = () => {
                                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                 ) : (
                                     <>
-                                        Submit Request <Send size={16} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                        {status === 'none' ? 'Submit Request' : 'Resubmit Request'} <Send size={16} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                                     </>
                                 )}
                             </button>
