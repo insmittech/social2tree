@@ -282,176 +282,113 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           {/* Header Section */}
           <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 italic">
-                Dashboard / Overview
+              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                Dashboard
               </div>
-              <h1 className="text-5xl font-black text-slate-900 tracking-tighter italic">
-                {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, {profile.displayName.split(' ')[0]}
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+                {new Date().getHours() < 12 ? 'Good Morning' : new Date().getHours() < 18 ? 'Good Afternoon' : 'Good Evening'}, {profile.displayName.split(' ')[0]}
               </h1>
-              <p className="text-slate-500 font-bold mt-2 flex items-center gap-2">
-                Managing your digital corner at <span className="text-indigo-600 font-black bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-100">s2t.me/{activePage.slug}</span>
+              <p className="text-slate-500 text-sm mt-1">
+                Your page is live at <span className="text-indigo-600 font-medium">s2t.me/{activePage.slug}</span>
               </p>
             </div>
-            <div className="flex gap-3 w-full sm:w-auto">
+            <div className="flex gap-2 w-full sm:w-auto">
               <button
                 onClick={() => setShowMobilePreview(true)}
-                className="lg:hidden flex-1 bg-white text-slate-900 px-6 py-4 rounded-2xl font-black flex items-center justify-center gap-2 border-2 border-slate-100 shadow-sm active:scale-95"
+                className="lg:hidden flex-1 bg-white text-slate-700 px-4 py-3 rounded-lg font-bold flex items-center justify-center gap-2 border border-slate-200"
               >
-                <Eye size={20} /> Preview
+                <Eye size={18} /> Preview
               </button>
               <div className="flex gap-2">
                 <button
                   onClick={handleShare}
-                  className="p-4 bg-white text-slate-400 border-2 border-slate-100 rounded-2xl hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm active:scale-95"
+                  className="p-3 bg-white text-slate-500 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
                   title="Copy Link"
                 >
-                  {copied ? <Check size={24} className="text-emerald-500" /> : <Share2 size={24} />}
+                  {copied ? <Check size={20} className="text-green-500" /> : <Share2 size={20} />}
                 </button>
                 <button
                   onClick={handleDownloadQR}
-                  className="p-4 bg-white text-slate-400 border-2 border-slate-100 rounded-2xl hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm active:scale-95"
+                  className="p-3 bg-white text-slate-500 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
                   title="Download QR"
                 >
-                  {isDownloading ? <div className="animate-spin h-6 w-6 border-2 border-indigo-600 border-t-transparent rounded-full" /> : <QrCode size={24} />}
+                  {isDownloading ? <div className="animate-spin h-5 w-5 border-2 border-indigo-600 border-t-transparent rounded-full" /> : <QrCode size={20} />}
                 </button>
-                <a
-                  href={publicUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-4 bg-slate-900 text-white rounded-2xl hover:bg-indigo-600 transition-all shadow-2xl shadow-indigo-100/20 active:scale-95"
-                  title="Open Live Site"
-                >
-                  <ExternalLink size={24} />
-                </a>
               </div>
             </div>
           </header>
 
           {/* Stats Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              {
-                label: "Total Views",
-                value: profile.views.toLocaleString(),
-                icon: <Eye size={20} />,
-                trend: "+12%",
-                color: "indigo",
-                chart: "M5 35 Q 25 5 45 30 T 85 15 T 145 25"
-              },
-              {
-                label: "Total Clicks",
-                value: totalClicks.toLocaleString(),
-                icon: <MousePointer2 size={20} />,
-                trend: "+5%",
-                color: "emerald",
-                chart: "M5 30 Q 35 10 65 35 T 145 15"
-              },
-              {
-                label: "CTR",
-                value: `${ctr}%`,
-                icon: <Zap size={20} />,
-                trend: "Avg",
-                color: "amber",
-                chart: "M5 20 Q 75 40 145 10"
-              }
+              { label: "Views", value: profile.views.toLocaleString(), color: "blue" },
+              { label: "Clicks", value: totalClicks.toLocaleString(), color: "green" },
+              { label: "CTR", value: `${ctr}%`, color: "orange" }
             ].map((stat, i) => (
-              <div key={i} className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col justify-between h-44 hover:border-indigo-100 hover:shadow-xl hover:shadow-indigo-500/5 transition-all group overflow-hidden relative">
-                <div className="flex justify-between items-start relative z-10">
-                  <div className={`p-3 bg-${stat.color}-50 text-${stat.color}-600 rounded-2xl group-hover:bg-indigo-600 group-hover:text-white transition-colors`}>
-                    {stat.icon}
-                  </div>
-                  <span className={`text-[10px] font-black bg-${stat.color === 'indigo' ? 'emerald' : stat.color}-50 text-${stat.color === 'indigo' ? 'emerald' : stat.color}-600 px-3 py-1.5 rounded-full uppercase tracking-widest`}>{stat.trend}</span>
-                </div>
-                <div className="relative z-10">
-                  <h3 className="text-4xl font-black text-slate-900 tracking-tighter tabular-nums mb-1">{stat.value}</h3>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">{stat.label}</p>
-                </div>
-                {/* Visual Chart Mockup */}
-                <div className="absolute bottom-0 left-0 right-0 h-16 opacity-10 group-hover:opacity-30 transition-opacity">
-                  <svg width="100%" height="100%" viewBox="0 0 150 40" preserveAspectRatio="none">
-                    <path d={stat.chart} strokeLinecap="round" strokeWidth="4" fill="none" className={`stroke-${stat.color}-600`} />
-                  </svg>
-                </div>
+              <div key={i} className="bg-white p-6 rounded-xl border border-slate-200">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{stat.label}</p>
+                <h3 className="text-2xl font-bold text-slate-900 tracking-tight">{stat.value}</h3>
               </div>
             ))}
 
             <div
-              className="bg-slate-900 p-6 rounded-[2.5rem] shadow-2xl flex flex-col justify-between h-44 text-white relative overflow-hidden group cursor-pointer active:scale-95 transition-all"
+              className="bg-indigo-600 p-6 rounded-xl shadow-md text-white cursor-pointer hover:bg-indigo-700 transition"
               onClick={() => navigate('/dashboard/analytics')}
             >
-              <div className="relative z-10 flex justify-between items-start">
-                <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-xl border border-white/10">
-                  <TrendingUp size={20} />
-                </div>
-                <div className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors">
-                  <ArrowRight size={20} />
-                </div>
+              <p className="text-xs font-bold text-indigo-100 uppercase tracking-wider mb-1">Analytics</p>
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-bold">View Insights</h3>
+                <ArrowRight size={20} />
               </div>
-              <div className="relative z-10">
-                <h3 className="text-2xl font-black leading-none mb-2 tracking-tighter italic">Deep Insights</h3>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Full Performance Logic &rarr;</p>
-              </div>
-              <div className="absolute -right-8 -bottom-8 bg-indigo-500/30 w-40 h-40 rounded-full blur-[60px] group-hover:bg-indigo-500/40 transition-all"></div>
-              <div className="absolute top-[20%] left-[10%] w-24 h-24 bg-purple-500/10 rounded-full blur-[50px]"></div>
             </div>
           </div>
 
           {/* Profile Settings Section */}
-          <section className="bg-white/60 backdrop-blur-xl p-10 rounded-[3rem] border border-white shadow-sm space-y-10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/50 rounded-full blur-[100px] -z-10 group-hover:bg-indigo-100/50 transition-colors duration-1000"></div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-3xl font-black text-slate-900 tracking-tighter flex items-center gap-3">
-                  <div className="p-2 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-100"><Settings size={24} /></div>
-                  Profile Station
-                </h2>
-                <p className="text-slate-400 text-sm font-bold mt-2">Customize how the world sees your digital identity.</p>
-              </div>
+          <section className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-8">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">Profile Settings</h2>
+              <p className="text-slate-500 text-sm">Update your public profile details.</p>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-10">
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Display Name</label>
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Display Name</label>
                   <input
                     type="text"
                     value={activePage.displayName}
-                    placeholder="Your Public Name"
+                    placeholder="Your Name"
                     onChange={(e) => handleProfileUpdate({ displayName: e.target.value })}
-                    className="w-full bg-slate-100/50 border-2 border-slate-100 rounded-2xl px-6 py-4 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white focus:border-indigo-600 outline-none transition-all font-black text-slate-700 placeholder:text-slate-200"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                   />
                 </div>
-                <div className="space-y-2 group">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Custom Hub Domain</label>
-                  <div className="relative">
-                    <Globe className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors" size={20} />
-                    <input
-                      type="text"
-                      value={activePage.customDomain || ''}
-                      placeholder="links.mybrand.com"
-                      onChange={(e) => handleProfileUpdate({ customDomain: e.target.value })}
-                      className="w-full bg-slate-100/50 border-2 border-slate-100 rounded-2xl pl-14 pr-6 py-4 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white focus:border-indigo-600 outline-none transition-all font-black text-slate-700 placeholder:text-slate-200"
-                    />
-                  </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Custom Domain</label>
+                  <input
+                    type="text"
+                    value={activePage.customDomain || ''}
+                    placeholder="links.yourbrand.com"
+                    onChange={(e) => handleProfileUpdate({ customDomain: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                  />
                 </div>
               </div>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center mb-1">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Bio / About</label>
+              <div className="space-y-1">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Bio</label>
                   <button
                     onClick={generateAIBio}
                     disabled={isGeneratingBio}
-                    className="px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-indigo-600 hover:text-white disabled:opacity-50 transition-all shadow-sm"
+                    className="text-[10px] font-bold text-indigo-600 uppercase hover:underline disabled:opacity-50"
                   >
-                    <Wand2 size={12} fill="currentColor" /> {isGeneratingBio ? 'Refining...' : 'AI Magic'}
+                    {isGeneratingBio ? 'Generating...' : 'AI Generate'}
                   </button>
                 </div>
                 <textarea
                   value={activePage.bio}
-                  placeholder="Describe your essence in a few powerful words..."
+                  placeholder="Tell your story..."
                   onChange={(e) => handleProfileUpdate({ bio: e.target.value })}
-                  className="w-full bg-slate-100/50 border-2 border-slate-100 rounded-[2rem] px-6 py-5 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white focus:border-indigo-600 outline-none transition-all font-bold text-slate-600 text-sm h-[132px] resize-none placeholder:text-slate-200 leading-relaxed"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all h-32 resize-none text-sm"
                 />
               </div>
             </div>
