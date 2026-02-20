@@ -8,6 +8,7 @@ import {
     Users,
     Settings,
     Shield,
+    Key,
     CreditCard,
     Bookmark,
     User,
@@ -35,6 +36,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout }) => 
         { to: '/admin/users', icon: <Users size={18} />, label: 'Users' },
         { to: '/admin/analytics', icon: <BarChart2 size={18} />, label: 'Data Hub' },
         { to: '/admin/security', icon: <Shield size={18} />, label: 'Security' },
+        { to: '/admin/rbac', icon: <Key size={18} />, label: 'Access Control' },
         { to: '/admin/settings', icon: <Settings size={18} />, label: 'Settings' },
     ];
 

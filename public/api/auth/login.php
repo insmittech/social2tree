@@ -28,13 +28,11 @@ if ($identifier && !empty($data['password'])) {
                 $_SESSION['username'] = $row['username'];
                 $_SESSION['role'] = $row['role'];
 
+                $profile = get_user_profile($pdo, $row['id']);
+
                 json_response([
                     "message" => "Login successful.",
-                    "user" => [
-                        "id" => (string) $row['id'],
-                        "username" => $row['username'],
-                        "role" => $row['role']
-                    ]
+                    "user" => $profile
                 ]);
             } else {
                 json_response(["message" => "Invalid username or password."], 401);

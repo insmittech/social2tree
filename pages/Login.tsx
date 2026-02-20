@@ -13,14 +13,14 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({ onLogin, isAuthenticated }) => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   React.useEffect(() => {
-    if (isAuthenticated) {
-      if (email === 'admin@social2tree.com') {
+    if (isAuthenticated && user) {
+      if (user.role === 'admin') {
         navigate('/admin');
       } else {
         navigate('/dashboard');

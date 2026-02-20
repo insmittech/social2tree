@@ -76,6 +76,95 @@ function sanitize_input($data)
     return htmlspecialchars(stripslashes(trim($data)));
 }
 
+function get_user_profile($pdo, $user_id) {
+    try {
+        // Fetch User Details
+        $stmt = $pdo->prepare("SELECT id, username, email, display_name, bio, avatar_url, role, plan, status, created_at FROM users WHERE id = ?");
+        $stmt->execute([$user_id]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user) {
+            $profile = [
+                'id' => (string) $user['id'],
+                'username' => $user['username'],
+                'displayName' => $user['display_name'] ?? $user['username'],
+                'bio' => $user['bio'] ?? '',
+                'avatarUrl' => $user['avatar_url'] ?? 'https://ui-avatars.com/api/?name=' . urlencode($user['username']),
+                'role' => $user['role'],
+                'plan' => $user['plan'],
+                'status' => $user['status'],
+                'createdAt' => $user['created_at'],
+                'views' => 0,
+                'pages' => [],
+                'roles' => [],
+                'permissions' => []
+            ];
+
+            // Fetch Roles (Defensive check if table exists)
+            try {
+                $stmt = $pdo->prepare("SELECT r.name FROM roles r JOIN user_roles ur ON r.id = ur.role_id WHERE ur.user_id = ?");
+                $stmt->execute([$user_id]);
+                $profile['roles'] = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+                // Fetch Permissions
+                $stmt = $pdo->prepare("SELECT DISTINCT p.name FROM permissions p JOIN role_permissions rp ON p.id = rp.permission_id JOIN user_roles ur ON rp.role_id = ur.role_id WHERE ur.user_id = ?");
+                $stmt->execute([$user_id]);
+                $profile['permissions'] = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            } catch (Exception $e) {
+                // Roles table might not exist yet if migration hasn't run
+                // Fallback to basic role from users table
+                $profile['roles'] = [$user['role']];
+            }
+
+            // Fetch Pages
+            $stmt = $pdo->prepare("SELECT * FROM pages WHERE user_id = ? ORDER BY created_at ASC");
+            $stmt->execute([$user_id]);
+            $pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $profile['pages'] = array_map(function ($page) use ($pdo) {
+                // Fetch links for each page
+                $stmt = $pdo->prepare("SELECT * FROM links WHERE page_id = ? ORDER BY sort_order ASC, created_at DESC");
+                $stmt->execute([$page['id']]);
+                $links = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                return [
+                    'id' => (string)$page['id'],
+                    'slug' => $page['slug'],
+                    'displayName' => $page['display_name'],
+                    'bio' => $page['bio'],
+                    'avatarUrl' => $page['avatar_url'] ?? 'https://ui-avatars.com/api/?name=' . urlencode($page['slug']),
+                    'theme' => $page['theme'],
+                    'buttonStyle' => $page['button_style'],
+                    'customDomain' => $page['custom_domain'],
+                    'links' => array_map(function ($link) {
+                        return [
+                            'id' => (string)$link['id'],
+                            'title' => $link['title'],
+                            'url' => $link['url'],
+                            'active' => (bool)$link['is_active'],
+                            'clicks' => (int)$link['clicks'],
+                            'type' => $link['type'] ?? 'social',
+                            'scheduledStart' => $link['scheduled_start'] ?? null,
+                            'scheduledEnd' => $link['scheduled_end'] ?? null
+                        ];
+                    }, $links)
+                ];
+            }, $pages);
+
+            // Fetch views count
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM analytics WHERE user_id = ? AND link_id IS NULL");
+            $stmt->execute([$user_id]);
+            $profile['views'] = (int)$stmt->fetchColumn();
+
+            return $profile;
+        }
+        return null;
+    } catch (PDOException $e) {
+        error_log("Profile Fetch Error: " . $e->getMessage());
+        return null;
+    }
+}
+
 function get_json_input()
 {
     $json = file_get_contents('php://input');

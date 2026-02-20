@@ -1,11 +1,12 @@
 <?php
 include_once __DIR__ . '/../../utils.php';
 
-// Admin check
-require_admin();
-json_response();
-
 include_once __DIR__ . '/../../db.php';
+include_once __DIR__ . '/../../rbac.php';
+
+// Require granular permission
+require_permission($pdo, 'settings:view');
+json_response();
 
 try {
     $stmt = $pdo->query("SELECT setting_key, setting_value FROM settings");

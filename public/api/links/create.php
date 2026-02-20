@@ -1,11 +1,12 @@
 <?php
 include_once __DIR__ . '/../utils.php';
 
-// Auth check
-$user_id = require_auth();
-json_response();
-
 include_once __DIR__ . '/../db.php';
+include_once __DIR__ . '/../rbac.php';
+
+// Require granular permission
+$user_id = require_permission($pdo, 'links:create');
+json_response();
 
 $data = get_json_input();
 

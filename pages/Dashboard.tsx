@@ -63,8 +63,28 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     })
   );
 
-  if (!profile || !activePage) {
+  if (!profile) {
     return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-2 border-indigo-600 border-t-transparent"></div></div>;
+  }
+
+  if (!activePage) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+        <div className="bg-white p-12 rounded-[3.5rem] border-2 border-slate-100 shadow-xl shadow-slate-100/50 max-w-2xl mx-auto">
+          <div className="bg-indigo-50 w-24 h-24 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8">
+            <Plus className="text-indigo-600 w-12 h-12" />
+          </div>
+          <h2 className="text-4xl font-black text-slate-900 mb-6 tracking-tight uppercase italic">Create Your First Bio-Tree</h2>
+          <p className="text-slate-500 font-medium text-lg mb-10">You don't have any pages yet. Create one to start sharing your social identity.</p>
+          <button
+            onClick={() => navigate('/dashboard/trees')}
+            className="bg-indigo-600 text-white px-10 py-5 rounded-[2rem] text-lg font-black uppercase tracking-widest hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-indigo-100 flex items-center justify-center gap-3 mx-auto"
+          >
+            Get Started <Plus size={24} />
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const isFreePlan = profile.plan === 'free';

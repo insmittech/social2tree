@@ -1,11 +1,12 @@
 <?php
 include_once __DIR__ . '/../../utils.php';
 
-// Admin check
-require_admin();
-json_response();
-
 include_once __DIR__ . '/../../db.php';
+include_once __DIR__ . '/../../rbac.php';
+
+// Require granular permission
+require_permission($pdo, 'users:view');
+json_response();
 
 try {
     // Fetch users with their primary stats
@@ -31,6 +32,11 @@ try {
 
     // Map to camelCase for frontend consistency
     $results = array_map(function ($user) {
+        // Fetch granular roles for this user
+        $stmt = $pdo->prepare("SELECT r.name FROM roles r JOIN user_roles ur ON r.id = ur.role_id WHERE ur.user_id = ?");
+        $stmt->execute([$user['id']]);
+        $roles = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
         return [
             'id' => (string)$user['id'],
             'username' => $user['username'],
@@ -38,6 +44,7 @@ try {
             'displayName' => $user['display_name'] ?? $user['username'],
             'avatarUrl' => $user['avatar_url'] ?? 'https://ui-avatars.com/api/?name=' . urlencode($user['username']),
             'role' => $user['role'],
+            'roles' => $roles,
             'plan' => $user['plan'],
             'status' => $user['status'],
             'createdAt' => $user['created_at'],

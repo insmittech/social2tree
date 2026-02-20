@@ -49,6 +49,8 @@ export interface UserProfile {
   createdAt: string;
   pages: LinkPage[];
   views: number;
+  roles: string[];
+  permissions: string[];
 }
 
 export interface AdminStats {

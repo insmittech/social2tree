@@ -12,6 +12,7 @@ import AdminUsers from './pages/AdminUsers';
 import AdminSettings from './pages/AdminSettings';
 import AdminAnalytics from './pages/AdminAnalytics';
 import AdminSecurity from './pages/AdminSecurity';
+import AdminRBAC from './pages/AdminRBAC';
 import Plan from './pages/Plan';
 import SavedLinks from './pages/SavedLinks';
 import Profile from './pages/Profile';
@@ -109,6 +110,10 @@ const AppRoutes: React.FC = () => {
         <Route
           path="/admin/settings"
           element={isAuthenticated && isAdmin ? <Layout userProfile={user} onLogout={handleLogout} isAdmin><AdminSettings onLogout={handleLogout} /></Layout> : <Navigate to="/dashboard" />}
+        />
+        <Route
+          path="/admin/rbac"
+          element={isAuthenticated && isAdmin ? <Layout userProfile={user} onLogout={handleLogout} isAdmin><AdminRBAC /></Layout> : <Navigate to="/dashboard" />}
         />
 
         {/* Public Profile View */}
