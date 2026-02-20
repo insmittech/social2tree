@@ -38,11 +38,12 @@ const Login: React.FC<LoginProps> = ({ onLogin, isAuthenticated }) => {
 
       localStorage.setItem('token', token);
       login(user);
-      onLogin(user.role === 'admin', user);
+      const isAdmin = user.roles?.includes('admin') || user.role === 'admin';
+      onLogin(isAdmin, user);
 
       showToast('Welcome back!', 'success');
 
-      if (user.role === 'admin') {
+      if (isAdmin) {
         navigate('/admin');
       } else {
         navigate('/dashboard');

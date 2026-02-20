@@ -13,7 +13,7 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout, isAuthenticated, userProfile, customLinks }) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const isAdmin = userProfile?.role === 'admin';
+  const isAdmin = userProfile?.roles?.includes('admin') || userProfile?.role === 'admin';
   const defaultAvatar = userProfile?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile?.displayName || 'User')}&background=6366f1&color=fff`;
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/admin');
