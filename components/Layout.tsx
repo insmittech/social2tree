@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import MobileNav from './MobileNav';
@@ -15,6 +15,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children, userProfile, onLogout, isAdmin }) => {
     const location = useLocation();
     const isAdminPath = location.pathname.startsWith('/admin');
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
     return (
         <div className="min-h-screen bg-slate-50 flex">
@@ -23,9 +24,11 @@ const Layout: React.FC<LayoutProps> = ({ children, userProfile, onLogout, isAdmi
                 isAdmin={isAdmin || isAdminPath}
                 userProfile={userProfile}
                 onLogout={onLogout}
+                isCollapsed={isCollapsed}
+                setIsCollapsed={setIsCollapsed}
             />
 
-            <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+            <div className={`flex-1 flex flex-col min-w-0 h-screen overflow-hidden transition-all duration-300`}>
                 {/* Navbar at top */}
                 <Navbar
                     isDashboard

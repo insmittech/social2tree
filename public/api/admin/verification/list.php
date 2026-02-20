@@ -11,7 +11,7 @@ $status = isset($_GET['status']) ? sanitize_input($_GET['status']) : null;
 try {
     $query = "SELECT vr.*, u.username, u.display_name, u.email 
               FROM verification_requests vr 
-              JOIN users u ON vr.user_id = u.id";
+              LEFT JOIN users u ON vr.user_id = u.id";
     
     if ($status) {
         $query .= " WHERE vr.status = :status";

@@ -28,6 +28,23 @@ if ($identifier && !empty($data['password'])) {
                 $_SESSION['username'] = $row['username'];
                 $_SESSION['role'] = $row['role'];
 
+                // RBAC Sync Hook: Ensure admins have the SuperAdmin role entry
+                if ($row['role'] === 'admin') {
+                    try {
+                        // Check if user has any role in user_roles
+                        $roleCheck = $pdo->prepare("SELECT COUNT(*) FROM user_roles WHERE user_id = ?");
+                        $roleCheck->execute([$row['id']]);
+                        if ($roleCheck->fetchColumn() == 0) {
+                            // Assign SuperAdmin role (ID 1 as per db_sync.php)
+                            $assign = $pdo->prepare("INSERT IGNORE INTO user_roles (user_id, role_id) 
+                                                   SELECT ?, id FROM roles WHERE name = 'SuperAdmin' LIMIT 1");
+                            $assign->execute([$row['id']]);
+                        }
+                    } catch (Exception $e) {
+                        error_log("RBAC Sync Error: " . $e->getMessage());
+                    }
+                }
+
                 $profile = get_user_profile($pdo, $row['id']);
 
                 json_response([
