@@ -1,39 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import { Check } from 'lucide-react';
 import { useAuth } from '../src/context/AuthContext';
 import { Link } from 'react-router-dom';
+import client from '../src/api/client';
+
+interface Plan {
+    id: string;
+    name: string;
+    priceMonthly: number;
+    priceYearly: number;
+    description: string;
+    features: string[];
+    isPopular: boolean;
+}
 
 const PricingPage: React.FC = () => {
     const { isAuthenticated, user } = useAuth();
     const [isYearly, setIsYearly] = useState(true);
+    const [plans, setPlans] = useState<Plan[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const plans = [
-        {
-            name: "Starter",
-            price: "0",
-            desc: "For individuals starting out.",
-            features: ["1 Bio Tree", "3 Links", "Basic Stats"],
-            cta: "Join Free",
-            popular: false
-        },
-        {
-            name: "Pro",
-            price: isYearly ? "12" : "15",
-            desc: "For serious creators.",
-            features: ["Unlimited Trees", "Unlimited Links", "Advanced Stats", "Custom Domain"],
-            cta: "Go Pro",
-            popular: true
-        },
-        {
-            name: "Agency",
-            price: isYearly ? "49" : "59",
-            desc: "For teams and brands.",
-            features: ["Everything in Pro", "Team Access", "API Access", "Priority Support"],
-            cta: "Scale Now",
-            popular: false
-        }
-    ];
+    useEffect(() => {
+        const fetchPlans = async () => {
+            try {
+                const res = await client.get('/public/plans.php');
+                setPlans(res.data.plans || []);
+            } catch (err) {
+                console.error('Failed to fetch plans', err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchPlans();
+    }, []);
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -58,36 +58,48 @@ const PricingPage: React.FC = () => {
             </section>
 
             <section className="py-24 px-4 max-w-6xl mx-auto">
-                <div className="grid md:grid-cols-3 gap-8">
-                    {plans.map((plan, i) => (
-                        <div key={i} className={`bg-white rounded-2xl p-8 border ${plan.popular ? 'border-indigo-600 ring-4 ring-indigo-50' : 'border-slate-200'} flex flex-col`}>
-                            <h3 className="text-lg font-bold text-slate-900 mb-2">{plan.name}</h3>
-                            <div className="flex items-baseline gap-1 mb-4">
-                                <span className="text-4xl font-bold text-slate-900">${plan.price}</span>
-                                <span className="text-slate-400 text-sm">/mo</span>
-                            </div>
-                            <p className="text-slate-500 text-sm mb-8 leading-relaxed">{plan.desc}</p>
+                {isLoading ? (
+                    <div className="flex justify-center py-20">
+                        <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
+                    </div>
+                ) : (
+                    <div className="grid md:grid-cols-3 gap-8">
+                        {plans.map((plan) => {
+                            const price = isYearly
+                                ? Math.round(plan.priceYearly / 12)
+                                : plan.priceMonthly;
 
-                            <ul className="space-y-4 mb-8 flex-grow">
-                                {plan.features.map((f, j) => (
-                                    <li key={j} className="flex items-center gap-3 text-slate-600 text-sm font-medium">
-                                        <Check size={16} className="text-indigo-600" /> {f}
-                                    </li>
-                                ))}
-                            </ul>
+                            return (
+                                <div key={plan.id} className={`bg-white rounded-2xl p-8 border ${plan.isPopular ? 'border-indigo-600 ring-4 ring-indigo-50' : 'border-slate-200'} flex flex-col`}>
+                                    <h3 className="text-lg font-bold text-slate-900 mb-2">{plan.name}</h3>
+                                    <div className="flex items-baseline gap-1 mb-4">
+                                        <span className="text-4xl font-bold text-slate-900">${price}</span>
+                                        <span className="text-slate-400 text-sm">/mo</span>
+                                    </div>
+                                    <p className="text-slate-500 text-sm mb-8 leading-relaxed">{plan.description}</p>
 
-                            <Link
-                                to={plan.price === "0" ? "/register" : "/dashboard/plan"}
-                                className={`w-full block text-center py-3 rounded-lg font-bold text-sm transition ${plan.popular
-                                    ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                                    : 'bg-slate-900 text-white hover:bg-slate-800'
-                                    }`}
-                            >
-                                {plan.cta}
-                            </Link>
-                        </div>
-                    ))}
-                </div>
+                                    <ul className="space-y-4 mb-8 flex-grow">
+                                        {plan.features.map((f, j) => (
+                                            <li key={j} className="flex items-center gap-3 text-slate-600 text-sm font-medium">
+                                                <Check size={16} className="text-indigo-600" /> {f}
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    <Link
+                                        to={price === 0 ? "/register" : "/dashboard/plan"}
+                                        className={`w-full block text-center py-3 rounded-lg font-bold text-sm transition ${plan.isPopular
+                                            ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                                            : 'bg-slate-900 text-white hover:bg-slate-800'
+                                            }`}
+                                    >
+                                        {price === 0 ? "Join Free" : (plan.name === 'Pro' ? "Go Pro" : "Scale Now")}
+                                    </Link>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </section>
         </div>
     );

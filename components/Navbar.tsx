@@ -36,38 +36,37 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout, isAuthenticated,
     <nav className={`sticky top-0 z-50 transition-all ${isAdminPath ? 'border-b border-slate-800 bg-slate-900 text-white' : 'border-b border-slate-100 bg-white/80 backdrop-blur-md text-slate-900'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="bg-indigo-600 p-2 rounded-xl group-hover:rotate-12 transition-transform shadow-lg shadow-indigo-200">
-              <TreePine className="text-white w-5 h-5" />
+          {/* Conditionally render Logo and Links */}
+          {!isDashboard && (
+            <Link to="/" className="flex items-center gap-2 group">
+              <div className="bg-indigo-600 p-2 rounded-xl group-hover:rotate-12 transition-transform shadow-lg shadow-indigo-200">
+                <TreePine className="text-white w-5 h-5" />
+              </div>
+              <span className="text-2xl font-black tracking-tighter uppercase italic">Social2Tree</span>
+            </Link>
+          )}
+
+          {/* Desktop Links - Only on Landing Page */}
+          {!isDashboard && (
+            <div className="hidden md:flex items-center gap-8">
+              {linksToRender.map((link, idx) => (
+                <Link
+                  key={`${link.to}-${idx}`}
+                  to={link.to}
+                  className={`text-sm font-bold uppercase tracking-widest hover:text-indigo-600 transition-colors ${location.pathname === link.to ? 'text-indigo-600' : 'text-slate-500'}`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+
+              {isAuthenticated && (
+                <div className="w-10 h-10" /> /* Spacer to balance layout without the button */
+              )}
             </div>
-            <span className="text-2xl font-black tracking-tighter uppercase italic">Social2Tree</span>
-          </Link>
+          )}
 
-          {/* Desktop Links */}
-          <div className="hidden md:flex items-center gap-8">
-            {linksToRender.map((link, idx) => (
-              <Link
-                key={`${link.to}-${idx}`}
-                to={link.to}
-                className={`text-sm font-bold uppercase tracking-widest hover:text-indigo-600 transition-colors ${location.pathname === link.to ? 'text-indigo-600' : 'text-slate-500'}`}
-              >
-                {link.label}
-              </Link>
-            ))}
-
-            {isAuthenticated && isDashboard && isAdmin && (
-              <Link to={isAdminPath ? "/dashboard" : "/admin"} className="text-sm font-black uppercase tracking-widest text-indigo-600 flex items-center gap-2 bg-indigo-50 px-4 py-2 rounded-xl hover:bg-indigo-100 transition-all">
-                {isAdminPath ? <User size={14} /> : <Shield size={14} />}
-                {isAdminPath ? "User Mode" : "Admin Panel"}
-              </Link>
-            )}
-
-            {isAuthenticated && !isDashboard && (
-              <Link to="/dashboard" className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl text-sm font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
-                Dashboard
-              </Link>
-            )}
-          </div>
+          {/* If Dashboard, we might want a separator or just empty space on the left */}
+          {isDashboard && <div className="flex-1" />}
 
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
@@ -101,19 +100,21 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout, isAuthenticated,
               </div>
             )}
 
-            {/* Mobile Toggle */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 text-slate-600 hover:bg-slate-50 rounded-xl transition-all"
-            >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            {/* Mobile Toggle - Only on Landing */}
+            {!isDashboard && (
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="md:hidden p-2 text-slate-600 hover:bg-slate-50 rounded-xl transition-all"
+              >
+                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
+      {/* Mobile Menu - Only on Landing */}
+      {!isDashboard && isMenuOpen && (
         <div className={`md:hidden absolute top-full left-0 right-0 border-b p-6 space-y-4 shadow-xl animate-in slide-in-from-top-4 duration-300 ${isAdminPath ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
           {linksToRender.map((link, idx) => (
             <Link
@@ -125,21 +126,11 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout, isAuthenticated,
               {link.label}
             </Link>
           ))}
-          {!isAuthenticated ? (
+          {!isAuthenticated && (
             <div className="grid gap-3 pt-4">
               <Link to="/login" onClick={() => setIsMenuOpen(false)} className="w-full py-4 text-center font-bold text-slate-600 bg-slate-50 rounded-xl">Log In</Link>
               <Link to="/register" onClick={() => setIsMenuOpen(false)} className="w-full py-4 text-center font-bold text-white bg-indigo-600 rounded-xl shadow-lg shadow-indigo-100">Join Free</Link>
             </div>
-          ) : (
-            isAdmin && (
-              <Link
-                to={isAdminPath ? "/dashboard" : "/admin"}
-                onClick={() => setIsMenuOpen(false)}
-                className="block text-base font-bold text-indigo-600 bg-indigo-50 px-4 py-3 rounded-xl mt-4"
-              >
-                {isAdminPath ? "Back to Dashboard" : "Admin Panel"}
-              </Link>
-            )
           )}
         </div>
       )}

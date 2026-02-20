@@ -58,6 +58,12 @@ const SortableMenuItem: React.FC<SortableItemProps> = ({ item, onRemove, onUpdat
         { label: 'Pricing', to: '/pricing' },
         { label: 'Features', to: '/features' },
         { label: 'Contact', to: '/contact' },
+        { label: 'Admin Dashboard', to: '/admin' },
+        { label: 'Manage Users', to: '/admin/users' },
+        { label: 'Subscription Plans', to: '/admin/settings/plans' },
+        { label: 'Platform Themes', to: '/admin/settings/themes' },
+        { label: 'Platform Analytics', to: '/admin/analytics' },
+        { label: 'RBAC (Roles)', to: '/admin/rbac' },
     ];
 
     const {

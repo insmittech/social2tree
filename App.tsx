@@ -14,6 +14,7 @@ import AdminAnalytics from './pages/AdminAnalytics';
 import AdminSecurity from './pages/AdminSecurity';
 import AdminMenus from './pages/AdminMenus';
 import AdminThemes from './pages/AdminThemes';
+import AdminPlans from './pages/AdminPlans';
 import AdminRBAC from './pages/AdminRBAC';
 import Plan from './pages/Plan';
 import SavedLinks from './pages/SavedLinks';
@@ -126,6 +127,10 @@ const AppRoutes: React.FC = () => {
         <Route
           path="/admin/settings/themes"
           element={isAuthenticated && isAdmin ? <Layout userProfile={user} onLogout={handleLogout} isAdmin><AdminThemes /></Layout> : <Navigate to="/dashboard" />}
+        />
+        <Route
+          path="/admin/settings/plans"
+          element={isAuthenticated && isAdmin ? <Layout userProfile={user} onLogout={handleLogout} isAdmin><AdminPlans /></Layout> : <Navigate to="/dashboard" />}
         />
         <Route
           path="/admin/rbac"

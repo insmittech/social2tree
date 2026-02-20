@@ -137,6 +137,20 @@ try {
         'settings' => "CREATE TABLE IF NOT EXISTS settings (
             setting_key VARCHAR(50) PRIMARY KEY,
             setting_value TEXT
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+        'plans' => "CREATE TABLE IF NOT EXISTS plans (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(50) NOT NULL,
+            price_monthly DECIMAL(10,2) DEFAULT 0.00,
+            price_yearly DECIMAL(10,2) DEFAULT 0.00,
+            description TEXT,
+            features JSON,
+            is_popular TINYINT(1) DEFAULT 0,
+            is_visible TINYINT(1) DEFAULT 1,
+            sort_order INT DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
     ];
 
@@ -280,6 +294,54 @@ try {
     $sStmt = $pdo->prepare("INSERT IGNORE INTO settings (setting_key, setting_value) VALUES (?, ?)");
     foreach ($sysSettings as $k => $v) $sStmt->execute([$k, $v]);
     echo "<span class='success'>✅ Proper</span><br>";
+
+    // Seed Plans
+    echo "Seeding initial subscription plans... ";
+    $defaultPlans = [
+        [
+            'name' => 'Free',
+            'price_monthly' => 0.00,
+            'price_yearly' => 0.00,
+            'description' => 'For individuals starting out.',
+            'features' => json_encode(['1 Bio Tree', '3 Links', 'Basic Stats']),
+            'is_popular' => 0,
+            'is_visible' => 1,
+            'sort_order' => 1
+        ],
+        [
+            'name' => 'Pro',
+            'price_monthly' => 15.00,
+            'price_yearly' => 144.00,
+            'description' => 'For serious creators.',
+            'features' => json_encode(['Unlimited Trees', 'Unlimited Links', 'Advanced Stats', 'Custom Domain']),
+            'is_popular' => 1,
+            'is_visible' => 1,
+            'sort_order' => 2
+        ],
+        [
+            'name' => 'Agency',
+            'price_monthly' => 59.00,
+            'price_yearly' => 588.00,
+            'description' => 'For teams and brands.',
+            'features' => json_encode(['Everything in Pro', 'Team Access', 'API Access', 'Priority Support']),
+            'is_popular' => 0,
+            'is_visible' => 1,
+            'sort_order' => 3
+        ]
+    ];
+
+    $planInsert = $pdo->prepare("INSERT IGNORE INTO plans (name, price_monthly, price_yearly, description, features, is_popular, is_visible, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    foreach ($defaultPlans as $p) {
+        // Check if plan already exists by name
+        $check = $pdo->prepare("SELECT COUNT(*) FROM plans WHERE name = ?");
+        $check->execute([$p['name']]);
+        if ($check->fetchColumn() == 0) {
+            $planInsert->execute([
+                $p['name'], $p['price_monthly'], $p['price_yearly'], $p['description'], $p['features'], $p['is_popular'], $p['is_visible'], $p['sort_order']
+            ]);
+        }
+    }
+    echo "<span class='success'>✅ Done</span><br>";
     
     // Clear permission cache to reflect changes immediately
     clear_permission_cache();

@@ -88,6 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
             links: [
                 { to: '/admin/settings/themes', icon: <Palette size={18} />, label: 'Platform Themes' },
                 { to: '/admin/settings/menus', icon: <Menu size={18} />, label: 'Navigation Menus' },
+                { to: '/admin/settings/plans', icon: <CreditCard size={18} />, label: 'Subscription Plans' },
             ]
         },
         {
