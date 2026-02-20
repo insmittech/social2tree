@@ -31,7 +31,7 @@ try {
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Map to camelCase for frontend consistency
-    $results = array_map(function ($user) {
+    $results = array_map(function ($user) use ($pdo) {
         // Fetch granular roles for this user
         $stmt = $pdo->prepare("SELECT r.name FROM roles r JOIN user_roles ur ON r.id = ur.role_id WHERE ur.user_id = ?");
         $stmt->execute([$user['id']]);

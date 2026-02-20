@@ -1,15 +1,29 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { UserProfile, THEMES, ButtonStyle } from '../types';
+import { THEMES, ButtonStyle, Link, PlanType, UserRole } from '../types';
+
+interface PublicProfileData {
+  id: string;
+  username: string;
+  displayName: string;
+  bio: string;
+  avatarUrl: string;
+  theme: string;
+  buttonStyle: ButtonStyle;
+  plan: PlanType;
+  role: UserRole;
+  isVerified: boolean;
+  links: Link[];
+}
 import { Helmet } from 'react-helmet-async';
 import client from '../src/api/client';
-import { TreePine, Share2, Lock, X } from 'lucide-react';
+import { TreePine, Share2, Lock, X, ShieldCheck } from 'lucide-react';
 import { getSocialIcon } from '../src/utils/socialIcons';
 
 const PublicProfile: React.FC = () => {
   const { username } = useParams();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<PublicProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [passwordModal, setPasswordModal] = useState<{ isOpen: boolean; linkId: string; url: string; correctPassword?: string | null } | null>(null);
@@ -118,7 +132,10 @@ const PublicProfile: React.FC = () => {
           alt={profile.displayName}
           className="w-24 h-24 rounded-full border-4 border-white/30 shadow-xl object-cover mb-4"
         />
-        <h1 className={`text-2xl font-bold mb-2 tracking-tight ${theme.textClass}`}>{profile.displayName}</h1>
+        <div className="flex items-center gap-2 mb-2">
+          <h1 className={`text-2xl font-bold tracking-tight ${theme.textClass}`}>{profile.displayName}</h1>
+          {profile.isVerified && <ShieldCheck className="text-blue-500 fill-blue-500/10" size={24} />}
+        </div>
         <p className={`text-center max-w-[320px] text-sm leading-relaxed opacity-90 ${theme.textClass}`}>{profile.bio}</p>
       </header>
 

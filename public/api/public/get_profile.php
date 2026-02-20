@@ -9,11 +9,11 @@ $host = $_SERVER['HTTP_HOST'] ?? '';
 try {
     // 1. Fetch Page and Owner Data
     if ($slug) {
-        $query = "SELECT p.*, u.plan, u.role FROM pages p JOIN users u ON p.user_id = u.id WHERE p.slug = ? LIMIT 1";
+        $query = "SELECT p.*, u.plan, u.role, u.is_verified FROM pages p JOIN users u ON p.user_id = u.id WHERE p.slug = ? LIMIT 1";
         $params = [$slug];
     } else {
         // Try identifying by custom domain
-        $query = "SELECT p.*, u.plan, u.role FROM pages p JOIN users u ON p.user_id = u.id WHERE p.custom_domain = ? LIMIT 1";
+        $query = "SELECT p.*, u.plan, u.role, u.is_verified FROM pages p JOIN users u ON p.user_id = u.id WHERE p.custom_domain = ? LIMIT 1";
         $params = [$host];
     }
     
@@ -59,6 +59,7 @@ try {
         'buttonStyle' => $page['button_style'] ?? 'rounded-lg',
         'plan' => $page['plan'],
         'role' => $page['role'],
+        'isVerified' => (bool)$page['is_verified'],
         'links' => array_map(function ($link) {
             return [
                 'id' => (string) $link['id'],

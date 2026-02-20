@@ -8,11 +8,13 @@ import {
     Users,
     Settings,
     Shield,
+    ShieldCheck,
     Key,
     CreditCard,
     Bookmark,
     User,
-    LogOut
+    LogOut,
+    CheckCircle
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -29,6 +31,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout }) => 
         { to: '/dashboard/analytics', icon: <BarChart2 size={18} />, label: 'Analytics' },
         { to: '/dashboard/plan', icon: <CreditCard size={18} />, label: 'Plan' },
         { to: '/dashboard/saved', icon: <Bookmark size={18} />, label: 'Saved Links' },
+        { to: '/dashboard/verification', icon: <ShieldCheck size={18} />, label: 'Verification' },
     ];
 
     const adminLinks = [
@@ -38,6 +41,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout }) => 
         { to: '/admin/security', icon: <Shield size={18} />, label: 'Security' },
         { to: '/admin/rbac', icon: <Key size={18} />, label: 'Access Control' },
         { to: '/admin/settings', icon: <Settings size={18} />, label: 'Settings' },
+        { to: '/admin/verification', icon: <CheckCircle size={18} />, label: 'Verify Requests' },
     ];
 
     const links = isAdmin ? adminLinks : userLinks;

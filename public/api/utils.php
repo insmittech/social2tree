@@ -79,7 +79,7 @@ function sanitize_input($data)
 function get_user_profile($pdo, $user_id) {
     try {
         // Fetch User Details
-        $stmt = $pdo->prepare("SELECT id, username, email, display_name, bio, avatar_url, role, plan, status, created_at FROM users WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT id, username, email, display_name, bio, avatar_url, role, plan, status, is_verified, created_at FROM users WHERE id = ?");
         $stmt->execute([$user_id]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -93,6 +93,7 @@ function get_user_profile($pdo, $user_id) {
                 'role' => $user['role'],
                 'plan' => $user['plan'],
                 'status' => $user['status'],
+                'isVerified' => (bool)$user['is_verified'],
                 'createdAt' => $user['created_at'],
                 'views' => 0,
                 'pages' => [],

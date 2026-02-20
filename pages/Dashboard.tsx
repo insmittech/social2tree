@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PhonePreview from '../components/PhonePreview';
 import { useNavigate } from 'react-router-dom';
 import client from '../src/api/client';
-import { Plus, Trash2, Check, Share2, QrCode, Eye, ArrowRight, ShieldAlert, X } from 'lucide-react';
+import { Plus, Trash2, Check, Share2, QrCode, Eye, ArrowRight, ShieldAlert, X, ShieldCheck, Lock } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { useToast } from '../src/context/ToastContext';
 import { useAuth } from '../src/context/AuthContext';
@@ -281,8 +281,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Overview</p>
-              <h1 className="text-2xl font-bold text-slate-900">
+              <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
                 Welcome back, {profile.displayName.split(' ')[0]}
+                {profile.isVerified && <ShieldCheck className="text-blue-500 fill-blue-500/10" size={24} />}
               </h1>
               <p className="text-slate-500 text-xs mt-1">
                 Your profile: <span className="text-indigo-600 font-bold">s2t.me/{activePage.slug}</span>
@@ -320,6 +321,40 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
               </div>
             ))}
           </div>
+
+          {/* Verification Status */}
+          {!profile.isVerified && (
+            <div className="bg-white p-6 rounded-2xl border-2 border-slate-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-4 text-center md:text-left">
+                <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center border border-slate-100 relative">
+                  <ShieldCheck className="text-slate-300 w-8 h-8" />
+                  <div className="absolute -top-1 -right-1 bg-amber-400 p-1 rounded-full border-2 border-white">
+                    <Lock size={10} className="text-white" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg font-black uppercase tracking-tight text-slate-900">Get Verified</h3>
+                  <p className="text-slate-500 text-xs font-medium">Verify your identity to get the official blue checkmark.</p>
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <button
+                  onClick={() => navigate('/dashboard/verification')}
+                  className="px-6 py-3 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all whitespace-nowrap"
+                >
+                  Apply for Verification
+                </button>
+                {isFreePlan && (
+                  <button
+                    onClick={() => navigate('/dashboard/plan')}
+                    className="px-6 py-3 bg-amber-50 text-amber-600 rounded-xl text-[10px] font-black uppercase tracking-widest border border-amber-100 hover:bg-amber-100 transition-all whitespace-nowrap"
+                  >
+                    Upgrade to Pro (Instant)
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Profile Section */}
           <div className="bg-white p-6 rounded-lg border border-slate-200 space-y-6">
@@ -435,7 +470,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

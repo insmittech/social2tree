@@ -53,10 +53,11 @@ try {
         'avatar_url' => "VARCHAR(255) AFTER bio",
         'theme' => "VARCHAR(50) DEFAULT 'default' AFTER avatar_url",
         'button_style' => "VARCHAR(50) DEFAULT 'rounded-lg' AFTER theme",
-        'plan' => "ENUM('free', 'pro', 'business') DEFAULT 'free' AFTER button_style",
+        'plan' => "ENUM('free', 'pro', 'business', 'vip') DEFAULT 'free' AFTER button_style",
         'role' => "ENUM('user', 'admin') DEFAULT 'user' AFTER plan",
         'status' => "ENUM('active', 'suspended') DEFAULT 'active' AFTER role",
-        'custom_domain' => "VARCHAR(255) NULL AFTER status"
+        'custom_domain' => "VARCHAR(255) NULL AFTER status",
+        'is_verified' => "TINYINT(1) DEFAULT 0 AFTER custom_domain"
     ];
 
     foreach ($userColsToAdd as $col => $def) {
@@ -67,8 +68,24 @@ try {
         }
     }
 
+    // Check if VIP is in plan enum (if column already exists)
+    if (in_array('plan', $existingUserCols)) {
+        $pdo->exec("ALTER TABLE users MODIFY plan ENUM('free', 'pro', 'business', 'vip') DEFAULT 'free'");
+    }
+
     // Core Tables
     $coreTables = [
+        'verification_requests' => "CREATE TABLE IF NOT EXISTS verification_requests (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            status ENUM('pending', 'approved', 'rejected', 'more_info') DEFAULT 'pending',
+            details TEXT,
+            rejection_reason TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
         'pages' => "CREATE TABLE IF NOT EXISTS pages (
             id INT AUTO_INCREMENT PRIMARY KEY,
             user_id INT NOT NULL,
@@ -188,6 +205,7 @@ try {
         ['billing:manage', 'billing', 'Manage plan settings and prices'],
         ['settings:view', 'system_settings', 'View system settings'],
         ['settings:manage', 'system_settings', 'Edit system configurations'],
+        ['analytics:view', 'analytics', 'View platform-wide analytics'],
         ['rbac:manage', 'rbac', 'Full control over Roles and Permissions']
     ];
 
@@ -213,8 +231,8 @@ try {
     $mappings = [
         'User' => ['links:create', 'links:view', 'links:edit', 'links:delete', 'pages:manage'],
         'Editor' => ['links:create', 'links:view', 'links:edit', 'links:delete', 'pages:manage'],
-        'Support' => ['links:view', 'users:view', 'billing:view', 'settings:view'],
-        'Manager' => ['links:create', 'links:view', 'links:edit', 'links:delete', 'pages:manage', 'users:view', 'users:edit', 'billing:view', 'billing:manage', 'settings:view']
+        'Support' => ['links:view', 'users:view', 'billing:view', 'settings:view', 'analytics:view'],
+        'Manager' => ['links:create', 'links:view', 'links:edit', 'links:delete', 'pages:manage', 'users:view', 'users:edit', 'billing:view', 'billing:manage', 'settings:view', 'analytics:view']
     ];
 
     foreach ($mappings as $roleName => $perms) {
@@ -256,11 +274,16 @@ try {
         'maintenance_mode' => 'false',
         'free_link_limit' => '3',
         'pro_link_limit' => '100',
+        'auto_verify_on_upgrade' => 'true',
         'available_themes' => '["default", "dark", "glass", "minimal"]'
     ];
     $sStmt = $pdo->prepare("INSERT IGNORE INTO settings (setting_key, setting_value) VALUES (?, ?)");
     foreach ($sysSettings as $k => $v) $sStmt->execute([$k, $v]);
     echo "<span class='success'>✅ Proper</span><br>";
+    
+    // Clear permission cache to reflect changes immediately
+    clear_permission_cache();
+    echo "Permission cache cleared.<br>";
 
     echo "<div class='footer'><span class='success'>🎉 All systems synchronized successfully!</span><br><br>";
     echo "<a href='/'>Go to Landing Page</a> | <a href='/dashboard'>Go to Dashboard</a></div>";

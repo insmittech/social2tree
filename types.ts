@@ -1,5 +1,5 @@
 
-export type PlanType = 'free' | 'pro' | 'business';
+export type PlanType = 'free' | 'pro' | 'business' | 'vip';
 export type UserRole = 'user' | 'admin';
 export type ButtonStyle = 'rounded-lg' | 'rounded-full' | 'rounded-none' | 'brutal';
 
@@ -46,11 +46,25 @@ export interface UserProfile {
   role: UserRole;
   plan: PlanType;
   status: 'active' | 'suspended';
+  isVerified: boolean;
   createdAt: string;
   pages: LinkPage[];
   views: number;
   roles: string[];
   permissions: string[];
+}
+
+export interface VerificationRequest {
+  id: string;
+  userId: string;
+  username: string;
+  displayName: string;
+  email: string;
+  status: 'pending' | 'approved' | 'rejected' | 'more_info';
+  details: string;
+  rejectionReason?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AdminStats {

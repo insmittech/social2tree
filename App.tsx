@@ -15,6 +15,8 @@ import AdminSecurity from './pages/AdminSecurity';
 import AdminRBAC from './pages/AdminRBAC';
 import Plan from './pages/Plan';
 import SavedLinks from './pages/SavedLinks';
+import RequestVerification from './pages/RequestVerification';
+import AdminVerification from './pages/AdminVerification';
 import Profile from './pages/Profile';
 import BioTrees from './pages/BioTrees';
 import TreeEditor from './pages/TreeEditor';
@@ -114,6 +116,10 @@ const AppRoutes: React.FC = () => {
         <Route
           path="/admin/rbac"
           element={isAuthenticated && isAdmin ? <Layout userProfile={user} onLogout={handleLogout} isAdmin><AdminRBAC /></Layout> : <Navigate to="/dashboard" />}
+        />
+        <Route
+          path="/admin/verification"
+          element={isAuthenticated && isAdmin ? <Layout userProfile={user} onLogout={handleLogout} isAdmin><AdminVerification /></Layout> : <Navigate to="/dashboard" />}
         />
 
         {/* Public Profile View */}
