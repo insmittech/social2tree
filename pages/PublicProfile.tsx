@@ -84,8 +84,8 @@ const PublicProfile: React.FC = () => {
 
   if (error || !profile) return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
-      <h1 className="text-4xl font-bold text-slate-900 mb-4">Tree not found 🌲</h1>
-      <p className="text-slate-500 mb-8">The user @{username} doesn't exist.</p>
+      <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">Tree not found 🌲</h1>
+      <p className="text-slate-500 dark:text-slate-400 mb-8">The user @{username} doesn't exist.</p>
       <a href="/" className="px-6 py-3 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 transition-colors">Claim this username</a>
     </div>
   );
@@ -123,14 +123,14 @@ const PublicProfile: React.FC = () => {
       </Helmet>
 
       <header className="w-full max-w-[580px] pt-16 pb-8 px-6 flex flex-col items-center">
-        <button className="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all backdrop-blur-lg border border-white/20 text-white">
+        <button className="absolute top-6 right-6 p-2 rounded-full bg-white dark:bg-slate-900/40/10 hover:bg-white/20 transition-all backdrop-blur-lg border border-white/20 text-white">
           <Share2 size={20} />
         </button>
 
         <img
           src={profile.avatarUrl}
           alt={profile.displayName}
-          className="w-24 h-24 rounded-full border-4 border-white/30 shadow-xl object-cover mb-4"
+          className="w-24 h-24 rounded-full border-4 border-white/30 shadow-xl dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] object-cover mb-4"
         />
         <div className="flex items-center gap-2 mb-2">
           <h1 className={`text-2xl font-bold tracking-tight ${theme.textClass}`}>{profile.displayName}</h1>
@@ -144,7 +144,7 @@ const PublicProfile: React.FC = () => {
           <button
             key={link.id}
             onClick={() => handleLinkClick(link.id, link.url, link.password)}
-            className={`flex items-center justify-between w-full min-h-[56px] px-6 py-4 text-base font-semibold shadow-sm transition-all transform hover:scale-[1.02] active:scale-[0.98] ${getButtonStyle(theme.buttonClass, profile.buttonStyle)}`}
+            className={`flex items-center justify-between w-full min-h-[56px] px-6 py-4 text-base font-semibold shadow-sm dark:shadow-none transition-all transform hover:scale-[1.02] active:scale-[0.98] ${getButtonStyle(theme.buttonClass, profile.buttonStyle)}`}
           >
             <span className="flex-grow text-center">{link.title}</span>
             {link.password && <Lock size={16} className="opacity-60" />}
@@ -155,11 +155,11 @@ const PublicProfile: React.FC = () => {
       {/* Password Modal */}
       {passwordModal?.isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl space-y-6 relative overflow-hidden">
+          <div className="bg-white dark:bg-slate-900/40 w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl dark:shadow-none space-y-6 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-2 bg-amber-400"></div>
             <button
               onClick={() => setPasswordModal(null)}
-              className="absolute top-4 right-6 p-2 text-slate-400 hover:text-slate-600 transition-colors"
+              className="absolute top-4 right-6 p-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 transition-colors"
             >
               <X size={20} />
             </button>
@@ -168,8 +168,8 @@ const PublicProfile: React.FC = () => {
               <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-3xl flex items-center justify-center mx-auto mb-4">
                 <Lock size={32} />
               </div>
-              <h3 className="text-xl font-black text-slate-900 leading-tight">Password Protected</h3>
-              <p className="text-slate-500 text-sm font-medium">Please enter the password to access this link.</p>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white leading-tight">Password Protected</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Please enter the password to access this link.</p>
             </div>
 
             <div className="space-y-4">
@@ -184,7 +184,7 @@ const PublicProfile: React.FC = () => {
                     setPasswordError(false);
                   }}
                   onKeyDown={(e) => e.key === 'Enter' && handlePasswordSubmit()}
-                  className={`w-full bg-slate-50 border ${passwordError ? 'border-red-300 ring-red-100' : 'border-slate-200 focus:ring-amber-100'} rounded-2xl px-5 py-4 focus:ring-4 outline-none transition-all font-bold text-slate-700 text-center tracking-[0.3em]`}
+                  className={`w-full bg-slate-50 dark:bg-[#0b0f19] border ${passwordError ? 'border-red-300 ring-red-100' : 'border-slate-200 dark:border-slate-700/50 focus:ring-amber-100'} rounded-2xl px-5 py-4 focus:ring-4 outline-none transition-all font-bold text-slate-700 dark:text-slate-200 text-center tracking-[0.3em]`}
                 />
                 {passwordError && (
                   <p className="text-red-500 text-[10px] font-bold uppercase text-center mt-2 tracking-widest">Incorrect password</p>
@@ -192,7 +192,7 @@ const PublicProfile: React.FC = () => {
               </div>
               <button
                 onClick={handlePasswordSubmit}
-                className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg active:scale-95"
+                className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] active:scale-95"
               >
                 Access Link
               </button>

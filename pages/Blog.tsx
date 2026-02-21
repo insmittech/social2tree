@@ -74,7 +74,7 @@ const Blog: React.FC = () => {
     const { isAuthenticated, user } = useAuth();
 
     return (
-        <div className="min-h-screen bg-[#0b0f19] text-slate-300 font-sans selection:bg-teal-500/30">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#0b0f19] text-slate-900 dark:text-slate-300 font-sans selection:bg-teal-500/30 transition-colors duration-300">
             <Navbar isAuthenticated={isAuthenticated} userProfile={user} />
 
             {/* Hero Section */}
@@ -84,8 +84,8 @@ const Blog: React.FC = () => {
                 </div>
                 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full text-center">
-                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white tracking-tight mb-6">Insights & Resources</h1>
-                    <p className="text-lg md:text-xl text-slate-400 max-w-3xl mx-auto mb-10">
+                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-slate-900 dark:text-white tracking-tight mb-6 transition-colors">Insights & Resources</h1>
+                    <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-10 transition-colors">
                         Dive into the latest research, intelligence gathering techniques, and OSINT platform updates.
                     </p>
                     
@@ -96,7 +96,7 @@ const Blog: React.FC = () => {
                         </div>
                         <input
                             type="text"
-                            className="bg-slate-900/50 block w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-800 text-slate-300 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 transition-all shadow-inner backdrop-blur-xl"
+                            className="bg-white dark:bg-slate-900/50 block w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-300 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 transition-all shadow-sm dark:shadow-inner backdrop-blur-xl"
                             placeholder="Search articles, guides, and reports..."
                         />
                     </div>
@@ -105,30 +105,30 @@ const Blog: React.FC = () => {
 
             {/* Featured Post */}
             <section className="px-4 pb-16 max-w-7xl mx-auto z-20 relative">
-                <div className="relative rounded-3xl overflow-hidden group border border-slate-800 focus-within:ring-2 focus-within:ring-teal-500">
+                <div className="relative rounded-3xl overflow-hidden group border border-slate-200 dark:border-slate-800 focus-within:ring-2 focus-within:ring-teal-500 transition-colors">
                     {/* Background Image with Overlay */}
-                    <div className="absolute inset-0">
+                    <div className="absolute inset-0 bg-slate-50 dark:bg-transparent">
                         <img 
                             src={FEATURED_POST.imageUrl} 
                             alt="Featured" 
                             className="w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700 ease-out"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f19] via-[#0b0f19]/80 to-transparent"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-50 dark:from-[#0b0f19] via-slate-50/80 dark:via-[#0b0f19]/80 to-transparent transition-colors duration-300"></div>
                     </div>
                     
                     <div className="relative p-8 md:p-12 lg:p-16 flex flex-col justify-end min-h-[500px]">
-                        <div className="inline-flex w-fit items-center px-3 py-1 mb-6 border border-teal-500/30 bg-teal-500/10 text-teal-400 rounded-full text-xs font-bold tracking-wider uppercase backdrop-blur-md">
+                        <div className="inline-flex w-fit items-center px-3 py-1 mb-6 border border-teal-500/30 bg-teal-500/10 text-teal-600 dark:text-teal-400 rounded-full text-xs font-bold tracking-wider uppercase backdrop-blur-md transition-colors">
                             Featured • {FEATURED_POST.category}
                         </div>
-                        <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 max-w-4xl hover:text-teal-400 transition-colors cursor-pointer">
+                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4 max-w-4xl hover:text-teal-600 dark:hover:text-teal-400 transition-colors cursor-pointer">
                             {FEATURED_POST.title}
                         </h2>
-                        <p className="text-slate-300 text-lg max-w-3xl mb-8 leading-relaxed">
+                        <p className="text-slate-700 dark:text-slate-300 text-lg max-w-3xl mb-8 leading-relaxed transition-colors">
                             {FEATURED_POST.excerpt}
                         </p>
                         
                         <div className="flex items-center justify-between flex-wrap gap-4">
-                            <div className="flex items-center gap-6 text-sm text-slate-400 font-medium">
+                            <div className="flex items-center gap-6 text-sm text-slate-600 dark:text-slate-400 font-medium transition-colors">
                                 <div className="flex items-center gap-2">
                                     <User size={16} className="text-teal-500" />
                                     <span>{FEATURED_POST.author}</span>
@@ -138,9 +138,9 @@ const Blog: React.FC = () => {
                                     <span>{FEATURED_POST.date}</span>
                                 </div>
                             </div>
-                            <button className="flex items-center gap-2 text-white font-bold tracking-wide hover:text-teal-400 transition-colors group/btn">
+                            <button className="flex items-center gap-2 text-slate-900 dark:text-white font-bold tracking-wide hover:text-teal-600 dark:hover:text-teal-400 transition-colors group/btn">
                                 Read Article 
-                                <span className="p-1 rounded-full bg-slate-800 group-hover/btn:bg-teal-500/20 transition-colors">
+                                <span className="p-1 rounded-full bg-slate-200 dark:bg-slate-800 group-hover/btn:bg-teal-500/10 dark:group-hover/btn:bg-teal-500/20 transition-colors">
                                     <ChevronRight size={16} />
                                 </span>
                             </button>
@@ -150,12 +150,12 @@ const Blog: React.FC = () => {
             </section>
 
             {/* Filters Bar */}
-            <section className="px-4 pb-10 max-w-7xl mx-auto border-b border-slate-800 flex flex-wrap gap-4 items-center justify-between">
+            <section className="px-4 pb-10 max-w-7xl mx-auto border-b border-slate-200 dark:border-slate-800 flex flex-wrap gap-4 items-center justify-between transition-colors">
                 <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 md:pb-0">
                     {['All Topics', 'OSINT Strategy', 'Threat Intelligence', 'AI & ML', 'Crypto Analysis'].map((topic, i) => (
                         <button 
                             key={i} 
-                            className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-semibold transition-all ${i === 0 ? 'bg-teal-500 text-white' : 'bg-slate-900/50 text-slate-400 hover:text-white border border-slate-800 hover:border-teal-500/50'}`}
+                            className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm font-semibold transition-all ${i === 0 ? 'bg-teal-500 text-white' : 'bg-white dark:bg-slate-900/50 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800 hover:border-teal-400/50 dark:hover:border-teal-500/50 shadow-sm dark:shadow-none'}`}
                         >
                             {topic}
                         </button>
@@ -170,18 +170,17 @@ const Blog: React.FC = () => {
             <section className="py-16 px-4 max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {BLOG_POSTS.map((post) => (
-                        <article key={post.id} className="group bg-slate-900/40 rounded-3xl border border-slate-800 overflow-hidden hover:border-teal-500/50 hover:shadow-[0_0_30px_rgba(20,184,166,0.05)] transition-all duration-300 flex flex-col h-full backdrop-blur-xl">
+                        <article key={post.id} className="group bg-white dark:bg-slate-900/40 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-teal-400/50 dark:hover:border-teal-500/50 shadow-sm hover:shadow-xl dark:shadow-none dark:hover:shadow-[0_0_30px_rgba(20,184,166,0.05)] transition-all duration-300 flex flex-col h-full backdrop-blur-xl">
                             {/* Image Container */}
-                            <div className="relative h-56 overflow-hidden">
-                                <div className="absolute inset-0 bg-slate-800 animate-pulse"></div> {/* Optional loading placeholder */}
+                            <div className="relative h-56 overflow-hidden bg-slate-100 dark:bg-slate-800">
                                 <img 
                                     src={post.imageUrl} 
                                     alt={post.title} 
                                     className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 ease-out"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-slate-900 via-transparent to-transparent transition-colors duration-300"></div>
                                 <div className="absolute top-4 left-4">
-                                     <span className="px-3 py-1 bg-[#0b0f19]/80 border border-teal-500/30 text-teal-400 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md">
+                                     <span className="px-3 py-1 bg-slate-50/90 dark:bg-[#0b0f19]/80 border border-teal-500/30 text-teal-600 dark:text-teal-400 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md transition-colors">
                                         {post.category}
                                     </span>
                                 </div>
@@ -189,18 +188,18 @@ const Blog: React.FC = () => {
                             
                             {/* Content Container */}
                             <div className="p-6 md:p-8 flex flex-col flex-1">
-                                <h3 className="text-xl font-bold text-white mb-3 leading-tight group-hover:text-teal-400 transition-colors cursor-pointer">
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 leading-tight group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors cursor-pointer">
                                     {post.title}
                                 </h3>
-                                <p className="text-slate-400 text-sm leading-relaxed mb-6 flex-1">
+                                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6 flex-1 transition-colors">
                                     {post.excerpt}
                                 </p>
                                 
-                                <div className="flex items-center justify-between mt-auto pt-6 border-t border-slate-800/50">
+                                <div className="flex items-center justify-between mt-auto pt-6 border-t border-slate-100 dark:border-slate-800/50 transition-colors">
                                      <div className="text-xs text-slate-500 font-medium">
                                         {post.date}
                                     </div>
-                                    <button className="flex items-center gap-1 text-teal-500 text-sm font-bold hover:text-cyan-400 transition-colors">
+                                    <button className="flex items-center gap-1 text-teal-600 dark:text-teal-500 text-sm font-bold hover:text-teal-500 dark:hover:text-cyan-400 transition-colors">
                                         Read <ChevronRight size={14} />
                                     </button>
                                 </div>

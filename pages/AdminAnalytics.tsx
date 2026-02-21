@@ -64,14 +64,14 @@ const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ onLogout }) => {
     <div className="p-4 sm:p-8 lg:px-12 py-8 overflow-hidden pb-32 lg:pb-12">
       <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900">Platform Analytics</h1>
-          <p className="text-slate-500 font-medium">Real-time aggregate performance across all users</p>
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white">Platform Analytics</h1>
+          <p className="text-slate-500 dark:text-slate-400 font-medium">Real-time aggregate performance across all users</p>
         </div>
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 bg-white border border-slate-200 px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-widest text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
+          <button className="flex items-center gap-2 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700/50 px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-slate-50 transition-all shadow-sm dark:shadow-none">
             <Filter size={18} /> Timeframe
           </button>
-          <button className="flex items-center gap-2 bg-slate-900 text-white px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-200">
+          <button className="flex items-center gap-2 bg-slate-900 text-white px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-slate-200">
             <Download size={18} /> Export Report
           </button>
         </div>
@@ -84,20 +84,20 @@ const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ onLogout }) => {
           { label: 'Link Engagement', value: stats.totalClicks.toLocaleString(), icon: <MousePointer2 size={22} />, color: 'emerald' },
           { label: 'Pro Members', value: stats.proUsers.toLocaleString(), icon: <Users size={22} />, color: 'purple' },
         ].map((stat, i) => (
-          <div key={i} className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm">
+          <div key={i} className="bg-white dark:bg-slate-900/40 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-700/50 shadow-sm dark:shadow-none">
             <div className={`w-12 h-12 rounded-2xl bg-${stat.color}-50 text-${stat.color}-600 flex items-center justify-center mb-6`}>
               {stat.icon}
             </div>
-            <p className="text-slate-400 text-xs font-black uppercase tracking-widest">{stat.label}</p>
-            <h3 className="text-3xl font-black text-slate-900 mt-2">{stat.value}</h3>
+            <p className="text-slate-400 dark:text-slate-500 text-xs font-black uppercase tracking-widest">{stat.label}</p>
+            <h3 className="text-3xl font-black text-slate-900 dark:text-white mt-2">{stat.value}</h3>
           </div>
         ))}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8 mb-12">
         {/* Traffic Growth */}
-        <div className="lg:col-span-2 bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
-          <h3 className="text-xl font-black flex items-center gap-2 text-slate-900 mb-8">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900/40 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-700/50 shadow-sm dark:shadow-none">
+          <h3 className="text-xl font-black flex items-center gap-2 text-slate-900 dark:text-white mb-8">
             <TrendingUp size={20} className="text-indigo-600" /> Platform Traffic Growth
           </h3>
           <div className="h-[350px]">
@@ -120,8 +120,8 @@ const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ onLogout }) => {
         </div>
 
         {/* Plan Distribution */}
-        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
-          <h3 className="text-xl font-black flex items-center gap-2 text-slate-900 mb-8">
+        <div className="bg-white dark:bg-slate-900/40 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-700/50 shadow-sm dark:shadow-none">
+          <h3 className="text-xl font-black flex items-center gap-2 text-slate-900 dark:text-white mb-8">
             <Users size={20} className="text-indigo-600" /> Plan Distribution
           </h3>
           <div className="h-[250px]">
@@ -149,9 +149,9 @@ const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ onLogout }) => {
               <div key={plan.name} className="flex justify-between items-center px-2">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: plan.color }}></div>
-                  <span className="text-sm font-bold text-slate-600">{plan.name}</span>
+                  <span className="text-sm font-bold text-slate-600 dark:text-slate-300">{plan.name}</span>
                 </div>
-                <span className="text-sm font-black text-slate-900">{plan.value}</span>
+                <span className="text-sm font-black text-slate-900 dark:text-white">{plan.value}</span>
               </div>
             ))}
           </div>
@@ -159,9 +159,9 @@ const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ onLogout }) => {
       </div>
 
       {/* Top Performers */}
-      <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-8 border-b border-slate-100 flex justify-between items-center">
-          <h3 className="text-xl font-black flex items-center gap-2 text-slate-900">
+      <div className="bg-white dark:bg-slate-900/40 rounded-[2.5rem] border border-slate-200 dark:border-slate-700/50 shadow-sm dark:shadow-none overflow-hidden">
+        <div className="p-8 border-b border-slate-100 dark:border-slate-800/50 flex justify-between items-center">
+          <h3 className="text-xl font-black flex items-center gap-2 text-slate-900 dark:text-white">
             <Activity size={20} className="text-indigo-600" /> Top Performing Accounts
           </h3>
           <button className="text-indigo-600 text-xs font-black uppercase tracking-widest hover:underline">View All Users</button>
@@ -169,11 +169,11 @@ const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ onLogout }) => {
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-slate-50/50">
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Username</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Total Views</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Link Clicks</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Conversion Rate</th>
+              <tr className="bg-slate-50 dark:bg-[#0b0f19]/50">
+                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Username</th>
+                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Total Views</th>
+                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Link Clicks</th>
+                <th className="px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Conversion Rate</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -184,11 +184,11 @@ const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ onLogout }) => {
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-3">
                         <img src={user.avatarUrl} className="w-8 h-8 rounded-lg" alt="" />
-                        <span className="font-bold text-slate-800 text-sm">@{user.username}</span>
+                        <span className="font-bold text-slate-800 dark:text-slate-200 text-sm">@{user.username}</span>
                       </div>
                     </td>
-                    <td className="px-8 py-5 text-sm font-black text-slate-700">{user.views.toLocaleString()}</td>
-                    <td className="px-8 py-5 text-sm font-black text-slate-700">{user.totalClicks.toLocaleString()}</td>
+                    <td className="px-8 py-5 text-sm font-black text-slate-700 dark:text-slate-200">{user.views.toLocaleString()}</td>
+                    <td className="px-8 py-5 text-sm font-black text-slate-700 dark:text-slate-200">{user.totalClicks.toLocaleString()}</td>
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-2">
                         <div className="flex-grow bg-slate-100 h-1.5 rounded-full overflow-hidden max-w-[100px]">

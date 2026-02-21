@@ -137,7 +137,7 @@ const SOCIAL_LABELS = ['twitter', 'instagram', 'github', 'youtube', 'linkedin', 
 
 const LinkBlockPreview: React.FC<{ data: LinkBlock['data']; accent: string }> = ({ data, accent }) => (
     <a href={data.url} onClick={e => e.preventDefault()} style={{ background: data.bg || accent, color: data.textColor, borderRadius: data.radius }}
-        className="block w-full py-3.5 text-center text-sm font-bold shadow-sm hover:opacity-90 transition-opacity">
+        className="block w-full py-3.5 text-center text-sm font-bold shadow-sm dark:shadow-none hover:opacity-90 transition-opacity">
         {data.label}
     </a>
 );
@@ -181,7 +181,7 @@ const NewsletterBlockPreview: React.FC<{ data: NewsletterBlock['data']; accent: 
     <div className="rounded-2xl p-4" style={{ background: data.bg }}>
         <p className="text-xs font-black text-center mb-3 uppercase tracking-widest">{data.title}</p>
         <div className="flex gap-2">
-            <input placeholder={data.placeholder} className="flex-1 text-xs px-3 py-2 rounded-xl border border-slate-200 outline-none bg-white" />
+            <input placeholder={data.placeholder} className="flex-1 text-xs px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/50 outline-none bg-white dark:bg-slate-900/40" />
             <button style={{ background: accent }} className="px-4 py-2 rounded-xl text-white text-xs font-bold">{data.buttonText}</button>
         </div>
     </div>
@@ -190,7 +190,7 @@ const NewsletterBlockPreview: React.FC<{ data: NewsletterBlock['data']; accent: 
 const ImageBlockPreview: React.FC<{ data: ImageBlock['data'] }> = ({ data }) => (
     data.src
         ? <img src={data.src} alt={data.alt} style={{ borderRadius: data.radius }} className="w-full object-cover" />
-        : <div style={{ borderRadius: data.radius }} className="w-full h-32 bg-slate-100 flex items-center justify-center text-slate-400 text-xs font-bold"><Image size={24} /></div>
+        : <div style={{ borderRadius: data.radius }} className="w-full h-32 bg-slate-100 flex items-center justify-center text-slate-400 dark:text-slate-500 text-xs font-bold"><Image size={24} /></div>
 );
 
 const BlockRenderer: React.FC<{ block: Block; config: PageConfig }> = ({ block, config }) => {
@@ -215,9 +215,9 @@ const LinkSettings: React.FC<{ data: LinkBlock['data']; onChange: (d: any) => vo
             <input value={data.url} onChange={e => onChange({ ...data, url: e.target.value })} placeholder="https://" className="settings-input" /></label>
         <div className="grid grid-cols-2 gap-3">
             <label className="block"><span className="settings-label">Background</span>
-                <input type="color" value={data.bg} onChange={e => onChange({ ...data, bg: e.target.value })} className="h-10 w-full rounded-xl border border-slate-200 cursor-pointer" /></label>
+                <input type="color" value={data.bg} onChange={e => onChange({ ...data, bg: e.target.value })} className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-700/50 cursor-pointer" /></label>
             <label className="block"><span className="settings-label">Text Color</span>
-                <input type="color" value={data.textColor} onChange={e => onChange({ ...data, textColor: e.target.value })} className="h-10 w-full rounded-xl border border-slate-200 cursor-pointer" /></label>
+                <input type="color" value={data.textColor} onChange={e => onChange({ ...data, textColor: e.target.value })} className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-700/50 cursor-pointer" /></label>
         </div>
         <label className="block"><span className="settings-label">Border Radius</span>
             <select value={data.radius} onChange={e => onChange({ ...data, radius: e.target.value })} className="settings-input">
@@ -234,14 +234,14 @@ const TextSettings: React.FC<{ data: TextBlock['data']; onChange: (d: any) => vo
         <div className="flex gap-2">
             {(['left', 'center', 'right'] as const).map(a => (
                 <button key={a} onClick={() => onChange({ ...data, align: a })}
-                    className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${data.align === a ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}>
+                    className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${data.align === a ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500 dark:text-slate-400 hover:bg-slate-200'}`}>
                     {a === 'left' ? <AlignLeft size={14} className="mx-auto" /> : a === 'center' ? <AlignCenter size={14} className="mx-auto" /> : <AlignRight size={14} className="mx-auto" />}
                 </button>
             ))}
         </div>
         <div className="flex gap-2">
-            <button onClick={() => onChange({ ...data, bold: !data.bold })} className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${data.bold ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'}`}><Bold size={14} className="mx-auto" /></button>
-            <button onClick={() => onChange({ ...data, italic: !data.italic })} className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${data.italic ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'}`}><Italic size={14} className="mx-auto" /></button>
+            <button onClick={() => onChange({ ...data, bold: !data.bold })} className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${data.bold ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500 dark:text-slate-400'}`}><Bold size={14} className="mx-auto" /></button>
+            <button onClick={() => onChange({ ...data, italic: !data.italic })} className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${data.italic ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500 dark:text-slate-400'}`}><Italic size={14} className="mx-auto" /></button>
         </div>
         <div className="grid grid-cols-2 gap-3">
             <label className="block"><span className="settings-label">Font Size</span>
@@ -249,7 +249,7 @@ const TextSettings: React.FC<{ data: TextBlock['data']; onChange: (d: any) => vo
                     {['11px', '12px', '13px', '14px', '16px', '18px', '22px', '28px'].map(s => <option key={s}>{s}</option>)}
                 </select></label>
             <label className="block"><span className="settings-label">Color</span>
-                <input type="color" value={data.color} onChange={e => onChange({ ...data, color: e.target.value })} className="h-10 w-full rounded-xl border border-slate-200 cursor-pointer" /></label>
+                <input type="color" value={data.color} onChange={e => onChange({ ...data, color: e.target.value })} className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-700/50 cursor-pointer" /></label>
         </div>
     </div>
 );
@@ -266,7 +266,7 @@ const SocialSettings: React.FC<{ data: SocialBlock['data']; onChange: (d: any) =
                     <button onClick={() => { const icons = data.icons.filter((_, j) => j !== i); onChange({ ...data, icons }); }} className="p-2 text-rose-400 hover:text-rose-600"><X size={14} /></button>
                 </div>
             ))}
-            <button onClick={() => onChange({ ...data, icons: [...data.icons, { platform: 'twitter', url: '#' }] })} className="w-full py-2 border-2 border-dashed border-slate-200 rounded-xl text-xs font-black text-slate-400 hover:border-indigo-300 hover:text-indigo-500 transition-all flex items-center justify-center gap-1">
+            <button onClick={() => onChange({ ...data, icons: [...data.icons, { platform: 'twitter', url: '#' }] })} className="w-full py-2 border-2 border-dashed border-slate-200 dark:border-slate-700/50 rounded-xl text-xs font-black text-slate-400 dark:text-slate-500 hover:border-indigo-300 hover:text-indigo-500 transition-all flex items-center justify-center gap-1">
                 <Plus size={12} /> Add Icon
             </button>
         </div>
@@ -303,7 +303,7 @@ const NewsletterSettings: React.FC<{ data: NewsletterBlock['data']; onChange: (d
         <label className="block"><span className="settings-label">Button Text</span>
             <input value={data.buttonText} onChange={e => onChange({ ...data, buttonText: e.target.value })} className="settings-input" /></label>
         <label className="block"><span className="settings-label">Background</span>
-            <input type="color" value={data.bg} onChange={e => onChange({ ...data, bg: e.target.value })} className="h-10 w-full rounded-xl border border-slate-200 cursor-pointer" /></label>
+            <input type="color" value={data.bg} onChange={e => onChange({ ...data, bg: e.target.value })} className="h-10 w-full rounded-xl border border-slate-200 dark:border-slate-700/50 cursor-pointer" /></label>
     </div>
 );
 
@@ -335,20 +335,20 @@ const SortableBlock: React.FC<{
             className={`relative group cursor-pointer transition-all duration-150 ${isActive ? 'ring-2 ring-indigo-500 ring-offset-2 rounded-2xl' : ''} ${isHidden ? 'opacity-40' : ''}`}>
             {/* Left — grip */}
             <div className={`absolute -left-7 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity ${isActive ? 'opacity-100' : ''}`}>
-                <button {...attributes} {...listeners} className="p-1 text-slate-400 cursor-grab active:cursor-grabbing hover:text-slate-600"><GripVertical size={14} /></button>
+                <button {...attributes} {...listeners} className="p-1 text-slate-400 dark:text-slate-500 cursor-grab active:cursor-grabbing hover:text-slate-600"><GripVertical size={14} /></button>
             </div>
             {/* Right — actions */}
             <div className={`absolute -right-8 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity ${isActive ? 'opacity-100' : ''}`}>
                 <button onClick={e => { e.stopPropagation(); onToggleVisible(); }} title={isHidden ? 'Show' : 'Hide'}
-                    className={`p-1 rounded-lg transition-colors ${isHidden ? 'text-amber-400 hover:text-amber-600' : 'text-slate-400 hover:text-slate-600'}`}>
+                    className={`p-1 rounded-lg transition-colors ${isHidden ? 'text-amber-400 hover:text-amber-600' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600'}`}>
                     {isHidden ? <EyeOff size={13} /> : <Eye size={13} />}
                 </button>
                 <button onClick={e => { e.stopPropagation(); onDuplicate(); }} title="Duplicate"
-                    className="p-1 text-slate-400 hover:text-indigo-500 rounded-lg transition-colors">
+                    className="p-1 text-slate-400 dark:text-slate-500 hover:text-indigo-500 rounded-lg transition-colors">
                     <Copy size={13} />
                 </button>
                 <button onClick={e => { e.stopPropagation(); onDelete(); }} title="Delete"
-                    className="p-1 text-slate-400 hover:text-rose-500 rounded-lg transition-colors">
+                    className="p-1 text-slate-400 dark:text-slate-500 hover:text-rose-500 rounded-lg transition-colors">
                     <Trash2 size={13} />
                 </button>
             </div>
@@ -382,9 +382,9 @@ const LibraryItem: React.FC<{ type: BlockType; label: string; icon: React.ReactN
     return (
         <div ref={setNodeRef} {...attributes} {...listeners}
             className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 cursor-grab active:cursor-grabbing transition-all select-none
-                ${isDragging ? 'opacity-40 scale-95' : 'border-slate-100 bg-white hover:border-indigo-200 hover:shadow-md hover:scale-105'}`}>
+                ${isDragging ? 'opacity-40 scale-95' : 'border-slate-100 dark:border-slate-800/50 bg-white dark:bg-slate-900/40 hover:border-indigo-200 hover:shadow-md hover:scale-105'}`}>
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color}`}>{icon}</div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{label}</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">{label}</span>
         </div>
     );
 };
@@ -647,8 +647,8 @@ const PageBuilder: React.FC = () => {
         if (!activeBlock) return (
             <div className="flex flex-col items-center justify-center h-40 text-slate-300 text-center p-4">
                 <Settings size={32} className="mb-3" />
-                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">No block selected</p>
-                <p className="text-[11px] text-slate-400 mt-1 font-medium">Click a block in the canvas to edit it</p>
+                <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">No block selected</p>
+                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 font-medium">Click a block in the canvas to edit it</p>
             </div>
         );
         const upd = (d: any) => updateBlock(activeBlock.id, d);
@@ -663,22 +663,22 @@ const PageBuilder: React.FC = () => {
     };
 
     return (
-        <div className="h-screen w-screen flex flex-col overflow-hidden bg-slate-50 font-sans">
+        <div className="h-screen w-screen flex flex-col overflow-hidden bg-slate-50 dark:bg-[#0b0f19] font-sans">
             {/* ── HEADER ─────────────────────────────────────────────────── */}
-            <header className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-white border-b border-slate-100 flex-shrink-0">
+            <header className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-white dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800/50 flex-shrink-0">
                 <div className="flex items-center justify-between w-full sm:w-auto">
                     <div className="flex items-center gap-3">
                         <button onClick={() => navigate('/dashboard/trees')}
-                            className="p-2 text-slate-400 hover:text-slate-900 transition-colors bg-slate-50 rounded-xl lg:hidden">
+                            className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-900 transition-colors bg-slate-50 dark:bg-[#0b0f19] rounded-xl lg:hidden">
                             <ArrowLeft size={18} />
                         </button>
                         <button onClick={() => navigate('/dashboard/trees')}
-                            className="hidden lg:flex items-center gap-2 p-2 text-slate-400 hover:text-slate-900 transition-colors bg-slate-50 rounded-xl">
+                            className="hidden lg:flex items-center gap-2 p-2 text-slate-400 dark:text-slate-500 hover:text-slate-900 transition-colors bg-slate-50 dark:bg-[#0b0f19] rounded-xl">
                             <ArrowLeft size={18} />
                             <span className="text-xs font-black uppercase tracking-widest">Back</span>
                         </button>
                     </div>
-                    <div className="hidden sm:flex items-center gap-2 text-xs text-slate-400 font-bold ml-4">
+                    <div className="hidden sm:flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500 font-bold ml-4">
                         {previewMode === 'mobile' ? <Smartphone size={14} /> : <Monitor size={14} />} Page Builder
                     </div>
                 </div>
@@ -691,16 +691,16 @@ const PageBuilder: React.FC = () => {
                             <Save size={10} /> {autoSaveStatus === 'saving' ? 'Saving…' : 'Auto-saved'}
                         </span>
                     )}
-                    <button className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-black hover:bg-slate-50 transition-all">
+                    <button className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-900/40 text-slate-600 dark:text-slate-300 text-xs font-black hover:bg-slate-50 transition-all">
                         <Globe size={14} /> <span className="hidden lg:inline">Connect Domain</span>
                     </button>
                     <button onClick={() => handleSave()} disabled={isSaving}
-                        className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-black hover:bg-slate-50 transition-all disabled:opacity-50`}>
+                        className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-900/40 text-slate-600 dark:text-slate-300 text-xs font-black hover:bg-slate-50 transition-all disabled:opacity-50`}>
                         {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                         Save
                     </button>
                     <button onClick={() => handleSave()} disabled={isSaving}
-                        className={`flex-shrink-0 flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-xl text-xs font-black transition-all shadow-sm ${saved ? 'bg-emerald-500 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200'} disabled:opacity-50`}>
+                        className={`flex-shrink-0 flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-xl text-xs font-black transition-all shadow-sm dark:shadow-none ${saved ? 'bg-emerald-500 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200'} disabled:opacity-50`}>
                         {isSaving ? <><Loader2 size={14} className="animate-spin" /> Publishing...</> : saved ? <><Check size={14} /> Published!</> : <><Upload size={14} /> Publish</>}
                     </button>
                 </div>
@@ -710,21 +710,21 @@ const PageBuilder: React.FC = () => {
                 <div className="flex flex-1 overflow-hidden relative">
 
                     {/* ── LEFT SIDEBAR (Library) ── */}
-                    <aside className={`fixed inset-0 z-30 lg:relative lg:inset-auto lg:flex w-full lg:w-52 flex-shrink-0 bg-white border-r border-slate-100 flex flex-col overflow-hidden transition-transform duration-300 ${mobileView === 'library' ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+                    <aside className={`fixed inset-0 z-30 lg:relative lg:inset-auto lg:flex w-full lg:w-52 flex-shrink-0 bg-white dark:bg-slate-900/40 border-r border-slate-100 dark:border-slate-800/50 flex flex-col overflow-hidden transition-transform duration-300 ${mobileView === 'library' ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
                         <div className="lg:hidden flex justify-between items-center p-4 border-b">
-                            <h2 className="text-sm font-black uppercase tracking-widest text-slate-800">Add Elements</h2>
-                            <button onClick={() => setMobileView('canvas')} className="p-2 text-slate-400"><X size={20} /></button>
+                            <h2 className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">Add Elements</h2>
+                            <button onClick={() => setMobileView('canvas')} className="p-2 text-slate-400 dark:text-slate-500"><X size={20} /></button>
                         </div>
                         {/* Tab switcher: Blocks | Templates */}
-                        <div className="flex border-b border-slate-100 flex-shrink-0 lg:mt-0">
+                        <div className="flex border-b border-slate-100 dark:border-slate-800/50 flex-shrink-0 lg:mt-0">
                             <button onClick={() => setShowTemplates(false)}
                                 className={`flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 flex items-center justify-center gap-1
-                                    ${!showTemplates ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>
+                                    ${!showTemplates ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400 dark:text-slate-500 hover:text-slate-600'}`}>
                                 <Plus size={11} /> Blocks
                             </button>
                             <button onClick={() => setShowTemplates(true)}
                                 className={`flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 flex items-center justify-center gap-1
-                                    ${showTemplates ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>
+                                    ${showTemplates ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400 dark:text-slate-500 hover:text-slate-600'}`}>
                                 <LayoutTemplate size={11} /> Templates
                             </button>
                         </div>
@@ -745,15 +745,15 @@ const PageBuilder: React.FC = () => {
                                 <div className="space-y-2">
                                     {TEMPLATES.map(tpl => (
                                         <button key={tpl.id} onClick={() => applyTemplate(tpl)}
-                                            className="w-full text-left p-3 rounded-2xl border-2 border-slate-100 hover:border-indigo-300 hover:shadow-md transition-all bg-white group">
+                                            className="w-full text-left p-3 rounded-2xl border-2 border-slate-100 dark:border-slate-800/50 hover:border-indigo-300 hover:shadow-md transition-all bg-white dark:bg-slate-900/40 group">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <span className="text-xl">{tpl.emoji}</span>
-                                                <span className="text-xs font-black text-slate-700 group-hover:text-indigo-600">{tpl.label}</span>
+                                                <span className="text-xs font-black text-slate-700 dark:text-slate-200 group-hover:text-indigo-600">{tpl.label}</span>
                                             </div>
-                                            <p className="text-[10px] text-slate-400 font-medium leading-relaxed">{tpl.desc}</p>
+                                            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium leading-relaxed">{tpl.desc}</p>
                                         </button>
                                     ))}
-                                    <p className="text-[10px] text-slate-400 text-center font-medium pt-2">Profile info is preserved</p>
+                                    <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center font-medium pt-2">Profile info is preserved</p>
                                 </div>
                             )}
                         </div>
@@ -762,19 +762,19 @@ const PageBuilder: React.FC = () => {
                     {/* ── CANVAS (Preview) ── */}
                     <main className={`flex-1 flex flex-col items-center overflow-auto bg-slate-100 relative transition-all duration-300 ${mobileView === 'canvas' ? 'block' : 'hidden lg:block'}`} onClick={() => setActiveBlockId(null)}>
                         {/* Toolbar: device toggle + zoom */}
-                        <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-white rounded-2xl shadow-sm border border-slate-100 px-3 py-1.5 z-10">
+                        <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-white dark:bg-slate-900/40 rounded-2xl shadow-sm dark:shadow-none border border-slate-100 dark:border-slate-800/50 px-3 py-1.5 z-10">
                             <button onClick={() => setPreviewMode('mobile')} title="Mobile"
-                                className={`p-1.5 rounded-lg transition-all ${previewMode === 'mobile' ? 'bg-indigo-100 text-indigo-600' : 'text-slate-400 hover:text-slate-700'}`}>
+                                className={`p-1.5 rounded-lg transition-all ${previewMode === 'mobile' ? 'bg-indigo-100 text-indigo-600' : 'text-slate-400 dark:text-slate-500 hover:text-slate-700'}`}>
                                 <Smartphone size={14} />
                             </button>
                             <button onClick={() => setPreviewMode('desktop')} title="Desktop"
-                                className={`p-1.5 rounded-lg transition-all ${previewMode === 'desktop' ? 'bg-indigo-100 text-indigo-600' : 'text-slate-400 hover:text-slate-700'}`}>
+                                className={`p-1.5 rounded-lg transition-all ${previewMode === 'desktop' ? 'bg-indigo-100 text-indigo-600' : 'text-slate-400 dark:text-slate-500 hover:text-slate-700'}`}>
                                 <Monitor size={14} />
                             </button>
                             <div className="w-px h-4 bg-slate-200 mx-1" />
-                            <button onClick={() => setZoom(z => Math.max(50, z - 10))} className="p-1 text-slate-400 hover:text-slate-700 rounded-lg transition-colors"><ZoomOut size={14} /></button>
-                            <span className="text-xs font-black text-slate-600 w-10 text-center">{zoom}%</span>
-                            <button onClick={() => setZoom(z => Math.min(150, z + 10))} className="p-1 text-slate-400 hover:text-slate-700 rounded-lg transition-colors"><ZoomIn size={14} /></button>
+                            <button onClick={() => setZoom(z => Math.max(50, z - 10))} className="p-1 text-slate-400 dark:text-slate-500 hover:text-slate-700 rounded-lg transition-colors"><ZoomOut size={14} /></button>
+                            <span className="text-xs font-black text-slate-600 dark:text-slate-300 w-10 text-center">{zoom}%</span>
+                            <button onClick={() => setZoom(z => Math.min(150, z + 10))} className="p-1 text-slate-400 dark:text-slate-500 hover:text-slate-700 rounded-lg transition-colors"><ZoomIn size={14} /></button>
                         </div>
 
                         <div className="pt-16 pb-10 flex flex-col items-center">
@@ -783,13 +783,13 @@ const PageBuilder: React.FC = () => {
                                 {previewMode === 'mobile' ? (
                                     /* ── Phone frame ── */
                                     <div className="w-full max-w-[390px] px-4">
-                                        <div className="bg-slate-900 rounded-[3rem] p-3 shadow-2xl shadow-slate-500/40">
+                                        <div className="bg-slate-900 rounded-[3rem] p-3 shadow-2xl dark:shadow-none shadow-slate-500/40">
                                             <div className="flex justify-center mb-3"><div className="w-28 h-5 bg-slate-800 rounded-full" /></div>
                                             <div style={{ background: config.colors.background, fontFamily: config.fonts.family, color: config.colors.text, minHeight: 600 }}
                                                 className="rounded-[2.3rem] overflow-hidden" onClick={e => e.stopPropagation()}>
                                                 <div className="flex flex-col items-center pt-8 pb-4 px-5">
-                                                    <div className="w-20 h-20 rounded-full border-4 border-white shadow-lg overflow-hidden mb-3 bg-slate-200 flex items-center justify-center">
-                                                        {config.profile.avatar ? <img src={config.profile.avatar} alt="av" className="w-full h-full object-cover" /> : <span className="text-2xl font-black text-slate-400">{config.profile.name[0]}</span>}
+                                                    <div className="w-20 h-20 rounded-full border-4 border-white shadow-lg dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden mb-3 bg-slate-200 flex items-center justify-center">
+                                                        {config.profile.avatar ? <img src={config.profile.avatar} alt="av" className="w-full h-full object-cover" /> : <span className="text-2xl font-black text-slate-400 dark:text-slate-500">{config.profile.name[0]}</span>}
                                                     </div>
                                                     <p className="font-black text-lg">{config.profile.name}</p>
                                                     <p className="text-xs opacity-60 mt-1 text-center">{config.profile.bio}</p>
@@ -821,14 +821,14 @@ const PageBuilder: React.FC = () => {
                                     <div className="w-[820px]">
                                         <div className="bg-slate-800 rounded-t-2xl px-4 py-2 flex items-center gap-2">
                                             <span className="w-3 h-3 rounded-full bg-rose-400" /><span className="w-3 h-3 rounded-full bg-amber-400" /><span className="w-3 h-3 rounded-full bg-emerald-400" />
-                                            <div className="flex-1 mx-4 bg-slate-700 rounded-lg px-3 py-1 text-[10px] text-slate-400 font-mono">social2tree.com/you</div>
+                                            <div className="flex-1 mx-4 bg-slate-700 rounded-lg px-3 py-1 text-[10px] text-slate-400 dark:text-slate-500 font-mono">social2tree.com/you</div>
                                         </div>
                                         <div style={{ background: config.colors.background, fontFamily: config.fonts.family, color: config.colors.text, minHeight: 500 }}
-                                            className="border-x-4 border-b-4 border-slate-800 rounded-b-2xl overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
+                                            className="border-x-4 border-b-4 border-slate-800 rounded-b-2xl overflow-hidden shadow-2xl dark:shadow-none" onClick={e => e.stopPropagation()}>
                                             <div className="max-w-xl mx-auto px-6 py-10">
                                                 <div className="flex flex-col items-center mb-6">
-                                                    <div className="w-20 h-20 rounded-full border-4 border-white shadow-lg overflow-hidden mb-3 bg-slate-200 flex items-center justify-center">
-                                                        {config.profile.avatar ? <img src={config.profile.avatar} alt="av" className="w-full h-full object-cover" /> : <span className="text-2xl font-black text-slate-400">{config.profile.name[0]}</span>}
+                                                    <div className="w-20 h-20 rounded-full border-4 border-white shadow-lg dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden mb-3 bg-slate-200 flex items-center justify-center">
+                                                        {config.profile.avatar ? <img src={config.profile.avatar} alt="av" className="w-full h-full object-cover" /> : <span className="text-2xl font-black text-slate-400 dark:text-slate-500">{config.profile.name[0]}</span>}
                                                     </div>
                                                     <p className="font-black text-lg">{config.profile.name}</p>
                                                     <p className="text-xs opacity-60 mt-1 text-center">{config.profile.bio}</p>
@@ -857,17 +857,17 @@ const PageBuilder: React.FC = () => {
                     </main>
 
                     {/* ── RIGHT SIDEBAR (Settings/Analytics) ── */}
-                    <aside className={`fixed inset-0 z-30 lg:relative lg:inset-auto lg:flex w-full lg:w-80 flex-shrink-0 bg-white lg:border-l border-slate-100 flex flex-col overflow-hidden transition-transform duration-300 ${mobileView === 'settings' ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}`}>
+                    <aside className={`fixed inset-0 z-30 lg:relative lg:inset-auto lg:flex w-full lg:w-80 flex-shrink-0 bg-white dark:bg-slate-900/40 lg:border-l border-slate-100 dark:border-slate-800/50 flex flex-col overflow-hidden transition-transform duration-300 ${mobileView === 'settings' ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}`}>
                         <div className="lg:hidden flex justify-between items-center p-4 border-b">
-                            <h2 className="text-sm font-black uppercase tracking-widest text-slate-800">Settings</h2>
-                            <button onClick={() => setMobileView('canvas')} className="p-2 text-slate-400"><X size={20} /></button>
+                            <h2 className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">Settings</h2>
+                            <button onClick={() => setMobileView('canvas')} className="p-2 text-slate-400 dark:text-slate-500"><X size={20} /></button>
                         </div>
                         {/* Tabs */}
-                        <div className="flex border-b border-slate-100 flex-shrink-0">
+                        <div className="flex border-b border-slate-100 dark:border-slate-800/50 flex-shrink-0">
                             {([['design', 'Design', <Palette size={13} />], ['analytics', 'Analytics', <BarChart2 size={13} />], ['settings', 'Settings', <Settings size={13} />]] as const).map(([id, label, icon]) => (
                                 <button key={id} onClick={() => setRightTab(id)}
                                     className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-[10px] font-black uppercase tracking-widest transition-all border-b-2
-                                            ${rightTab === id ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>
+                                            ${rightTab === id ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400 dark:text-slate-500 hover:text-slate-600'}`}>
                                     {icon}{label}
                                 </button>
                             ))}
@@ -880,10 +880,10 @@ const PageBuilder: React.FC = () => {
                                     {activeBlock && (
                                         <section>
                                             <div className="flex items-center justify-between mb-3">
-                                                <p className="text-[10px] font-black text-slate-800 uppercase tracking-widest">
+                                                <p className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest">
                                                     {BLOCK_LIBRARY.find(b => b.type === activeBlock.type)?.label} Settings
                                                 </p>
-                                                <button onClick={() => setActiveBlockId(null)} className="p-1 text-slate-400 hover:text-slate-600 rounded-lg"><X size={12} /></button>
+                                                <button onClick={() => setActiveBlockId(null)} className="p-1 text-slate-400 dark:text-slate-500 hover:text-slate-600 rounded-lg"><X size={12} /></button>
                                             </div>
                                             {renderBlockSettings()}
                                             <div className="h-px bg-slate-100 mt-6" />
@@ -892,19 +892,19 @@ const PageBuilder: React.FC = () => {
 
                                     {/* Theme Selector */}
                                     <section>
-                                        <p className="text-[10px] font-black text-slate-800 uppercase tracking-widest mb-3">Theme</p>
+                                        <p className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest mb-3">Theme</p>
                                         <div className="grid grid-cols-3 gap-2">
                                             {THEMES.map(t => {
                                                 const isCurrent = config.colors.background === t.preview[0] && config.colors.text === t.preview[1];
                                                 return (
                                                     <button key={t.id} onClick={() => updateConfig({ colors: { background: t.preview[0], text: t.preview[1], accent: t.preview[2], cardBg: t.preview[3] }, fonts: t.fonts })}
-                                                        className={`group relative rounded-2xl p-2.5 border-2 transition-all ${isCurrent ? 'border-indigo-500 shadow-md' : 'border-slate-100 hover:border-slate-300'}`}>
+                                                        className={`group relative rounded-2xl p-2.5 border-2 transition-all ${isCurrent ? 'border-indigo-500 shadow-md dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)]' : 'border-slate-100 dark:border-slate-800/50 hover:border-slate-300'}`}>
                                                         <div className="flex gap-1 mb-1.5 justify-center">
                                                             {t.preview.slice(0, 3).map((c, i) => (
-                                                                <div key={i} className="w-4 h-4 rounded-full border border-white/60 shadow-sm" style={{ background: c }} />
+                                                                <div key={i} className="w-4 h-4 rounded-full border border-white/60 shadow-sm dark:shadow-none" style={{ background: c }} />
                                                             ))}
                                                         </div>
-                                                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest text-center">{t.label}</p>
+                                                        <p className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest text-center">{t.label}</p>
                                                         {isCurrent && <div className="absolute top-1 right-1 w-3 h-3 bg-indigo-600 rounded-full flex items-center justify-center"><Check size={8} className="text-white" /></div>}
                                                     </button>
                                                 );
@@ -914,14 +914,14 @@ const PageBuilder: React.FC = () => {
 
                                     {/* Colors */}
                                     <section>
-                                        <p className="text-[10px] font-black text-slate-800 uppercase tracking-widest mb-3">Colors</p>
+                                        <p className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest mb-3">Colors</p>
                                         <div className="grid grid-cols-2 gap-3">
                                             {([['background', 'Background'], ['text', 'Text'], ['accent', 'Accent'], ['cardBg', 'Card BG']] as const).map(([key, label]) => (
                                                 <label key={key} className="block">
                                                     <span className="settings-label">{label}</span>
                                                     <input type="color" value={(config.colors as any)[key]}
                                                         onChange={e => updateConfig({ colors: { ...config.colors, [key]: e.target.value } })}
-                                                        className="h-8 w-full rounded-xl border border-slate-200 cursor-pointer" />
+                                                        className="h-8 w-full rounded-xl border border-slate-200 dark:border-slate-700/50 cursor-pointer" />
                                                 </label>
                                             ))}
                                         </div>
@@ -929,7 +929,7 @@ const PageBuilder: React.FC = () => {
 
                                     {/* Typography */}
                                     <section>
-                                        <p className="text-[10px] font-black text-slate-800 uppercase tracking-widest mb-3">Typography</p>
+                                        <p className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest mb-3">Typography</p>
                                         <div className="space-y-3">
                                             <label className="block">
                                                 <span className="settings-label">Font Family</span>
@@ -943,7 +943,7 @@ const PageBuilder: React.FC = () => {
                                                     {FONT_WEIGHTS.map(w => <option key={w} value={w}>{w === '300' ? '300 Light' : w === '400' ? '400 Regular' : w === '500' ? '500 Medium' : w === '600' ? '600 SemiBold' : w === '700' ? '700 Bold' : w === '800' ? '800 ExtraBold' : '900 Black'}</option>)}
                                                 </select>
                                             </label>
-                                            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                            <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#0b0f19] border border-slate-100 dark:border-slate-800/50">
                                                 <p style={{ fontFamily: config.fonts.family, fontWeight: config.fonts.weight, color: config.colors.text }} className="text-sm text-center">
                                                     The quick brown fox
                                                 </p>
@@ -953,7 +953,7 @@ const PageBuilder: React.FC = () => {
 
                                     {/* Profile */}
                                     <section>
-                                        <p className="text-[10px] font-black text-slate-800 uppercase tracking-widest mb-3">Profile</p>
+                                        <p className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest mb-3">Profile</p>
                                         <div className="space-y-3">
                                             <label className="block"><span className="settings-label">Display Name</span>
                                                 <input value={config.profile.name} onChange={e => updateConfig({ profile: { ...config.profile, name: e.target.value } })} className="settings-input" /></label>
@@ -965,23 +965,23 @@ const PageBuilder: React.FC = () => {
                                     </section>
 
                                     {/* No block msg when nothing selected */}
-                                    {!activeBlock && <div className="text-center p-4 text-slate-400 text-xs font-medium">Click any block in the canvas to edit it</div>}
+                                    {!activeBlock && <div className="text-center p-4 text-slate-400 dark:text-slate-500 text-xs font-medium">Click any block in the canvas to edit it</div>}
                                 </div>
                             )}
 
                             {rightTab === 'analytics' && (
                                 <div className="p-4 space-y-4">
-                                    <p className="text-[10px] font-black text-slate-800 uppercase tracking-widest mb-2">Page Analytics</p>
+                                    <p className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest mb-2">Page Analytics</p>
                                     {[
                                         { label: 'Total Views', value: '—', icon: <Eye size={16} />, color: 'bg-indigo-50 text-indigo-600' },
                                         { label: 'Clicks', value: '—', icon: <LinkIcon size={16} />, color: 'bg-violet-50 text-violet-600' },
                                         { label: 'CTR', value: '—', icon: <BarChart2 size={16} />, color: 'bg-emerald-50 text-emerald-600' },
                                     ].map(s => (
-                                        <div key={s.label} className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl">
+                                        <div key={s.label} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-[#0b0f19] rounded-2xl">
                                             <div className={`p-2 rounded-xl ${s.color}`}>{s.icon}</div>
                                             <div>
-                                                <p className="text-sm font-black text-slate-800">{s.value}</p>
-                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{s.label}</p>
+                                                <p className="text-sm font-black text-slate-800 dark:text-slate-200">{s.value}</p>
+                                                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest">{s.label}</p>
                                             </div>
                                         </div>
                                     ))}
@@ -993,7 +993,7 @@ const PageBuilder: React.FC = () => {
 
                             {rightTab === 'settings' && (
                                 <div className="p-4 space-y-5">
-                                    <p className="text-[10px] font-black text-slate-800 uppercase tracking-widest mb-2">Page Settings</p>
+                                    <p className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest mb-2">Page Settings</p>
                                     <label className="block"><span className="settings-label">Page Slug</span>
                                         <input placeholder="your-username" className="settings-input" /></label>
                                     <label className="block"><span className="settings-label">SEO Title</span>
@@ -1008,16 +1008,16 @@ const PageBuilder: React.FC = () => {
                                             </div>
                                             <div onClick={(e) => { e.preventDefault(); setIsAutoSaveEnabled(!isAutoSaveEnabled); }}
                                                 className={`w-10 h-6 rounded-full relative transition-all duration-300 ${isAutoSaveEnabled ? 'bg-indigo-600' : 'bg-slate-200'}`}>
-                                                <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all duration-300 ${isAutoSaveEnabled ? 'left-5' : 'left-1'} shadow-sm`} />
+                                                <div className={`w-4 h-4 bg-white dark:bg-slate-900/40 rounded-full absolute top-1 transition-all duration-300 ${isAutoSaveEnabled ? 'left-5' : 'left-1'} shadow-sm dark:shadow-none`} />
                                             </div>
                                         </label>
 
                                         <div className="h-px bg-slate-100 my-4" />
 
                                         {[['Hide from search engines', 'noindex'], ['Enable link animations', 'animations'], ['Show view count', 'viewcount']].map(([label, key]) => (
-                                            <label key={key} className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl cursor-pointer">
-                                                <span className="text-xs font-bold text-slate-600">{label}</span>
-                                                <div className="w-8 h-4 bg-slate-200 rounded-full relative"><div className="w-3 h-3 bg-white rounded-full absolute top-0.5 left-0.5 shadow-sm" /></div>
+                                            <label key={key} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-[#0b0f19] rounded-2xl cursor-pointer">
+                                                <span className="text-xs font-bold text-slate-600 dark:text-slate-300">{label}</span>
+                                                <div className="w-8 h-4 bg-slate-200 rounded-full relative"><div className="w-3 h-3 bg-white dark:bg-slate-900/40 rounded-full absolute top-0.5 left-0.5 shadow-sm dark:shadow-none" /></div>
                                             </label>
                                         ))}
                                     </div>
@@ -1028,19 +1028,19 @@ const PageBuilder: React.FC = () => {
                 </div>
 
                 {/* Mobile Tab Bar */}
-                <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-2 flex justify-around items-center z-40 pb-safe">
+                <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900/40 border-t border-slate-100 dark:border-slate-800/50 p-2 flex justify-around items-center z-40 pb-safe">
                     <button onClick={() => setMobileView('library')}
-                        className={`flex flex-col items-center gap-1 p-2 transition-all ${mobileView === 'library' ? 'text-indigo-600' : 'text-slate-400'}`}>
+                        className={`flex flex-col items-center gap-1 p-2 transition-all ${mobileView === 'library' ? 'text-indigo-600' : 'text-slate-400 dark:text-slate-500'}`}>
                         <Plus size={20} />
                         <span className="text-[10px] font-black uppercase tracking-widest">Library</span>
                     </button>
                     <button onClick={() => setMobileView('canvas')}
-                        className={`flex flex-col items-center gap-1 p-2 transition-all ${mobileView === 'canvas' ? 'text-indigo-600' : 'text-slate-400'}`}>
+                        className={`flex flex-col items-center gap-1 p-2 transition-all ${mobileView === 'canvas' ? 'text-indigo-600' : 'text-slate-400 dark:text-slate-500'}`}>
                         <Eye size={20} />
                         <span className="text-[10px] font-black uppercase tracking-widest">Preview</span>
                     </button>
                     <button onClick={() => setMobileView('settings')}
-                        className={`flex flex-col items-center gap-1 p-2 transition-all ${mobileView === 'settings' || activeBlockId ? 'text-indigo-600' : 'text-slate-400'}`}>
+                        className={`flex flex-col items-center gap-1 p-2 transition-all ${mobileView === 'settings' || activeBlockId ? 'text-indigo-600' : 'text-slate-400 dark:text-slate-500'}`}>
                         <Settings size={20} />
                         <span className="text-[10px] font-black uppercase tracking-widest">{activeBlockId ? 'Edit' : 'Settings'}</span>
                     </button>
@@ -1049,10 +1049,10 @@ const PageBuilder: React.FC = () => {
                 {/* DnD overlay ghost */}
                 <DragOverlay>
                     {dragOverlay && (
-                        <div className="bg-white rounded-2xl border-2 border-indigo-400 shadow-2xl p-3 w-40 opacity-90">
+                        <div className="bg-white dark:bg-slate-900/40 rounded-2xl border-2 border-indigo-400 shadow-2xl dark:shadow-none p-3 w-40 opacity-90">
                             <div className="flex items-center gap-2">
                                 {BLOCK_LIBRARY.find(b => b.type === dragOverlay)?.icon}
-                                <span className="text-xs font-black text-slate-600">{BLOCK_LIBRARY.find(b => b.type === dragOverlay)?.label}</span>
+                                <span className="text-xs font-black text-slate-600 dark:text-slate-300">{BLOCK_LIBRARY.find(b => b.type === dragOverlay)?.label}</span>
                             </div>
                         </div>
                     )}

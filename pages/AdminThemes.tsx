@@ -39,11 +39,11 @@ const AdminThemes: React.FC = () => {
                 // Mocking the full theme list from types.ts for management
                 // In production, this should ideally come from the database
                 const platformThemes: UserTheme[] = [
-                    { id: 'default', name: 'Snowy White', background: 'bg-white', buttonClass: 'bg-slate-900 text-white', textClass: 'text-slate-900', cardClass: 'bg-slate-50' },
-                    { id: 'dark', name: 'Midnight', background: 'bg-slate-950', buttonClass: 'bg-white text-slate-950', textClass: 'text-white', cardClass: 'bg-slate-900' },
-                    { id: 'purple', name: 'Grape Juice', background: 'bg-gradient-to-br from-purple-600 to-indigo-900', buttonClass: 'bg-white/10 text-white', textClass: 'text-white' },
-                    { id: 'sunset', name: 'Sunset Glow', background: 'bg-gradient-to-tr from-orange-400 to-rose-500', buttonClass: 'bg-white text-rose-600', textClass: 'text-white' },
-                    { id: 'brutalist', name: 'Neo-Brutalism', background: 'bg-yellow-400', buttonClass: 'bg-white text-black border-4 border-black', textClass: 'text-black font-black' },
+                    { id: 'default', name: 'Snowy White', background: 'bg-white dark:bg-slate-900/40', buttonClass: 'bg-slate-900 text-white', textClass: 'text-slate-900 dark:text-white', cardClass: 'bg-slate-50 dark:bg-[#0b0f19]' },
+                    { id: 'dark', name: 'Midnight', background: 'bg-slate-950', buttonClass: 'bg-white dark:bg-slate-900/40 text-slate-950', textClass: 'text-white', cardClass: 'bg-slate-900' },
+                    { id: 'purple', name: 'Grape Juice', background: 'bg-gradient-to-br from-purple-600 to-indigo-900', buttonClass: 'bg-white dark:bg-slate-900/40/10 text-white', textClass: 'text-white' },
+                    { id: 'sunset', name: 'Sunset Glow', background: 'bg-gradient-to-tr from-orange-400 to-rose-500', buttonClass: 'bg-white dark:bg-slate-900/40 text-rose-600', textClass: 'text-white' },
+                    { id: 'brutalist', name: 'Neo-Brutalism', background: 'bg-yellow-400', buttonClass: 'bg-white dark:bg-slate-900/40 text-black border-4 border-black', textClass: 'text-black font-black' },
                     { id: 'nature', name: 'Emerald Garden', background: 'bg-emerald-900', buttonClass: 'bg-emerald-400 text-emerald-950', textClass: 'text-emerald-50' }
                 ];
                 setThemes(platformThemes);
@@ -93,16 +93,16 @@ const AdminThemes: React.FC = () => {
         <div className="p-4 sm:p-8 lg:px-12 py-8 overflow-hidden pb-32 lg:pb-12">
             <header className="mb-10 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6">
                 <div>
-                    <h1 className="text-2xl sm:text-3xl font-black text-slate-900 uppercase italic tracking-tighter">Design Themes</h1>
-                    <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-1">Platform Appearance & User Selections</p>
+                    <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">Design Themes</h1>
+                    <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-1">Platform Appearance & User Selections</p>
                 </div>
                 <div className="flex gap-3 w-full sm:w-auto">
                     <div className="relative flex-1 sm:flex-none">
-                        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                         <input
                             type="text"
                             placeholder="Search themes..."
-                            className="w-full sm:w-64 pl-12 pr-6 py-3 bg-white border-2 border-slate-100 rounded-2xl outline-none focus:border-indigo-600 font-bold text-sm transition-all"
+                            className="w-full sm:w-64 pl-12 pr-6 py-3 bg-white dark:bg-slate-900/40 border-2 border-slate-100 dark:border-slate-800/50 rounded-2xl outline-none focus:border-indigo-600 font-bold text-sm transition-all"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -110,7 +110,7 @@ const AdminThemes: React.FC = () => {
                     <button
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 disabled:opacity-50"
+                        className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-indigo-200 disabled:opacity-50"
                     >
                         {isSaving ? 'Saving...' : <><Save size={18} /> Save Settings</>}
                     </button>
@@ -125,23 +125,23 @@ const AdminThemes: React.FC = () => {
                             key={theme.id}
                             onClick={() => toggleTheme(theme.id)}
                             className={`group cursor-pointer relative overflow-hidden rounded-[2.5rem] border-4 transition-all duration-300 ${isActive
-                                    ? 'border-indigo-600 bg-white ring-8 ring-indigo-50 shadow-2xl scale-[1.02]'
-                                    : 'border-slate-100 bg-slate-50 hover:border-slate-200'
+                                    ? 'border-indigo-600 bg-white dark:bg-slate-900/40 ring-8 ring-indigo-50 shadow-2xl dark:shadow-none scale-[1.02]'
+                                    : 'border-slate-100 dark:border-slate-800/50 bg-slate-50 dark:bg-[#0b0f19] hover:border-slate-200'
                                 }`}
                         >
                             <div className="p-8">
                                 <div className="flex justify-between items-start mb-6">
                                     <div>
-                                        <h3 className="text-xl font-black text-slate-900 uppercase italic tracking-tight">{theme.name}</h3>
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ID: {theme.id}</p>
+                                        <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase italic tracking-tight">{theme.name}</h3>
+                                        <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">ID: {theme.id}</p>
                                     </div>
-                                    <div className={`p-2 rounded-xl border-2 transition-all ${isActive ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white border-slate-100 text-slate-200'}`}>
+                                    <div className={`p-2 rounded-xl border-2 transition-all ${isActive ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white dark:bg-slate-900/40 border-slate-100 dark:border-slate-800/50 text-slate-200'}`}>
                                         <CheckCircle2 size={20} />
                                     </div>
                                 </div>
 
                                 {/* Preview Card */}
-                                <div className={`h-40 rounded-3xl p-6 ${theme.background} border-2 border-slate-100 shadow-inner flex flex-col justify-center gap-3`}>
+                                <div className={`h-40 rounded-3xl p-6 ${theme.background} border-2 border-slate-100 dark:border-slate-800/50 shadow-inner flex flex-col justify-center gap-3`}>
                                     <div className={`h-10 w-full rounded-xl ${theme.buttonClass} flex items-center justify-center text-[10px] font-black uppercase tracking-widest px-4 truncate`}>
                                         Preview Button
                                     </div>
@@ -154,7 +154,7 @@ const AdminThemes: React.FC = () => {
 
                             {/* Overlay Info */}
                             {!isActive && (
-                                <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="absolute inset-0 bg-white dark:bg-slate-900/40/40 backdrop-blur-[1px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                     <p className="bg-slate-900 text-white px-6 py-2 rounded-full font-black text-xs uppercase tracking-widest">Enable Theme</p>
                                 </div>
                             )}
@@ -163,11 +163,11 @@ const AdminThemes: React.FC = () => {
                 })}
 
                 {/* Add Custom Theme Placeholder */}
-                <div className="border-4 border-dashed border-slate-200 rounded-[2.5rem] p-12 flex flex-col items-center justify-center text-center group hover:bg-slate-50 transition-all cursor-not-allowed">
-                    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-slate-300 mb-4 group-hover:scale-110 transition-transform">
+                <div className="border-4 border-dashed border-slate-200 dark:border-slate-700/50 rounded-[2.5rem] p-12 flex flex-col items-center justify-center text-center group hover:bg-slate-50 transition-all cursor-not-allowed">
+                    <div className="w-16 h-16 bg-white dark:bg-slate-900/40 rounded-2xl flex items-center justify-center text-slate-300 mb-4 group-hover:scale-110 transition-transform">
                         <Plus size={32} />
                     </div>
-                    <h3 className="text-slate-400 font-black uppercase tracking-widest text-xs">New Custom Theme</h3>
+                    <h3 className="text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest text-xs">New Custom Theme</h3>
                     <p className="text-[10px] text-slate-300 font-bold mt-2 italic px-8">Custom css themes development coming soon</p>
                 </div>
             </div>

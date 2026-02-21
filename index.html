@@ -6,6 +6,14 @@
     <base href="/" />
     <title>Social2Tree | Everything you are in one link</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {},
+        },
+      };
+    </script>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
@@ -40,7 +48,9 @@
     </script>
     <link rel="stylesheet" href="/index.css" />
   </head>
-  <body class="bg-slate-50 text-slate-900">
+  <body
+    class="bg-slate-50 text-slate-900 dark:bg-[#0b0f19] dark:text-slate-50 transition-colors duration-300"
+  >
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

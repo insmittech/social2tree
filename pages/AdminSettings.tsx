@@ -75,13 +75,13 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ onLogout }) => {
     <div className="p-4 sm:p-8 lg:px-12 py-8 overflow-hidden pb-32 lg:pb-12">
       <header className="mb-10 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900">System Settings</h1>
-          <p className="text-slate-500 font-medium">Platform-wide configuration</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">System Settings</h1>
+          <p className="text-slate-500 dark:text-slate-400 font-medium">Platform-wide configuration</p>
         </div>
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="flex items-center gap-2 bg-indigo-600 text-white px-6 sm:px-8 py-3 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 disabled:opacity-50"
+          className="flex items-center gap-2 bg-indigo-600 text-white px-6 sm:px-8 py-3 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-indigo-200 disabled:opacity-50"
         >
           {isSaving ? 'Updating...' : <><Save size={18} /> Save Changes</>}
         </button>
@@ -89,26 +89,26 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ onLogout }) => {
 
       <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
         {/* General Settings */}
-        <section className="bg-white p-6 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-slate-200 shadow-sm space-y-6">
-          <h2 className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2 mb-2">
+        <section className="bg-white dark:bg-slate-900/40 p-6 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-700/50 shadow-sm dark:shadow-none space-y-6">
+          <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white flex items-center gap-2 mb-2">
             <Globe className="text-indigo-600" size={22} /> General
           </h2>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Site Name</label>
+              <label className="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-1">Site Name</label>
               <input
                 type="text"
                 value={settings.site_name}
                 onChange={(e) => handleUpdateSetting('site_name', e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-bold text-slate-700"
+                className="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-700/50 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-bold text-slate-700 dark:text-slate-200"
               />
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-[#0b0f19] rounded-2xl border border-slate-100 dark:border-slate-800/50">
               <div className="max-w-[70%]">
-                <p className="text-sm font-black text-slate-900">Maintenance Mode</p>
-                <p className="text-[10px] text-slate-500 font-medium">Redirect all non-admin traffic</p>
+                <p className="text-sm font-black text-slate-900 dark:text-white">Maintenance Mode</p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Redirect all non-admin traffic</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -124,52 +124,52 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ onLogout }) => {
         </section>
 
         {/* Plans & Limits */}
-        <section className="bg-white p-6 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-slate-200 shadow-sm space-y-6">
-          <h2 className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2 mb-2">
+        <section className="bg-white dark:bg-slate-900/40 p-6 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-700/50 shadow-sm dark:shadow-none space-y-6">
+          <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white flex items-center gap-2 mb-2">
             <Zap className="text-amber-500" size={22} /> Plans & Limits
           </h2>
 
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Free Links Limit</label>
+              <label className="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-1">Free Links Limit</label>
               <input
                 type="number"
                 value={settings.free_link_limit}
                 onChange={(e) => handleUpdateSetting('free_link_limit', e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-amber-100 outline-none transition-all font-bold text-slate-700"
+                className="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-700/50 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-amber-100 outline-none transition-all font-bold text-slate-700 dark:text-slate-200"
               />
             </div>
             <div>
-              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Pro Links Limit</label>
+              <label className="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-1">Pro Links Limit</label>
               <input
                 type="number"
                 value={settings.pro_link_limit}
                 onChange={(e) => handleUpdateSetting('pro_link_limit', e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-bold text-slate-700"
+                className="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-700/50 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-bold text-slate-700 dark:text-slate-200"
               />
             </div>
             <div>
-              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Pro Price ($)</label>
+              <label className="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-1">Pro Price ($)</label>
               <input
                 type="text"
                 value={settings.pro_price}
                 onChange={(e) => handleUpdateSetting('pro_price', e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-bold text-slate-700"
+                className="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-700/50 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-bold text-slate-700 dark:text-slate-200"
               />
             </div>
           </div>
         </section>
 
         {/* Domain Features */}
-        <section className="bg-white p-6 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-slate-200 shadow-sm space-y-6">
-          <h2 className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2 mb-2">
+        <section className="bg-white dark:bg-slate-900/40 p-6 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-700/50 shadow-sm dark:shadow-none space-y-6">
+          <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white flex items-center gap-2 mb-2">
             <Server className="text-emerald-500" size={22} /> Custom Domains
           </h2>
 
-          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+          <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-[#0b0f19] rounded-2xl border border-slate-100 dark:border-slate-800/50">
             <div className="max-w-[70%]">
-              <p className="text-sm font-black text-slate-900">Custom Domain Mapping</p>
-              <p className="text-[10px] text-slate-500 font-medium">Allow users to use their own domains</p>
+              <p className="text-sm font-black text-slate-900 dark:text-white">Custom Domain Mapping</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Allow users to use their own domains</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -184,17 +184,17 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ onLogout }) => {
         </section>
 
         {/* Theme Management */}
-        <section className="bg-white p-6 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-slate-200 shadow-sm space-y-6">
-          <h2 className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2 mb-2">
+        <section className="bg-white dark:bg-slate-900/40 p-6 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-700/50 shadow-sm dark:shadow-none space-y-6">
+          <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white flex items-center gap-2 mb-2">
             <Palette className="text-pink-500" size={22} /> Design Themes
           </h2>
 
           <div className="space-y-4">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Available Themes (JSON)</p>
+            <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest px-1">Available Themes (JSON)</p>
             <textarea
               value={settings.available_themes}
               onChange={(e) => handleUpdateSetting('available_themes', e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-pink-100 outline-none transition-all font-mono text-sm h-32"
+              className="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-700/50 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-pink-100 outline-none transition-all font-mono text-sm h-32"
             />
             <div className="flex flex-wrap gap-2 text-xs font-bold">
               {themes.map((t: string) => (
@@ -206,37 +206,37 @@ const AdminSettings: React.FC<AdminSettingsProps> = ({ onLogout }) => {
           </div>
         </section>
         {/* Navigation Menu Management */}
-        <section className="bg-white p-6 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-slate-200 shadow-sm space-y-6 lg:col-span-2">
-          <h2 className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2 mb-2">
+        <section className="bg-white dark:bg-slate-900/40 p-6 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-slate-200 dark:border-slate-700/50 shadow-sm dark:shadow-none space-y-6 lg:col-span-2">
+          <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white flex items-center gap-2 mb-2">
             <Layout className="text-indigo-600" size={22} /> Navigation Menu Management
           </h2>
 
           <div className="grid md:grid-cols-2 gap-8">
             <div className="space-y-4">
-              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Navbar Links (JSON)</label>
+              <label className="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-1">Navbar Links (JSON)</label>
               <textarea
                 value={settings.navbar_links || '[]'}
                 onChange={(e) => handleUpdateSetting('navbar_links', e.target.value)}
                 placeholder='[{"label": "Home", "to": "/"}]'
-                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-mono text-sm h-48"
+                className="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-700/50 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-mono text-sm h-48"
               />
-              <p className="text-[10px] text-slate-400 px-2 italic font-medium">Format: Array of {"{label: string, to: string}"}</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 px-2 italic font-medium">Format: Array of {"{label: string, to: string}"}</p>
             </div>
 
             <div className="space-y-4">
-              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Footer Explore Links (JSON)</label>
+              <label className="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-1">Footer Explore Links (JSON)</label>
               <textarea
                 value={settings.footer_explore_links || '[]'}
                 onChange={(e) => handleUpdateSetting('footer_explore_links', e.target.value)}
                 placeholder='[{"label": "Pricing", "to": "/pricing"}]'
-                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-mono text-sm h-48"
+                className="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-700/50 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-mono text-sm h-48"
               />
-              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Footer Legal Links (JSON)</label>
+              <label className="block text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-1">Footer Legal Links (JSON)</label>
               <textarea
                 value={settings.footer_legal_links || '[]'}
                 onChange={(e) => handleUpdateSetting('footer_legal_links', e.target.value)}
                 placeholder='[{"label": "Privacy", "to": "/privacy"}]'
-                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-mono text-sm h-48"
+                className="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-700/50 rounded-2xl px-5 py-4 focus:ring-4 focus:ring-indigo-100 outline-none transition-all font-mono text-sm h-48"
               />
             </div>
           </div>

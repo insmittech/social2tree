@@ -72,7 +72,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
     switch (plan) {
       case 'business': return <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-lg text-[8px] font-black uppercase tracking-wider">Business</span>;
       case 'pro': return <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-lg text-[8px] font-black uppercase tracking-wider">Pro</span>;
-      default: return <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-lg text-[8px] font-black uppercase tracking-wider">Free</span>;
+      default: return <span className="px-2 py-0.5 bg-slate-100 text-slate-600 dark:text-slate-300 rounded-lg text-[8px] font-black uppercase tracking-wider">Free</span>;
     }
   };
 
@@ -80,17 +80,17 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
     <div className="p-4 sm:p-8 lg:px-12 py-8 overflow-hidden pb-32 lg:pb-12">
       <header className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 uppercase italic tracking-tighter">User Management</h1>
-          <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-1">Roles, Access Control and Subscriptions</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">User Management</h1>
+          <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-1">Roles, Access Control and Subscriptions</p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 transition-colors" size={18} />
             <input
               type="text"
               placeholder="Search name..."
-              className="pl-12 pr-6 py-3 bg-white border-2 border-slate-100 rounded-2xl focus:border-indigo-600 outline-none w-full sm:w-80 font-bold text-sm transition-all shadow-sm"
+              className="pl-12 pr-6 py-3 bg-white dark:bg-slate-900/40 border-2 border-slate-100 dark:border-slate-800/50 rounded-2xl focus:border-indigo-600 outline-none w-full sm:w-80 font-bold text-sm transition-all shadow-sm dark:shadow-none"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -101,16 +101,16 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
         </div>
       </header>
 
-      <div className="bg-white rounded-3xl sm:rounded-[2.5rem] shadow-xl shadow-slate-100/50 border-2 border-slate-100 overflow-hidden">
+      <div className="bg-white dark:bg-slate-900/40 rounded-3xl sm:rounded-[2.5rem] shadow-xl dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-slate-100/50 border-2 border-slate-100 dark:border-slate-800/50 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-slate-50/50 border-b-2 border-slate-100">
-                <th className="px-4 sm:px-8 py-6 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">User</th>
-                <th className="hidden sm:table-cell px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Roles</th>
-                <th className="px-4 sm:px-8 py-6 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Plan</th>
-                <th className="hidden lg:table-cell px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Engagement</th>
-                <th className="px-4 sm:px-8 py-6 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-center">Actions</th>
+              <tr className="bg-slate-50 dark:bg-[#0b0f19]/50 border-b-2 border-slate-100 dark:border-slate-800/50">
+                <th className="px-4 sm:px-8 py-6 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">User</th>
+                <th className="hidden sm:table-cell px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Roles</th>
+                <th className="px-4 sm:px-8 py-6 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Plan</th>
+                <th className="hidden lg:table-cell px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Engagement</th>
+                <th className="px-4 sm:px-8 py-6 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y-2 divide-slate-50">
@@ -118,9 +118,9 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
                 <tr key={user.id} className="group hover:bg-slate-50/50 transition-colors">
                   <td className="px-4 sm:px-8 py-6">
                     <div className="flex items-center gap-3 sm:gap-4">
-                      <img src={user.avatarUrl} className="w-8 h-8 sm:w-12 sm:h-12 rounded-2xl border-2 border-slate-100 shadow-sm" alt="" />
+                      <img src={user.avatarUrl} className="w-8 h-8 sm:w-12 sm:h-12 rounded-2xl border-2 border-slate-100 dark:border-slate-800/50 shadow-sm dark:shadow-none" alt="" />
                       <div>
-                        <p className="font-black text-slate-800 text-xs sm:text-sm truncate max-w-[80px] sm:max-w-none">{user.displayName}</p>
+                        <p className="font-black text-slate-800 dark:text-slate-200 text-xs sm:text-sm truncate max-w-[80px] sm:max-w-none">{user.displayName}</p>
                         <p className="text-[10px] text-indigo-500 font-bold">@{user.username}</p>
                       </div>
                     </div>
@@ -134,7 +134,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
                           </span>
                         ))
                       ) : (
-                        <span className="text-[10px] text-slate-400 font-bold uppercase">{user.role} (Legacy)</span>
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">{user.role} (Legacy)</span>
                       )}
                     </div>
                   </td>
@@ -143,7 +143,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
                   </td>
                   <td className="hidden lg:table-cell px-8 py-6">
                     <div className="flex flex-col gap-0.5">
-                      <p className="text-xs font-black text-slate-700">{user.views.toLocaleString()} views</p>
+                      <p className="text-xs font-black text-slate-700 dark:text-slate-200">{user.views.toLocaleString()} views</p>
                     </div>
                   </td>
                   <td className="px-4 sm:px-8 py-6">
@@ -153,14 +153,14 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
                           setSelectedUser(user);
                           setIsRoleModalOpen(true);
                         }}
-                        className="p-2 sm:p-3 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                        className="p-2 sm:p-3 text-slate-400 dark:text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
                         title="Manage Roles"
                       >
                         <ShieldAlert size={18} />
                       </button>
                       <button
                         onClick={() => handlePlanChange(user.id, user.plan === 'pro' ? 'free' : 'pro')}
-                        className="p-2 sm:p-3 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all"
+                        className="p-2 sm:p-3 text-slate-400 dark:text-slate-500 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all"
                         title="Change Plan"
                       >
                         <CreditCard size={18} />
@@ -168,7 +168,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
                       <a
                         href={`/${user.username}`}
                         target="_blank"
-                        className="p-2 sm:p-3 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
+                        className="p-2 sm:p-3 text-slate-400 dark:text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
                         title="View Profile"
                       >
                         <ExternalLink size={18} />
@@ -182,7 +182,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
         </div>
         {filteredUsers.length === 0 && (
           <div className="p-20 text-center">
-            <p className="text-slate-400 font-black uppercase tracking-widest text-xs">No users found.</p>
+            <p className="text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest text-xs">No users found.</p>
           </div>
         )}
       </div>
@@ -191,9 +191,9 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
       {isRoleModalOpen && selectedUser && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setIsRoleModalOpen(false)}></div>
-          <div className="relative bg-white w-full max-w-lg rounded-[3.5rem] p-10 shadow-2xl animate-in zoom-in-95 duration-200">
-            <h2 className="text-3xl font-black text-slate-900 uppercase italic tracking-tighter mb-2">Manage Roles</h2>
-            <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-8">
+          <div className="relative bg-white dark:bg-slate-900/40 w-full max-w-lg rounded-[3.5rem] p-10 shadow-2xl dark:shadow-none animate-in zoom-in-95 duration-200">
+            <h2 className="text-3xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter mb-2">Manage Roles</h2>
+            <p className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-widest mb-8">
               Assign roles for <span className="text-indigo-600">@{selectedUser.username}</span>
             </p>
 
@@ -202,8 +202,8 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
                 <label
                   key={role.id}
                   className={`flex items-center justify-between p-4 rounded-2xl border-2 transition-all cursor-pointer ${selectedUser?.roles?.includes(role.name)
-                    ? 'bg-indigo-50 border-indigo-600 text-indigo-700 shadow-lg shadow-indigo-100'
-                    : 'bg-slate-50 border-slate-50 text-slate-500 hover:bg-white hover:border-slate-200'
+                    ? 'bg-indigo-50 border-indigo-600 text-indigo-700 shadow-lg dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-indigo-100'
+                    : 'bg-slate-50 dark:bg-[#0b0f19] border-slate-50 dark:border-slate-800/50 text-slate-500 dark:text-slate-400 hover:bg-white hover:border-slate-200'
                     }`}
                 >
                   <div className="flex items-center gap-3">
@@ -232,7 +232,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
             <div className="flex gap-4">
               <button
                 onClick={() => setIsRoleModalOpen(false)}
-                className="flex-1 py-4 text-sm font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-colors"
+                className="flex-1 py-4 text-sm font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest hover:text-slate-900 transition-colors"
               >
                 Cancel
               </button>
@@ -241,7 +241,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
                   handleAssignRole(selectedUser.id, selectedUser.roles);
                   setIsRoleModalOpen(false);
                 }}
-                className="flex-1 bg-indigo-600 text-white py-4 rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100"
+                className="flex-1 bg-indigo-600 text-white py-4 rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-xl dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-indigo-100"
               >
                 Save Changes
               </button>

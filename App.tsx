@@ -33,6 +33,7 @@ import Layout from './components/Layout';
 import { ToastProvider } from './src/context/ToastContext';
 import { ToastContainer } from './components/Toast';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
+import { ThemeProvider } from './src/context/ThemeContext';
 
 const AppRoutes: React.FC = () => {
   const { isAuthenticated, isAdmin, user, isLoading, logout } = useAuth();
@@ -160,11 +161,13 @@ const AppRoutes: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <ToastProvider>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </ToastProvider>
+    <ThemeProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </ToastProvider>
+    </ThemeProvider>
   );
 };
 

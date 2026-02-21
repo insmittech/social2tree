@@ -98,7 +98,7 @@ const PricingPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#0b0f19] text-slate-300 font-sans selection:bg-teal-500/30">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#0b0f19] text-slate-900 dark:text-slate-300 font-sans selection:bg-teal-500/30 transition-colors duration-300">
             <Navbar isAuthenticated={isAuthenticated} userProfile={user} />
 
             {/* Hero Section */}
@@ -108,27 +108,27 @@ const PricingPage: React.FC = () => {
                 </div>
                 
                 <div className="max-w-4xl mx-auto relative z-10 text-center">
-                    <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-teal-500/10 text-teal-400 font-bold text-xs tracking-widest uppercase border border-teal-500/20 mb-8">
+                    <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-teal-500/10 text-teal-600 dark:text-teal-400 font-bold text-xs tracking-widest uppercase border border-teal-500/20 mb-8 transition-colors">
                         Transparent Pricing
                     </div>
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight mb-6">
-                        Scale your <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-cyan-500">intelligence</span>
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white tracking-tight mb-6 transition-colors">
+                        Scale your <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-cyan-500 dark:from-teal-400 dark:to-cyan-500">intelligence</span>
                     </h1>
-                    <p className="text-lg md:text-xl text-slate-400 mb-12 max-w-2xl mx-auto">
+                    <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-12 max-w-2xl mx-auto transition-colors">
                         Deploy industry-leading OSINT capabilities tailored to your operation's scale, whether you're a lone analyst or a global agency.
                     </p>
 
                     {/* Billing Toggle */}
-                    <div className="flex items-center justify-center gap-4 bg-slate-900/50 p-2 rounded-full border border-slate-800 w-max mx-auto backdrop-blur-md">
+                    <div className="flex items-center justify-center gap-4 bg-white dark:bg-slate-900/50 p-2 rounded-full border border-slate-200 dark:border-slate-800 w-max mx-auto backdrop-blur-md transition-colors">
                         <button
                             onClick={() => setIsYearly(false)}
-                            className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${!isYearly ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-slate-300'}`}
+                            className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${!isYearly ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-300'}`}
                         >
                             Monthly
                         </button>
                         <button
                             onClick={() => setIsYearly(true)}
-                            className={`px-6 py-2 rounded-full text-sm font-bold transition-all relative ${isYearly ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-slate-300'}`}
+                            className={`px-6 py-2 rounded-full text-sm font-bold transition-all relative ${isYearly ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-300'}`}
                         >
                             Yearly
                             <span className="absolute -top-3 -right-3 bg-teal-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(20,184,166,0.5)]">
@@ -148,10 +148,10 @@ const PricingPage: React.FC = () => {
                         return (
                             <div 
                                 key={plan.id} 
-                                className={`bg-slate-900/40 backdrop-blur-xl rounded-3xl p-8 border transition-all duration-300 flex flex-col relative h-full ${
+                                className={`bg-white dark:bg-slate-900/40 backdrop-blur-xl rounded-3xl p-8 border transition-all duration-300 flex flex-col relative h-full ${
                                     plan.isPopular 
-                                    ? 'border-teal-500 shadow-[0_0_40px_rgba(20,184,166,0.15)] md:-rotate-1 md:scale-105 bg-[#0d1322] z-10' 
-                                    : 'border-slate-800 hover:border-slate-700'
+                                    ? 'border-teal-500 shadow-[0_0_40px_rgba(20,184,166,0.15)] md:-rotate-1 md:scale-105 bg-slate-50 dark:bg-[#0d1322] z-10' 
+                                    : 'border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700'
                                 }`}
                             >
                                 {plan.isPopular && (
@@ -161,13 +161,13 @@ const PricingPage: React.FC = () => {
                                 )}
                                 
                                 <div className="mb-6">
-                                    <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
-                                    <p className="text-slate-400 text-sm leading-relaxed min-h-[40px]">{plan.description}</p>
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 transition-colors">{plan.name}</h3>
+                                    <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed min-h-[40px] transition-colors">{plan.description}</p>
                                 </div>
 
                                 <div className="mb-8">
                                     <div className="flex items-baseline gap-1">
-                                        <span className="text-5xl font-black text-white">${price}</span>
+                                        <span className="text-5xl font-black text-slate-900 dark:text-white transition-colors">${price}</span>
                                         <span className="text-slate-500 text-sm font-medium">/mo</span>
                                     </div>
                                     <p className="text-xs text-slate-500 mt-2">
@@ -179,8 +179,8 @@ const PricingPage: React.FC = () => {
                                     to={plan.id === 'enterprise' ? "/contact" : (isAuthenticated ? "/dashboard/plan" : "/login")}
                                     className={`w-full block text-center py-3.5 rounded-xl font-bold tracking-wide text-sm transition-all duration-300 mb-8 ${
                                         plan.isPopular
-                                        ? 'bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-[0_0_20px_rgba(20,184,166,0.3)] hover:shadow-[0_0_30px_rgba(20,184,166,0.5)]'
-                                        : 'bg-slate-800 text-white hover:bg-slate-700 border border-slate-700/50'
+                                        ? 'bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-md hover:shadow-lg dark:shadow-[0_0_20px_rgba(20,184,166,0.3)] dark:hover:shadow-[0_0_30px_rgba(20,184,166,0.5)]'
+                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700/50'
                                     }`}
                                 >
                                     {plan.ctaText}
@@ -192,9 +192,9 @@ const PricingPage: React.FC = () => {
                                         {plan.features.map((feature, idx) => (
                                             <li key={idx} className="flex items-start gap-3">
                                                 <div className="flex-shrink-0 w-5 h-5 rounded-full bg-teal-500/10 flex items-center justify-center mt-0.5">
-                                                    <Check size={12} className="text-teal-400" />
+                                                    <Check size={12} className="text-teal-500 dark:text-teal-400" />
                                                 </div>
-                                                <span className="text-slate-300 text-sm">{feature}</span>
+                                                <span className="text-slate-700 dark:text-slate-300 text-sm transition-colors">{feature}</span>
                                             </li>
                                         ))}
                                     </ul>
@@ -207,24 +207,24 @@ const PricingPage: React.FC = () => {
 
             {/* Enterprise Custom Text */}
             <section className="py-12 px-4 text-center">
-                <div className="inline-flex items-center gap-2 text-slate-400 bg-slate-900/50 px-6 py-3 rounded-full border border-slate-800 text-sm">
-                    <Info size={16} className="text-teal-500" />
-                    Need processing for more than 1M targets/month? <Link to="/contact" className="text-white font-bold hover:text-teal-400 transition-colors underline decoration-slate-600 underline-offset-4">Talk to our architecture team.</Link>
+                <div className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900/50 px-6 py-3 rounded-full border border-slate-200 dark:border-slate-800 text-sm transition-colors">
+                    <Info size={16} className="text-teal-600 dark:text-teal-500" />
+                    Need processing for more than 1M targets/month? <Link to="/contact" className="text-slate-900 dark:text-white font-bold hover:text-teal-500 dark:hover:text-teal-400 transition-colors underline decoration-slate-400 dark:decoration-slate-600 underline-offset-4">Talk to our architecture team.</Link>
                 </div>
             </section>
 
             {/* FAQ Section */}
-            <section className="py-24 px-4 max-w-3xl mx-auto border-t border-slate-800/50">
+            <section className="py-24 px-4 max-w-3xl mx-auto border-t border-slate-200 dark:border-slate-800/50 transition-colors">
                 <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Frequently Asked Questions</h2>
-                    <p className="text-slate-400">Everything you need to know about billing and capabilities.</p>
+                    <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4 transition-colors">Frequently Asked Questions</h2>
+                    <p className="text-slate-600 dark:text-slate-400 transition-colors">Everything you need to know about billing and capabilities.</p>
                 </div>
 
                 <div className="space-y-4">
                     {FAQS.map((faq, index) => (
                         <div 
                             key={index} 
-                            className={`border border-slate-800 rounded-2xl overflow-hidden transition-colors ${openFaqIndex === index ? 'bg-slate-900/60' : 'bg-slate-900/30 hover:bg-slate-900/50'}`}
+                            className={`border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden transition-colors ${openFaqIndex === index ? 'bg-slate-50 dark:bg-slate-900/60' : 'bg-white dark:bg-slate-900/30 hover:bg-slate-50 dark:hover:bg-slate-900/50'}`}
                         >
                             <button 
                                 onClick={() => toggleFaq(index)}

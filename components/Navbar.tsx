@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LogOut, Shield, Menu, X, Activity } from 'lucide-react';
+import { LogOut, Shield, Menu, X, Activity, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../src/context/ThemeContext';
 
 interface NavbarProps {
   isDashboard?: boolean;
@@ -16,6 +17,7 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout, isAuthenticated,
   const isAdmin = userProfile?.roles?.includes('admin') || userProfile?.role === 'admin';
   const defaultAvatar = userProfile?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile?.displayName || 'User')}&background=14b8a6&color=fff`;
   const location = useLocation();
+  const { theme, toggleTheme } = useTheme();
 
   // Landing links to match OSINT design
   const landingLinks = [
@@ -34,17 +36,17 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout, isAuthenticated,
   const linksToRender = customLinks && customLinks.length > 0 ? customLinks : (!isDashboard ? landingLinks : dashboardLinks);
 
   return (
-    <nav className="fixed w-full z-50 top-0 border-b border-teal-900/30 bg-[#0b0f19]/80 backdrop-blur-xl">
+    <nav className="fixed w-full z-50 top-0 border-b border-slate-200 dark:border-teal-900/30 bg-white/80 dark:bg-[#0b0f19]/80 backdrop-blur-xl transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500/20 to-teal-900/20 border border-teal-500/30 group-hover:border-teal-400 transition-all duration-300">
-              <Shield className="text-teal-400 w-5 h-5 absolute z-10" />
+            <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500/10 to-teal-600/10 dark:from-teal-500/20 dark:to-teal-900/20 border border-teal-500/20 dark:border-teal-500/30 group-hover:border-teal-400 dark:group-hover:border-teal-400 transition-all duration-300">
+              <Shield className="text-teal-500 dark:text-teal-400 w-5 h-5 absolute z-10" />
               <div className="absolute inset-0 bg-teal-500/10 blur-md rounded-xl"></div>
             </div>
-            <span className="text-xl font-bold tracking-wide text-white">Social<span className="text-teal-400">2Tree</span></span>
+            <span className="text-xl font-bold tracking-wide text-slate-800 dark:text-white">Social<span className="text-teal-500 dark:text-teal-400">2Tree</span></span>
           </Link>
 
           {/* Desktop Navigation Links (Centered) */}
@@ -55,10 +57,10 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout, isAuthenticated,
                 <Link
                   key={`${link.to}-${idx}`}
                   to={link.to}
-                  className={`text-sm font-medium transition-colors relative group ${isActive ? 'text-white' : 'text-slate-300 hover:text-white'}`}
+                  className={`text-sm font-medium transition-colors relative group ${isActive ? 'text-teal-600 dark:text-white' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'}`}
                 >
                   {link.label}
-                  <span className={`absolute -bottom-[30px] left-0 w-full h-0.5 bg-teal-400 transition-transform origin-left ${isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
+                  <span className={`absolute -bottom-[30px] left-0 w-full h-0.5 bg-teal-500 dark:bg-teal-400 transition-transform origin-left ${isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}></span>
                 </Link>
               );
             })}
@@ -66,29 +68,39 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout, isAuthenticated,
 
           {/* Actions (Right Side) */}
           <div className="flex items-center gap-4">
+            
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-xl transition-all"
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+
             {isAuthenticated ? (
-              <div className="hidden md:flex items-center gap-4 pl-6 border-l border-slate-800">
+              <div className="hidden md:flex items-center gap-4 pl-6 border-l border-slate-200 dark:border-slate-800">
                 <button
                   onClick={() => navigate('/dashboard/profile')}
                   className="flex items-center gap-3 hover:opacity-80 transition-opacity"
                 >
                   <div className="text-right">
-                    <p className="text-xs font-bold leading-none mb-1 text-white">{userProfile?.displayName.split(' ')[0]}</p>
-                    <p className="text-[10px] text-teal-400 font-bold uppercase tracking-widest">{userProfile?.role || 'User'}</p>
+                    <p className="text-xs font-bold leading-none mb-1 text-slate-900 dark:text-white">{userProfile?.displayName.split(' ')[0]}</p>
+                    <p className="text-[10px] text-teal-600 dark:text-teal-400 font-bold uppercase tracking-widest">{userProfile?.role || 'User'}</p>
                   </div>
-                  <img src={defaultAvatar} className="w-10 h-10 rounded-xl border border-teal-500/30 object-cover" alt="Avatar" />
+                  <img src={defaultAvatar} className="w-10 h-10 rounded-xl border border-teal-200 dark:border-teal-500/30 object-cover" alt="Avatar" />
                 </button>
                 <button
                   onClick={onLogout}
-                  className="p-2.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
+                  className="p-2.5 text-slate-500 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all"
                   title="Logout"
                 >
                   <LogOut size={20} />
                 </button>
               </div>
             ) : (
-              <div className="hidden md:flex items-center gap-4">
-                <Link to="/login" className="text-sm font-medium text-slate-300 hover:text-white transition-colors px-2">
+              <div className="hidden md:flex items-center gap-4 pr-1">
+                <Link to="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors px-2">
                   Log In
                 </Link>
                 <Link
@@ -104,7 +116,7 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout, isAuthenticated,
             {/* Mobile Toggle */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-xl transition-all"
+              className="md:hidden p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-xl transition-all"
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -114,39 +126,39 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout, isAuthenticated,
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 border-b border-slate-800 bg-[#0b0f19] p-6 space-y-4 shadow-2xl animate-in slide-in-from-top-4 duration-300">
+        <div className="md:hidden absolute top-full left-0 right-0 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0b0f19] p-6 space-y-4 shadow-2xl animate-in slide-in-from-top-4 duration-300">
           <div className="space-y-2">
             {linksToRender.map((link, idx) => (
               <Link
                 key={`${link.to}-mobile-${idx}`}
                 to={link.to}
                 onClick={() => setIsMenuOpen(false)}
-                className={`block text-base font-medium px-4 py-3 rounded-xl transition-all ${location.pathname === link.to ? 'text-teal-400 bg-teal-500/10' : 'text-slate-300 hover:text-white hover:bg-slate-800/50'}`}
+                className={`block text-base font-medium px-4 py-3 rounded-xl transition-all ${location.pathname === link.to ? 'text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-500/10' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}
               >
                 {link.label}
               </Link>
             ))}
           </div>
 
-          <div className="pt-4 border-t border-slate-800">
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
             {isAuthenticated ? (
               <div className="flex flex-col gap-3">
                 <button
                   onClick={() => { setIsMenuOpen(false); navigate('/dashboard/profile'); }}
-                  className="flexItems-center justify-center w-full py-4 font-bold text-white bg-slate-800 rounded-xl"
+                  className="flexItems-center justify-center w-full py-4 font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 rounded-xl"
                 >
                   My Profile
                 </button>
                 <button
                   onClick={() => { setIsMenuOpen(false); if (onLogout) onLogout(); }}
-                  className="w-full py-4 text-center font-bold text-red-400 bg-red-500/10 rounded-xl"
+                  className="w-full py-4 text-center font-bold text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-500/10 rounded-xl"
                 >
                   Logout
                 </button>
               </div>
             ) : (
               <div className="grid gap-3">
-                <Link to="/login" onClick={() => setIsMenuOpen(false)} className="w-full py-4 text-center font-medium text-slate-300 border border-slate-700/50 bg-slate-800/20 hover:bg-slate-800/50 rounded-xl transition-colors">
+                <Link to="/login" onClick={() => setIsMenuOpen(false)} className="w-full py-4 text-center font-medium text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/50 bg-slate-50 dark:bg-slate-800/20 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-xl transition-colors">
                   Log In
                 </Link>
                 <Link to="/contact" onClick={() => setIsMenuOpen(false)} className="w-full py-4 text-center font-semibold text-white bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl shadow-[0_0_15px_rgba(20,184,166,0.3)]">

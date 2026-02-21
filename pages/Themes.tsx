@@ -75,11 +75,11 @@ const Themes: React.FC = () => {
             />
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
                   <Palette size={28} className="text-indigo-600" />
                   Appearance
                 </h1>
-                <p className="text-slate-500 mt-1">Customize the look and feel of your profile</p>
+                <p className="text-slate-500 dark:text-slate-400 mt-1">Customize the look and feel of your profile</p>
               </div>
               <button
                 onClick={() => setShowMobilePreview(true)}
@@ -90,7 +90,7 @@ const Themes: React.FC = () => {
             </div>
           </header>
 
-          <section className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
+          <section className="bg-white dark:bg-slate-900/40 p-6 sm:p-8 rounded-2xl shadow-sm dark:shadow-none border border-slate-200 dark:border-slate-700/50">
             <h2 className="text-lg font-bold mb-6">Visual Themes</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {Object.values(THEMES).map((theme) => (
@@ -105,7 +105,7 @@ const Themes: React.FC = () => {
                     <div className={`w-full h-1.5 sm:h-2 rounded ${theme.buttonClass}`}></div>
                     <div className={`w-full h-1.5 sm:h-2 rounded ${theme.buttonClass} opacity-50`}></div>
                   </div>
-                  <div className="p-2 sm:p-3 text-left flex justify-between items-center bg-white">
+                  <div className="p-2 sm:p-3 text-left flex justify-between items-center bg-white dark:bg-slate-900/40">
                     <span className="font-semibold text-[10px] sm:text-sm truncate mr-1">{theme.name}</span>
                     {activePage.theme === theme.id && <CheckCircle2 className="text-indigo-600 shrink-0" size={16} />}
                   </div>
@@ -114,7 +114,7 @@ const Themes: React.FC = () => {
             </div>
           </section>
 
-          <section className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
+          <section className="bg-white dark:bg-slate-900/40 p-6 sm:p-8 rounded-2xl shadow-sm dark:shadow-none border border-slate-200 dark:border-slate-700/50">
             <h2 className="text-lg font-bold mb-4">Button Style</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
               {[
@@ -129,11 +129,11 @@ const Themes: React.FC = () => {
                   className={`h-11 sm:h-12 border-2 text-xs sm:text-sm font-medium transition-all ${style.id === 'brutal' ? (
                     activePage.buttonStyle === 'brutal'
                       ? 'bg-indigo-600 text-white border-indigo-700 shadow-none'
-                      : 'bg-white text-black border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                      : 'bg-white dark:bg-slate-900/40 text-black border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
                   ) : (
                     activePage.buttonStyle === style.id || (!activePage.buttonStyle && style.id === 'rounded-lg')
                       ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                      : 'border-slate-100 hover:border-slate-300'
+                      : 'border-slate-100 dark:border-slate-800/50 hover:border-slate-300'
                   )
                     } ${style.id === 'rounded-full' ? 'rounded-full' :
                       style.id === 'rounded-none' || style.id === 'brutal' ? 'rounded-none' : 'rounded-lg'

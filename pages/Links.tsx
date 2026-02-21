@@ -265,8 +265,8 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full pb-32 lg:pb-8">
             <header className="mb-8">
-                <h1 className="text-3xl font-black text-slate-900">Manage Links</h1>
-                <p className="text-slate-500 font-medium">Add, edit and organize your custom links</p>
+                <h1 className="text-3xl font-black text-slate-900 dark:text-white">Manage Links</h1>
+                <p className="text-slate-500 dark:text-slate-400 font-medium">Add, edit and organize your custom links</p>
             </header>
 
             <div className="grid lg:grid-cols-[1fr,320px] gap-8 items-start">
@@ -278,10 +278,10 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
                     />
 
                     {/* Plan Info Bar */}
-                    <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-4 transition-all ${isFreePlan ? 'bg-amber-50 border-amber-200' : 'bg-indigo-600 text-white border-indigo-700 shadow-lg shadow-indigo-100'
+                    <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-4 transition-all ${isFreePlan ? 'bg-amber-50 border-amber-200' : 'bg-indigo-600 text-white border-indigo-700 shadow-lg dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-indigo-100'
                         }`}>
                         <div className="flex items-center gap-3">
-                            <div className={`p-2 rounded-xl ${isFreePlan ? 'bg-amber-200 text-amber-800' : 'bg-white/20 text-white'}`}>
+                            <div className={`p-2 rounded-xl ${isFreePlan ? 'bg-amber-200 text-amber-800' : 'bg-white dark:bg-slate-900/40/20 text-white'}`}>
                                 {isFreePlan ? <Zap size={20} /> : <Star size={20} />}
                             </div>
                             <div>
@@ -291,7 +291,7 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
                         </div>
                         {isFreePlan && (
                             <button
-                                className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded-xl font-black text-sm transition-all shadow-md active:scale-95"
+                                className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded-xl font-black text-sm transition-all shadow-md dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] active:scale-95"
                                 onClick={() => navigate('/dashboard')}
                             >
                                 Upgrade to PRO
@@ -303,17 +303,17 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
                     <section className="space-y-4">
                         <div className="flex justify-between items-center">
                             <div className="flex items-center gap-3">
-                                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                     <LinkIcon size={20} className="text-indigo-600" /> My Links
                                 </h2>
-                                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${hasReachedLimit ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-500'}`}>
+                                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${hasReachedLimit ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-500 dark:text-slate-400'}`}>
                                     {mainLinks.length} / {isFreePlan ? '3' : '∞'}
                                 </span>
                             </div>
                             <button
                                 onClick={() => setShowAddForm(true)}
                                 disabled={hasReachedLimit}
-                                className={`px-4 sm:px-6 py-2.5 rounded-full font-bold flex items-center gap-2 transition-all shadow-lg active:scale-95 text-sm ${hasReachedLimit ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                                className={`px-4 sm:px-6 py-2.5 rounded-full font-bold flex items-center gap-2 transition-all shadow-lg dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] active:scale-95 text-sm ${hasReachedLimit ? 'bg-slate-200 text-slate-400 dark:text-slate-500 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 text-white'
                                     }`}
                             >
                                 <Plus size={18} /> <span className="hidden xs:inline">Add New Link</span>
@@ -328,71 +328,71 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
                         )}
 
                         {showAddForm && (
-                            <div className="bg-white p-6 rounded-2xl shadow-xl border-2 border-indigo-100 animate-in fade-in slide-in-from-top-4 duration-300">
+                            <div className="bg-white dark:bg-slate-900/40 p-6 rounded-2xl shadow-xl dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-2 border-indigo-100 animate-in fade-in slide-in-from-top-4 duration-300">
                                 <div className="flex justify-between mb-4">
                                     <h3 className="font-bold">New Link</h3>
-                                    <button onClick={() => setShowAddForm(false)} className="text-slate-400 hover:text-slate-600"><X size={18} /></button>
+                                    <button onClick={() => setShowAddForm(false)} className="text-slate-400 dark:text-slate-500 hover:text-slate-600"><X size={18} /></button>
                                 </div>
                                 <form onSubmit={handleAddLink} className="space-y-4">
                                     <div className="grid gap-4 sm:grid-cols-2">
                                         <input
                                             placeholder="Title (e.g. My Website)"
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                                            className="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-700/50 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                                             value={newTitle}
                                             onChange={(e) => setNewTitle(e.target.value)}
                                             autoFocus
                                         />
                                         <input
                                             placeholder="URL (e.g. https://...)"
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono text-sm"
+                                            className="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-700/50 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono text-sm"
                                             value={newUrl}
                                             onChange={(e) => setNewUrl(e.target.value)}
                                         />
                                     </div>
                                     <div className="grid gap-4 sm:grid-cols-2">
                                         <div>
-                                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Start Date (Optional)</label>
+                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 block">Start Date (Optional)</label>
                                             <input
                                                 type="datetime-local"
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm"
+                                                className="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-700/50 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm"
                                                 value={newScheduledStart}
                                                 onChange={(e) => setNewScheduledStart(e.target.value)}
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">End Date (Optional)</label>
+                                            <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 block">End Date (Optional)</label>
                                             <input
                                                 type="datetime-local"
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm"
+                                                className="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-700/50 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm"
                                                 value={newScheduledEnd}
                                                 onChange={(e) => setNewScheduledEnd(e.target.value)}
                                             />
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Password Protection (Optional)</label>
+                                        <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 block">Password Protection (Optional)</label>
                                         <div className="relative">
                                             <input
                                                 type="text"
                                                 placeholder="Set a password to lock this link"
-                                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 pl-10 focus:ring-2 focus:ring-amber-500 outline-none transition-all text-sm"
+                                                className="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-700/50 rounded-lg px-4 py-3 pl-10 focus:ring-2 focus:ring-amber-500 outline-none transition-all text-sm"
                                                 value={newPassword}
                                                 onChange={(e) => setNewPassword(e.target.value)}
                                             />
-                                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={16} />
                                         </div>
                                     </div>
                                     <div className="flex justify-end gap-3">
                                         <button
                                             type="button"
                                             onClick={() => setShowAddForm(false)}
-                                            className="px-4 py-2 rounded-lg text-slate-500 font-semibold hover:bg-slate-100 transition-all"
+                                            className="px-4 py-2 rounded-lg text-slate-500 dark:text-slate-400 font-semibold hover:bg-slate-100 transition-all"
                                         >
                                             Cancel
                                         </button>
                                         <button
                                             type="submit"
-                                            className="bg-indigo-600 text-white px-8 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-all shadow-md"
+                                            className="bg-indigo-600 text-white px-8 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-all shadow-md dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
                                         >
                                             Add Link
                                         </button>
@@ -412,13 +412,13 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
                                     strategy={verticalListSortingStrategy}
                                 >
                                     {mainLinks.length === 0 ? (
-                                        <div className="bg-white p-12 rounded-3xl border-2 border-dashed border-slate-200 text-center space-y-4">
-                                            <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto text-slate-400">
+                                        <div className="bg-white dark:bg-slate-900/40 p-12 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700/50 text-center space-y-4">
+                                            <div className="w-16 h-16 bg-slate-50 dark:bg-[#0b0f19] rounded-2xl flex items-center justify-center mx-auto text-slate-400 dark:text-slate-500">
                                                 <Plus size={32} />
                                             </div>
                                             <div>
-                                                <h3 className="font-bold text-slate-900 text-lg">No links yet</h3>
-                                                <p className="text-slate-500 text-sm">Add your first custom link to get started!</p>
+                                                <h3 className="font-bold text-slate-900 dark:text-white text-lg">No links yet</h3>
+                                                <p className="text-slate-500 dark:text-slate-400 text-sm">Add your first custom link to get started!</p>
                                             </div>
                                             <button
                                                 onClick={() => setShowAddForm(true)}
@@ -447,32 +447,32 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
                     <section className="space-y-4 pt-10">
                         <div className="flex justify-between items-center">
                             <div className="flex items-center gap-3">
-                                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                     <Share2 size={20} className="text-indigo-600" /> Social Icons
                                 </h2>
-                                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">
+                                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 dark:text-slate-400">
                                     {socialIcons.length}
                                 </span>
                             </div>
                             <button
                                 onClick={() => setShowSocialForm(true)}
-                                className="px-4 py-2 rounded-full font-bold flex items-center gap-2 transition-all shadow-sm bg-white border border-slate-200 hover:border-indigo-300 text-indigo-600 text-sm"
+                                className="px-4 py-2 rounded-full font-bold flex items-center gap-2 transition-all shadow-sm dark:shadow-none bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700/50 hover:border-indigo-300 text-indigo-600 text-sm"
                             >
                                 <Plus size={18} /> Add Social
                             </button>
                         </div>
 
                         {showSocialForm && (
-                            <div className="bg-white p-6 rounded-2xl shadow-xl border-2 border-indigo-100 animate-in fade-in slide-in-from-top-4 duration-300">
+                            <div className="bg-white dark:bg-slate-900/40 p-6 rounded-2xl shadow-xl dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-2 border-indigo-100 animate-in fade-in slide-in-from-top-4 duration-300">
                                 <div className="flex justify-between mb-4">
                                     <h3 className="font-bold">New Social Icon</h3>
-                                    <button onClick={() => setShowSocialForm(false)} className="text-slate-400 hover:text-slate-600"><X size={18} /></button>
+                                    <button onClick={() => setShowSocialForm(false)} className="text-slate-400 dark:text-slate-500 hover:text-slate-600"><X size={18} /></button>
                                 </div>
                                 <form onSubmit={(e) => handleAddLink(e, 'social_icon')} className="space-y-4">
                                     <div>
                                         <input
                                             placeholder="Social Profile URL (e.g. https://instagram.com/...)"
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono text-sm"
+                                            className="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-200 dark:border-slate-700/50 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-mono text-sm"
                                             value={newSocialUrl}
                                             onChange={(e) => setNewSocialUrl(e.target.value)}
                                             autoFocus
@@ -482,13 +482,13 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
                                         <button
                                             type="button"
                                             onClick={() => setShowSocialForm(false)}
-                                            className="px-4 py-2 rounded-lg text-slate-500 font-semibold hover:bg-slate-100 transition-all"
+                                            className="px-4 py-2 rounded-lg text-slate-500 dark:text-slate-400 font-semibold hover:bg-slate-100 transition-all"
                                         >
                                             Cancel
                                         </button>
                                         <button
                                             type="submit"
-                                            className="bg-indigo-600 text-white px-8 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-all shadow-md"
+                                            className="bg-indigo-600 text-white px-8 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-all shadow-md dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
                                         >
                                             Add Icon
                                         </button>
@@ -499,13 +499,13 @@ const LinksPage: React.FC<LinksPageProps> = ({ onLogout }) => {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {socialIcons.map((link) => (
-                                <div key={link.id} className="bg-white p-3 rounded-xl border border-slate-200 flex items-center justify-between">
+                                <div key={link.id} className="bg-white dark:bg-slate-900/40 p-3 rounded-xl border border-slate-200 dark:border-slate-700/50 flex items-center justify-between">
                                     <div className="flex items-center gap-3 overflow-hidden">
-                                        <div className="p-2 bg-slate-50 rounded-lg">
+                                        <div className="p-2 bg-slate-50 dark:bg-[#0b0f19] rounded-lg">
                                             {getSocialIcon(link.url)}
                                         </div>
                                         <div className="overflow-hidden">
-                                            <p className="text-xs font-mono text-slate-500 truncate">{link.url}</p>
+                                            <p className="text-xs font-mono text-slate-500 dark:text-slate-400 truncate">{link.url}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">

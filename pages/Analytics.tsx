@@ -79,10 +79,10 @@ const Analytics: React.FC = () => {
 
       {/* Header */}
       <header>
-        <h1 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2 sm:gap-3">
+        <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2 sm:gap-3">
           <BarChart2 size={22} className="text-indigo-600" /> Analytics
         </h1>
-        <p className="text-slate-500 mt-1 font-bold text-[11px] sm:text-sm uppercase tracking-wider">
+        <p className="text-slate-500 dark:text-slate-400 mt-1 font-bold text-[11px] sm:text-sm uppercase tracking-wider">
           Performance for <span className="text-indigo-600">@{activePage.slug}</span>
         </p>
       </header>
@@ -94,10 +94,10 @@ const Analytics: React.FC = () => {
           { label: 'Link Clicks', value: totalClicks.toLocaleString(), icon: <MousePointer2 size={18} />, color: 'bg-indigo-50 text-indigo-600', trend: '+24%' },
           { label: 'Top Country', value: topCountry ? `${flag(topCountry.country_code)} ${topCountry.country}` : '—', icon: <Globe size={18} />, color: 'bg-emerald-50 text-emerald-600', trend: null },
         ].map((stat, i) => (
-          <div key={i} className="bg-white p-5 sm:p-6 rounded-[2rem] shadow-sm border border-slate-100 flex sm:block items-center justify-between">
+          <div key={i} className="bg-white dark:bg-slate-900/40 p-5 sm:p-6 rounded-[2rem] shadow-sm dark:shadow-none border border-slate-100 dark:border-slate-800/50 flex sm:block items-center justify-between">
             <div className="flex flex-col">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">{stat.label}</p>
-              <h3 className="text-xl sm:text-2xl font-black text-slate-900 mt-0.5 sm:mt-1">{stat.value}</h3>
+              <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em]">{stat.label}</p>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-0.5 sm:mt-1">{stat.value}</h3>
               {stat.trend && (
                 <div className="mt-1.5 sm:mt-2 flex items-center gap-1 text-[10px] sm:text-xs font-black text-emerald-600 bg-emerald-50/50 w-fit px-2 py-0.5 rounded-full">
                   <ArrowUpRight size={12} /> {stat.trend}
@@ -112,8 +112,8 @@ const Analytics: React.FC = () => {
       {/* Charts row */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Traffic Chart */}
-        <div className="bg-white p-4 sm:p-6 rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
-          <h3 className="font-black text-slate-800 mb-6 text-[10px] sm:text-xs uppercase tracking-[0.2em]">Traffic Overview</h3>
+        <div className="bg-white dark:bg-slate-900/40 p-4 sm:p-6 rounded-[2rem] shadow-sm dark:shadow-none border border-slate-100 dark:border-slate-800/50 overflow-hidden">
+          <h3 className="font-black text-slate-800 dark:text-slate-200 mb-6 text-[10px] sm:text-xs uppercase tracking-[0.2em]">Traffic Overview</h3>
           <div className="h-[220px] sm:h-[260px] -ml-4 sm:ml-0">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -134,24 +134,24 @@ const Analytics: React.FC = () => {
         </div>
 
         {/* Link Performance */}
-        <div className="bg-white p-4 sm:p-6 rounded-[2rem] shadow-sm border border-slate-100">
-          <h3 className="font-black text-slate-800 mb-6 text-[10px] sm:text-xs uppercase tracking-[0.2em]">Link Performance</h3>
+        <div className="bg-white dark:bg-slate-900/40 p-4 sm:p-6 rounded-[2rem] shadow-sm dark:shadow-none border border-slate-100 dark:border-slate-800/50">
+          <h3 className="font-black text-slate-800 dark:text-slate-200 mb-6 text-[10px] sm:text-xs uppercase tracking-[0.2em]">Link Performance</h3>
           <div className="space-y-4 sm:space-y-5">
             {activePage.links.length > 0 ? activePage.links.map(link => {
               const pct = Math.round((link.clicks / Math.max(totalClicks, 1)) * 100);
               return (
                 <div key={link.id}>
                   <div className="flex justify-between items-end mb-1.5 gap-2">
-                    <p className="text-xs sm:text-sm font-bold text-slate-700 truncate">{link.title}</p>
+                    <p className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 truncate">{link.title}</p>
                     <p className="text-[10px] sm:text-xs font-black text-indigo-600 whitespace-nowrap bg-indigo-50 px-2 py-0.5 rounded-full">{link.clicks} clicks</p>
                   </div>
-                  <div className="w-full bg-slate-50 border border-slate-100 rounded-full h-1.5 sm:h-2 overflow-hidden">
+                  <div className="w-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-100 dark:border-slate-800/50 rounded-full h-1.5 sm:h-2 overflow-hidden">
                     <div className="bg-indigo-600 h-full rounded-full transition-all duration-1000" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
               );
             }) : (
-              <div className="py-10 text-center text-slate-400 font-bold italic text-sm">No links added yet</div>
+              <div className="py-10 text-center text-slate-400 dark:text-slate-500 font-bold italic text-sm">No links added yet</div>
             )}
           </div>
         </div>
@@ -161,13 +161,13 @@ const Analytics: React.FC = () => {
       <div className="grid lg:grid-cols-3 gap-6">
 
         {/* Countries */}
-        <div className="lg:col-span-2 bg-white rounded-[2rem] border border-slate-100 shadow-sm p-4 sm:p-6">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900/40 rounded-[2rem] border border-slate-100 dark:border-slate-800/50 shadow-sm dark:shadow-none p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-2">
-            <h3 className="font-black text-slate-800 text-[10px] sm:text-xs uppercase tracking-[0.2em] flex items-center gap-2">
+            <h3 className="font-black text-slate-800 dark:text-slate-200 text-[10px] sm:text-xs uppercase tracking-[0.2em] flex items-center gap-2">
               <Globe size={14} className="text-indigo-500" /> Visitors by Country
             </h3>
             {geoTotal > 0 && (
-              <span className="text-[9px] sm:text-[10px] font-black text-slate-400 bg-slate-50 px-2.5 py-1 rounded-full uppercase tracking-wider w-fit">
+              <span className="text-[9px] sm:text-[10px] font-black text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-[#0b0f19] px-2.5 py-1 rounded-full uppercase tracking-wider w-fit">
                 {geoTotal} clicks tracked
               </span>
             )}
@@ -180,8 +180,8 @@ const Analytics: React.FC = () => {
           ) : geoCountries.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-40 text-slate-300">
               <Globe size={40} className="mb-3" />
-              <p className="text-xs font-black uppercase tracking-widest text-slate-400">No geo data yet</p>
-              <p className="text-[10px] text-slate-400 mt-1 font-medium">Data appears as visitors click your links</p>
+              <p className="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">No geo data yet</p>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 font-medium">Data appears as visitors click your links</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -192,10 +192,10 @@ const Analytics: React.FC = () => {
                     <span className="text-xl w-7 flex-shrink-0 text-center">{flag(c.country_code)}</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-center mb-1 gap-2">
-                        <p className="text-xs sm:text-sm font-bold text-slate-700 truncate">{c.country}</p>
-                        <p className="text-[10px] font-black text-slate-500 ml-auto flex-shrink-0">{c.clicks} <span className="text-slate-300">({pct}%)</span></p>
+                        <p className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 truncate">{c.country}</p>
+                        <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 ml-auto flex-shrink-0">{c.clicks} <span className="text-slate-300">({pct}%)</span></p>
                       </div>
-                      <div className="h-1.5 bg-slate-50 border border-slate-100 rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-slate-50 dark:bg-[#0b0f19] border border-slate-100 dark:border-slate-800/50 rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-1000"
                           style={{
@@ -213,8 +213,8 @@ const Analytics: React.FC = () => {
         </div>
 
         {/* Top Cities */}
-        <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-4 sm:p-6">
-          <h3 className="font-black text-slate-800 text-[10px] sm:text-xs uppercase tracking-[0.2em] flex items-center gap-2 mb-6">
+        <div className="bg-white dark:bg-slate-900/40 rounded-[2rem] border border-slate-100 dark:border-slate-800/50 shadow-sm dark:shadow-none p-4 sm:p-6">
+          <h3 className="font-black text-slate-800 dark:text-slate-200 text-[10px] sm:text-xs uppercase tracking-[0.2em] flex items-center gap-2 mb-6">
             <MapPin size={14} className="text-violet-500" /> Top Cities
           </h3>
 
@@ -225,7 +225,7 @@ const Analytics: React.FC = () => {
           ) : geoCities.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-40 text-slate-300">
               <MapPin size={32} className="mb-3" />
-              <p className="text-xs font-black uppercase tracking-widest text-slate-400">No data yet</p>
+              <p className="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">No data yet</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -234,8 +234,8 @@ const Analytics: React.FC = () => {
                   <div className="flex items-center gap-3 min-w-0">
                     <span className="text-lg flex-shrink-0">{flag(c.country_code)}</span>
                     <div className="min-w-0">
-                      <p className="text-xs sm:text-sm font-bold text-slate-700 truncate">{c.city}</p>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">{c.country}</p>
+                      <p className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 truncate">{c.city}</p>
+                      <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">{c.country}</p>
                     </div>
                   </div>
                   <span className="text-[11px] font-black text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full flex-shrink-0">

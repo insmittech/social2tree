@@ -93,17 +93,17 @@ const Dashboard: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
         <div>
-          <h1 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
-            Welcome back, <span className="text-indigo-600">{profile?.displayName?.split(' ')[0] || 'User'}</span> 👋
+          <h1 className="text-xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-tight transition-colors">
+            Welcome back, <span className="text-indigo-600 dark:text-teal-500 transition-colors">{profile?.displayName?.split(' ')[0] || 'User'}</span> 👋
           </h1>
-          <p className="text-slate-400 font-bold text-[11px] sm:text-sm mt-1 uppercase tracking-wider">Activity Overview</p>
+          <p className="text-slate-400 dark:text-slate-500 font-bold text-[11px] sm:text-sm mt-1 uppercase tracking-wider transition-colors">Activity Overview</p>
         </div>
         {activePage && (
           <a
             href={publicUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 px-5 py-3.5 bg-indigo-600 text-white rounded-2xl text-xs font-black hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 whitespace-nowrap sm:w-auto"
+            className="flex items-center justify-center gap-2 px-5 py-3.5 bg-indigo-600 dark:bg-teal-600 text-white rounded-2xl text-xs font-black hover:bg-indigo-700 dark:hover:bg-teal-700 transition-all shadow-lg shadow-indigo-100 dark:shadow-none whitespace-nowrap sm:w-auto"
           >
             <ExternalLink size={14} /> View Live Page
           </a>
@@ -118,11 +118,11 @@ const Dashboard: React.FC = () => {
           { label: 'Click Rate', value: `${ctr}%`, icon: <TrendingUp size={18} />, color: 'text-emerald-600 bg-emerald-50', trend: null },
           { label: 'Bio Trees', value: (profile?.pages?.length || 0).toString(), icon: <Layout size={18} />, color: 'text-amber-600 bg-amber-50', trend: null },
         ].map(stat => (
-          <div key={stat.label} className="bg-white rounded-[2rem] border border-slate-100 p-4 sm:p-5 shadow-sm hover:shadow-md transition-all">
-            <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl ${stat.color} flex items-center justify-center mb-3 sm:mb-4`}>
+          <div key={stat.label} className="bg-white dark:bg-slate-900/40 rounded-[2rem] border border-slate-100 dark:border-slate-800/50 p-4 sm:p-5 shadow-sm dark:shadow-none hover:shadow-md transition-all duration-300">
+            <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4 transition-colors bg-opacity-10 dark:bg-opacity-20 ${stat.color}`}>
               {stat.icon}
             </div>
-            <p className="text-xl sm:text-2xl font-black text-slate-900 leading-none">{stat.value}</p>
+            <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-none transition-colors">{stat.value}</p>
             <div className="flex flex-col sm:flex-row sm:items-center gap-1 mt-1.5">
               <p className="text-[9px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
               {stat.trend && (
@@ -164,7 +164,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Verification Card */}
-        <div className="bg-white rounded-[2rem] border border-slate-100 p-6 shadow-sm flex flex-col">
+        <div className="bg-white dark:bg-slate-900/40 rounded-[2rem] border border-slate-100 dark:border-slate-800/50 p-6 shadow-sm dark:shadow-none flex flex-col transition-all duration-300">
           <div className="flex items-start justify-between mb-4">
             <div className="bg-slate-50 p-3 rounded-2xl text-slate-600">
               <ShieldCheck size={22} />
@@ -173,7 +173,7 @@ const Dashboard: React.FC = () => {
               {vBadge.icon} {vBadge.label}
             </span>
           </div>
-          <h3 className="text-lg font-black text-slate-900 mb-2">Verification</h3>
+          <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2 transition-colors">Verification</h3>
           <p className="text-slate-400 font-medium text-sm flex-1 leading-relaxed">
             {verificationLoading
               ? 'Checking status...'
@@ -195,7 +195,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Analytics Card */}
-        <div className="bg-white rounded-[2rem] border border-slate-100 p-6 shadow-sm flex flex-col">
+        <div className="bg-white dark:bg-slate-900/40 rounded-[2rem] border border-slate-100 dark:border-slate-800/50 p-6 shadow-sm dark:shadow-none flex flex-col transition-all duration-300">
           <div className="flex items-start justify-between mb-4">
             <div className="bg-violet-50 p-3 rounded-2xl text-violet-600">
               <BarChart2 size={22} />
@@ -204,7 +204,7 @@ const Dashboard: React.FC = () => {
               Last 30 days
             </span>
           </div>
-          <h3 className="text-lg font-black text-slate-900 mb-5">Analytics</h3>
+          <h3 className="text-lg font-black text-slate-900 dark:text-white mb-5 transition-colors">Analytics</h3>
           <div className="space-y-4 flex-1">
             {[
               { label: 'Profile Views', value: totalViews, max: Math.max(totalViews, 1), color: 'bg-indigo-500' },
@@ -213,7 +213,7 @@ const Dashboard: React.FC = () => {
               <div key={bar.label}>
                 <div className="flex justify-between text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wide">
                   <span>{bar.label}</span>
-                  <span className="text-slate-900">{bar.value.toLocaleString()}</span>
+                  <span className="text-slate-900 dark:text-white transition-colors">{bar.value.toLocaleString()}</span>
                 </div>
                 <div className="h-2.5 bg-slate-50 rounded-full overflow-hidden border border-slate-100">
                   <div
@@ -223,14 +223,14 @@ const Dashboard: React.FC = () => {
                 </div>
               </div>
             ))}
-            <div className="flex items-center justify-between pt-3 border-t border-slate-50 text-sm mt-2">
+            <div className="flex items-center justify-between pt-3 border-t border-slate-50 dark:border-slate-800/50 text-sm mt-2 transition-colors">
               <span className="text-slate-400 font-bold text-xs uppercase tracking-wider">CTR</span>
-              <span className="text-slate-900 font-black">{ctr}%</span>
+              <span className="text-slate-900 dark:text-white font-black transition-colors">{ctr}%</span>
             </div>
           </div>
           <button
             onClick={() => navigate('/dashboard/analytics')}
-            className="mt-6 w-full py-3.5 bg-slate-50 text-slate-700 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-100 transition-all flex items-center justify-center gap-2 active:scale-95"
+            className="mt-6 w-full py-3.5 bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center justify-center gap-2 active:scale-95"
           >
             Full Analytics <ArrowRight size={14} />
           </button>
@@ -242,11 +242,11 @@ const Dashboard: React.FC = () => {
 
         {/* Public Link */}
         {activePage && (
-          <div className="bg-white rounded-[2rem] border border-slate-100 p-6 shadow-sm">
-            <h3 className="text-base font-black text-slate-900 mb-1">Your Public Link</h3>
+          <div className="bg-white dark:bg-slate-900/40 rounded-[2rem] border border-slate-100 dark:border-slate-800/50 p-6 shadow-sm dark:shadow-none transition-all duration-300">
+            <h3 className="text-base font-black text-slate-900 dark:text-white mb-1 transition-colors">Your Public Link</h3>
             <p className="text-xs text-slate-400 font-bold mb-4">Share this link anywhere to direct people to your Bio-Tree.</p>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-slate-50 rounded-2xl px-4 py-3 border border-slate-100">
-              <span className="text-sm font-bold text-slate-600 truncate flex-1">{publicUrl}</span>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-slate-50 dark:bg-[#05080f]/50 rounded-2xl px-4 py-3 border border-slate-100 dark:border-slate-800/50 transition-colors">
+              <span className="text-sm font-bold text-slate-600 dark:text-slate-400 truncate flex-1 transition-colors">{publicUrl}</span>
               <button
                 onClick={handleCopy}
                 className={`flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black transition-all ${copied ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200'} active:scale-95`}
@@ -258,8 +258,8 @@ const Dashboard: React.FC = () => {
         )}
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-[2rem] border border-slate-100 p-6 shadow-sm">
-          <h3 className="text-base font-black text-slate-900 mb-4">Quick Actions</h3>
+        <div className="bg-white dark:bg-slate-900/40 rounded-[2rem] border border-slate-100 dark:border-slate-800/50 p-6 shadow-sm dark:shadow-none transition-all duration-300">
+          <h3 className="text-base font-black text-slate-900 dark:text-white mb-4 transition-colors">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-3">
             {[
               { label: 'Manage Trees', icon: <Layout size={18} />, to: '/dashboard/trees', color: 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100' },
