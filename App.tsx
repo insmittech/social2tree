@@ -23,6 +23,7 @@ import AdminVerification from './pages/AdminVerification';
 import Profile from './pages/Profile';
 import BioTrees from './pages/BioTrees';
 import TreeEditor from './pages/TreeEditor';
+import PageBuilder from './pages/PageBuilder';
 import Features from './pages/Features';
 import Pricing from './pages/Pricing';
 import Contact from './pages/Contact';
@@ -78,13 +79,17 @@ const AppRoutes: React.FC = () => {
           element={isAuthenticated ? <Layout userProfile={user} onLogout={handleLogout}><TreeEditor /></Layout> : <Navigate to="/login" />}
         />
         <Route
+          path="/dashboard/builder"
+          element={isAuthenticated ? <PageBuilder /> : <Navigate to="/login" />}
+        />
+        <Route
           path="/dashboard/analytics"
-          element={isAuthenticated ? <Layout userProfile={user} onLogout={handleLogout}><Analytics onLogout={handleLogout} /></Layout> : <Navigate to="/login" />}
+          element={isAuthenticated ? <Layout userProfile={user} onLogout={handleLogout}><Analytics /></Layout> : <Navigate to="/login" />}
         />
 
         <Route
           path="/dashboard/themes"
-          element={isAuthenticated ? <Layout userProfile={user} onLogout={handleLogout}><Themes onLogout={handleLogout} /></Layout> : <Navigate to="/login" />}
+          element={isAuthenticated ? <Layout userProfile={user} onLogout={handleLogout}><Themes /></Layout> : <Navigate to="/login" />}
         />
         <Route
           path="/dashboard/plan"

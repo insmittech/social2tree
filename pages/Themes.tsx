@@ -8,11 +8,8 @@ import PageManager from '../components/PageManager';
 import { useAuth } from '../src/context/AuthContext';
 import { usePageSelector } from '../src/hooks/usePageSelector';
 
-interface ThemesProps {
-  onLogout: () => void;
-}
 
-const Themes: React.FC<ThemesProps> = ({ onLogout }) => {
+const Themes: React.FC = () => {
   const { user: profile, updateUser } = useAuth();
   const [showMobilePreview, setShowMobilePreview] = useState(false);
   const { selectedPageId, setSelectedPageId } = usePageSelector();
