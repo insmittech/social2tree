@@ -14,7 +14,14 @@ export const formatDate = (
     includeTime: boolean = true
 ): string => {
     try {
-        const d = new Date(date);
+        let d: Date;
+        if (typeof date === 'string' && !date.includes('T') && !date.includes('Z') && !date.includes('+')) {
+            // If it's a "YYYY-MM-DD HH:MM:SS" string from DB, assume UTC
+            d = new Date(date.replace(' ', 'T') + 'Z');
+        } else {
+            d = new Date(date);
+        }
+        
         if (isNaN(d.getTime())) return 'Invalid Date';
 
         const options: Intl.DateTimeFormatOptions = {
