@@ -116,10 +116,10 @@ const Footer: React.FC<FooterProps> = () => {
                     
                     {/* CTA Button */}
                     <Link 
-                        to="/demo" 
+                        to="/contact" 
                         className="w-full lg:w-auto relative group overflow-hidden px-8 py-4 rounded-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-sm font-bold tracking-widest uppercase hover:shadow-[0_0_25px_rgba(20,184,166,0.4)] transition-all duration-300 text-center flex items-center justify-center gap-2 mb-10 lg:mb-12 cursor-pointer"
                     >
-                        <span className="relative z-10 flex items-center gap-2">Book a Demo <Activity size={18} /></span>
+                        <span className="relative z-10 flex items-center gap-2">Contact <Activity size={18} /></span>
                         <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-teal-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </Link>
 

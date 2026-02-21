@@ -27,6 +27,8 @@ import PageBuilder from './pages/PageBuilder';
 import Features from './pages/Features';
 import Pricing from './pages/Pricing';
 import Contact from './pages/Contact';
+import Blog from './pages/Blog';
+import About from './pages/About';
 import Layout from './components/Layout';
 import { ToastProvider } from './src/context/ToastContext';
 import { ToastContainer } from './components/Toast';
@@ -54,6 +56,8 @@ const AppRoutes: React.FC = () => {
         <Route path="/features" element={<Features />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login onLogin={() => { }} isAuthenticated={isAuthenticated} />} />
         <Route path="/register" element={<Register isAuthenticated={isAuthenticated} />} />
 

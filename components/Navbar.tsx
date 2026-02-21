@@ -19,10 +19,9 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout, isAuthenticated,
 
   // Landing links to match OSINT design
   const landingLinks = [
-    { label: 'Products', to: '/products' },
-    { label: 'Cases', to: '/cases' },
-    { label: 'Industries', to: '/industries' },
-    { label: 'Resources', to: '/resources' },
+    { label: 'Home', to: '/' },
+    { label: 'Features', to: '/features' },
+    { label: 'Pricing', to: '/pricing' },
     { label: 'Blog', to: '/blog' },
     { label: 'About', to: '/about' },
   ];
@@ -93,10 +92,10 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout, isAuthenticated,
                   Log In
                 </Link>
                 <Link 
-                  to="/demo" 
+                  to="/contact" 
                   className="relative group overflow-hidden px-6 py-2.5 rounded-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-sm font-semibold tracking-wide hover:shadow-[0_0_20px_rgba(20,184,166,0.4)] transition-all duration-300"
                 >
-                  <span className="relative z-10 flex items-center gap-2">Book a Demo <Activity size={16} /></span>
+                  <span className="relative z-10 flex items-center gap-2">Contact <Activity size={16} /></span>
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-teal-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </Link>
               </div>
@@ -150,8 +149,8 @@ const Navbar: React.FC<NavbarProps> = ({ isDashboard, onLogout, isAuthenticated,
                     <Link to="/login" onClick={() => setIsMenuOpen(false)} className="w-full py-4 text-center font-medium text-slate-300 border border-slate-700/50 bg-slate-800/20 hover:bg-slate-800/50 rounded-xl transition-colors">
                         Log In
                     </Link>
-                    <Link to="/demo" onClick={() => setIsMenuOpen(false)} className="w-full py-4 text-center font-semibold text-white bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl shadow-[0_0_15px_rgba(20,184,166,0.3)]">
-                        Book a Demo
+                    <Link to="/contact" onClick={() => setIsMenuOpen(false)} className="w-full py-4 text-center font-semibold text-white bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl shadow-[0_0_15px_rgba(20,184,166,0.3)]">
+                        Contact
                     </Link>
                 </div>
             )}
