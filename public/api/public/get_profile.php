@@ -9,6 +9,19 @@ $host = $_SERVER['HTTP_HOST'] ?? '';
 try {
     // 1. Fetch Page and Owner Data
     if ($slug) {
+        // Redirection Manager: Check if this is an old slug
+        $redirStmt = $pdo->prepare("SELECT new_slug, redirect_type FROM redirects WHERE old_slug = ? ORDER BY created_at DESC LIMIT 1");
+        $redirStmt->execute([$slug]);
+        $redir = $redirStmt->fetch();
+        if ($redir) {
+            json_response([
+                "redirect" => true,
+                "new_path" => "/" . $redir['new_slug'],
+                "status" => (int)$redir['redirect_type']
+            ]);
+            exit();
+        }
+
         $query = "SELECT p.*, u.plan, u.role, u.is_verified FROM pages p JOIN users u ON p.user_id = u.id WHERE p.slug = ? LIMIT 1";
         $params = [$slug];
     } else {
@@ -34,6 +47,11 @@ try {
     $stmt = $pdo->prepare($query);
     $stmt->execute([$page_id]);
     $links = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // 2.1 Fetch SEO Metadata
+    $seoStmt = $pdo->prepare("SELECT * FROM seo_metadata WHERE page_id = ?");
+    $seoStmt->execute([$page_id]);
+    $seo = $seoStmt->fetch(PDO::FETCH_ASSOC);
 
     // 3. Increment views
     // Increment User views (legacy/overview)
@@ -65,7 +83,16 @@ try {
                 'scheduledEnd' => $link['scheduled_end'] ?? null,
                 'password' => $link['password'] ?? null
             ];
-        }, $links)
+        }, $links),
+        'seo' => $seo ? [
+            'title_tag' => $seo['title_tag'],
+            'meta_description' => $seo['meta_description'],
+            'meta_keywords' => $seo['meta_keywords'],
+            'og_image' => $seo['og_image'],
+            'is_indexed' => (bool)$seo['is_indexed'],
+            'canonical_url' => $seo['canonical_url'],
+            'structured_data' => json_decode($seo['structured_data'])
+        ] : null
     ];
     json_response($profile);
 

@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import {
     Plus, Search, Filter, ExternalLink, MoreVertical,
-    LayoutGrid, List, BarChart3, Zap, X, Loader2, PanelsTopLeft
+    LayoutGrid, List, BarChart3, Zap, X, Loader2, PanelsTopLeft, Globe
 } from 'lucide-react';
 import { useAuth } from '../src/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { usePageSelector } from '../src/hooks/usePageSelector';
 import client from '../src/api/client';
 import Pagination from '../components/Pagination';
+import SeoManager from '../components/SeoManager';
 
 const BioTrees: React.FC = () => {
     const navigate = useNavigate();
@@ -19,6 +20,8 @@ const BioTrees: React.FC = () => {
 
     // ── Create Modal state ──────────────────────────────────────────────────
     const [showCreate, setShowCreate] = useState(false);
+    const [showSeo, setShowSeo] = useState(false);
+    const [selectedPageForSeo, setSelectedPageForSeo] = useState<any>(null);
     const [createName, setCreateName] = useState('');
     const [createSlug, setCreateSlug] = useState('');
     const [createError, setCreateError] = useState('');
@@ -195,9 +198,23 @@ const BioTrees: React.FC = () => {
                                             <span className="text-sm font-black text-slate-900 dark:text-white">{page.links?.length ?? 0}</span>
                                         </td>
                                         <td className="px-8 py-5 text-right">
-                                            <div className="flex items-center justify-end gap-4">
-                                                <button onClick={() => window.open(`http://s2t.me/${page.slug}`, '_blank')} className="text-slate-400 hover:text-indigo-600 transition-colors p-2">
+                                            <div className="flex items-center justify-end gap-3 sm:gap-4">
+                                                <button
+                                                    onClick={() => window.open(`http://s2t.me/${page.slug}`, '_blank')}
+                                                    className="text-slate-400 hover:text-indigo-600 transition-all p-2 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-xl"
+                                                    title="View Public Page"
+                                                >
                                                     <ExternalLink size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedPageForSeo(page);
+                                                        setShowSeo(true);
+                                                    }}
+                                                    className="p-2.5 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:text-slate-500 dark:hover:text-teal-400 dark:hover:bg-teal-500/10 transition-all active:scale-95 group/btn"
+                                                    title="SEO Settings"
+                                                >
+                                                    <Globe size={18} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleEditTree(page.id)}
@@ -296,6 +313,36 @@ const BioTrees: React.FC = () => {
                                     : <><Plus size={18} /> Create Final Tree</>}
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+            {showSeo && selectedPageForSeo && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-white dark:bg-[#0b121e] w-full max-w-5xl rounded-[3rem] p-8 sm:p-12 shadow-2xl dark:shadow-none relative overflow-hidden border dark:border-slate-800">
+                        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+                        <button
+                            onClick={() => setShowSeo(false)}
+                            className="absolute top-8 right-10 p-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 transition-colors"
+                        >
+                            <X size={24} />
+                        </button>
+
+                        <div className="flex items-center gap-4 mb-10">
+                            <div className="w-12 h-12 bg-indigo-50 dark:bg-slate-800 text-indigo-600 rounded-2xl flex items-center justify-center">
+                                <Search size={24} />
+                            </div>
+                            <div>
+                                <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter transition-colors">SEO & Indexing Control</h3>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm font-bold uppercase tracking-widest text-[10px] mt-1 transition-colors">Managing metadata for <span className="text-indigo-600">@{selectedPageForSeo.slug}</span></p>
+                            </div>
+                        </div>
+
+                        <SeoManager
+                            pageId={selectedPageForSeo.id}
+                            slug={selectedPageForSeo.slug}
+                            displayName={selectedPageForSeo.displayName}
+                            onClose={() => setShowSeo(false)}
+                        />
                     </div>
                 </div>
             )}

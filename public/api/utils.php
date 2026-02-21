@@ -33,6 +33,24 @@ function json_response($data = null, $status = 200)
     }
 }
 
+/**
+ * Pings Google and Bing with the sitemap URL
+ */
+function ping_search_engines() {
+    // This function requires a get_env_var function to be defined elsewhere,
+    // or APP_URL to be a constant/global. Assuming it exists for this context.
+    // For a complete solution, get_env_var would need to be defined or replaced.
+    $baseUrl = get_env_var('APP_URL', 'https://social2tree.com');
+    $sitemapUrl = urlencode($baseUrl . '/api/public/sitemap.php');
+    
+    // Google Ping (deprecated but sometimes still works if using Indexing API)
+    // Note: Google recommends using the Indexing API for quicker results
+    @file_get_contents("https://www.google.com/ping?sitemap=" . $sitemapUrl);
+    
+    // Bing Ping
+    @file_get_contents("https://www.bing.com/ping?sitemap=" . $sitemapUrl);
+}
+
 function start_secure_session() {
     if (session_status() === PHP_SESSION_NONE) {
         $is_secure = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') || 

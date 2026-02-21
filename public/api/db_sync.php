@@ -199,6 +199,33 @@ try {
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
             FOREIGN KEY (folder_id) REFERENCES folders(id) ON DELETE SET NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+        'seo_metadata' => "CREATE TABLE IF NOT EXISTS seo_metadata (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            page_id INT NOT NULL UNIQUE,
+            title_tag VARCHAR(255),
+            meta_description TEXT,
+            meta_keywords TEXT,
+            og_image VARCHAR(255),
+            is_indexed TINYINT(1) DEFAULT 1,
+            include_in_sitemap TINYINT(1) DEFAULT 1,
+            canonical_url VARCHAR(255),
+            structured_data JSON,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (page_id) REFERENCES pages(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+        'redirects' => "CREATE TABLE IF NOT EXISTS redirects (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            old_slug VARCHAR(100) NOT NULL,
+            new_slug VARCHAR(100) NOT NULL,
+            redirect_type INT DEFAULT 301,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            INDEX (old_slug)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
     ];
 
@@ -359,6 +386,18 @@ try {
         $slug = $u['username'];
         $pdo->prepare("INSERT IGNORE INTO pages (user_id, slug, display_name) VALUES (?, ?, ?)")
             ->execute([$u['id'], $slug, $u['display_name'] ?? $u['username']]);
+    }
+    echo "<span class='success'>✅ Done</span><br>";
+    
+    // Initial SEO Metadata for existing pages
+    echo "Verifying SEO metadata... ";
+    $pagesWithoutSEO = $pdo->query("SELECT id, slug, display_name, bio FROM pages WHERE id NOT IN (SELECT page_id FROM seo_metadata)")->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($pagesWithoutSEO as $p) {
+        $title = $p['display_name'] ?: $p['slug'];
+        $desc = mb_strimwidth($p['bio'] ?? '', 0, 160, '...');
+        
+        $pdo->prepare("INSERT IGNORE INTO seo_metadata (page_id, title_tag, meta_description, is_indexed, include_in_sitemap) VALUES (?, ?, ?, 1, 1)")
+            ->execute([$p['id'], $title, $desc]);
     }
     echo "<span class='success'>✅ Done</span><br>";
 

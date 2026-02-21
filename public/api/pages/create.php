@@ -37,6 +37,10 @@ if (!empty($data['slug']) && !empty($data['displayName'])) {
         ]);
 
         $page_id = $pdo->lastInsertId();
+
+        // Auto-initialize SEO Metadata
+        $pdo->prepare("INSERT INTO seo_metadata (page_id, title_tag, meta_description, is_indexed, include_in_sitemap) VALUES (?, ?, ?, 1, 1)")
+            ->execute([$page_id, $display_name, 'Check out my Social2Tree page!']);
         
         json_response([
             "message" => "Page created successfully.",

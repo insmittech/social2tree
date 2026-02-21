@@ -15,6 +15,15 @@ interface PublicProfileData {
   role: UserRole;
   isVerified: boolean;
   links: Link[];
+  seo?: {
+    title_tag: string;
+    meta_description: string;
+    meta_keywords: string;
+    og_image: string;
+    is_indexed: boolean;
+    canonical_url: string;
+    structured_data: any;
+  } | null;
 }
 import { Helmet } from 'react-helmet-async';
 import client from '../src/api/client';
@@ -34,6 +43,10 @@ const PublicProfile: React.FC = () => {
     const fetchProfile = async () => {
       try {
         const res = await client.get(`/public/get_profile.php?username=${username}`);
+        if (res.data.redirect) {
+          window.location.replace(res.data.new_path);
+          return;
+        }
         setProfile(res.data);
       } catch (err) {
         console.error("Failed to fetch profile", err);
@@ -134,12 +147,39 @@ const PublicProfile: React.FC = () => {
   return (
     <div className={`min-h-screen flex flex-col items-center ${theme.background} transition-colors duration-500`}>
       <Helmet>
-        <title>{profile.displayName} | Social2Tree</title>
-        <meta name="description" content={profile.bio || `Check out ${profile.displayName}'s links on Social2Tree.`} />
-        <meta property="og:title" content={`${profile.displayName} - Social2Tree`} />
-        <meta property="og:description" content={profile.bio} />
-        <meta property="og:image" content={profile.avatarUrl} />
+        <title>{profile.seo?.title_tag || `${profile.displayName} | Social2Tree`}</title>
+        <meta name="description" content={profile.seo?.meta_description || profile.bio || `Check out ${profile.displayName}'s links on Social2Tree.`} />
+        {profile.seo?.meta_keywords && <meta name="keywords" content={profile.seo.meta_keywords} />}
+        {profile.seo?.is_indexed === false && <meta name="robots" content="noindex, nofollow" />}
+        <link rel="canonical" href={profile.seo?.canonical_url || `https://social2tree.com/${profile.username}`} />
+
+        {/* OG/Social */}
+        <meta property="og:type" content="profile" />
+        <meta property="og:title" content={profile.seo?.title_tag || `${profile.displayName} - Social2Tree`} />
+        <meta property="og:description" content={profile.seo?.meta_description || profile.bio} />
+        <meta property="og:image" content={profile.seo?.og_image || profile.avatarUrl} />
+        <meta property="og:url" content={`https://social2tree.com/${profile.username}`} />
+
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={profile.seo?.title_tag || `${profile.displayName} - Social2Tree`} />
+        <meta name="twitter:description" content={profile.seo?.meta_description || profile.bio} />
+        <meta name="twitter:image" content={profile.seo?.og_image || profile.avatarUrl} />
+
+        {/* JSON-LD Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify(profile.seo?.structured_data || {
+            "@context": "https://schema.org",
+            "@type": "ProfilePage",
+            "mainEntity": {
+              "@type": "Person",
+              "name": profile.displayName,
+              "description": profile.bio,
+              "image": profile.avatarUrl,
+              "url": `https://social2tree.com/${profile.username}`,
+              "sameAs": profile.links.filter(l => l.type === 'social_icon').map(l => l.url)
+            }
+          })}
+        </script>
       </Helmet>
 
       <header className="w-full max-w-[580px] pt-16 pb-8 px-6 flex flex-col items-center">
@@ -150,6 +190,7 @@ const PublicProfile: React.FC = () => {
         <img
           src={profile.avatarUrl}
           alt={profile.displayName}
+          loading="lazy"
           className="w-24 h-24 rounded-full border-4 border-white/30 shadow-xl dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] object-cover mb-4"
         />
         <div className="flex items-center gap-2 mb-2">
@@ -161,14 +202,25 @@ const PublicProfile: React.FC = () => {
 
       <main className="w-full max-w-[580px] px-6 space-y-4 pb-12">
         {profile.links.filter(l => isLinkActive(l) && l.type !== 'social_icon').map(link => (
-          <button
+          <a
             key={link.id}
-            onClick={() => handleLinkClick(link.id, link.url, link.password)}
-            className={`flex items-center justify-between w-full min-h-[56px] px-6 py-4 text-base font-semibold shadow-sm dark:shadow-none transition-all transform hover:scale-[1.02] active:scale-[0.98] ${getButtonStyle(theme.buttonClass, profile.buttonStyle)}`}
+            href={link.password ? "#" : link.url}
+            target={link.password ? undefined : "_blank"}
+            rel={link.password ? undefined : "noopener noreferrer"}
+            onClick={(e) => {
+              if (link.password) {
+                e.preventDefault();
+                handleLinkClick(link.id, link.url, link.password);
+              } else {
+                // Background tracking, link navigation handled by <a>
+                client.post('/analytics/track.php', { link_id: link.id, referrer: document.referrer }).catch(console.error);
+              }
+            }}
+            className={`flex items-center justify-between w-full min-h-[56px] px-6 py-4 text-base font-semibold shadow-sm dark:shadow-none transition-all transform hover:scale-[1.02] active:scale-[0.98] no-underline ${getButtonStyle(theme.buttonClass, profile.buttonStyle)}`}
           >
             <span className="flex-grow text-center">{link.title}</span>
             {link.password && <Lock size={16} className="opacity-60" />}
-          </button>
+          </a>
         ))}
       </main>
 

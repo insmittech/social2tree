@@ -18,7 +18,8 @@ if (!empty($data['id'])) {
         'bio' => 'bio',
         'theme' => 'theme',
         'buttonStyle' => 'button_style',
-        'customDomain' => 'custom_domain'
+        'customDomain' => 'custom_domain',
+        'slug' => 'slug'
     ];
 
     $fields = [];
@@ -47,6 +48,11 @@ if (!empty($data['id'])) {
             $query = "UPDATE pages SET " . implode(", ", $fields) . " WHERE id = ? AND user_id = ?";
             $stmt = $pdo->prepare($query);
             if ($stmt->execute($params)) {
+                // Redirect Manager: If slug changed, log it
+                if (isset($data['slug']) && isset($data['oldSlug']) && $data['slug'] !== $data['oldSlug']) {
+                    $logRedirect = $pdo->prepare("INSERT INTO redirects (user_id, old_slug, new_slug, redirect_type) VALUES (?, ?, ?, 301)");
+                    $logRedirect->execute([$user_id, $data['oldSlug'], $data['slug']]);
+                }
                 json_response(["message" => "Page updated successfully."]);
             } else {
                 json_response(["message" => "Unable to update page."], 500);
