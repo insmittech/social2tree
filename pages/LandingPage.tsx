@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import MobileThemeShowcase from '../components/MobileThemeShowcase';
+import AIAssistantShowcase from '../components/AIAssistantShowcase';
 import { Shield, ChevronRight, Activity, Search, Globe, Lock, Cpu, Database, Eye, Fingerprint, Expand, Layers, BoxSelect, Zap, ShieldCheck, Sparkles, Network, User, ArrowRight } from 'lucide-react';
+import { FaInstagram, FaFacebookF, FaLinkedinIn, FaWhatsapp, FaYoutube, FaTwitter, FaSnapchat, FaXTwitter, FaPinterest, FaDiscord, FaTelegram, FaGithub } from 'react-icons/fa6';
 import client from '../src/api/client';
 
 interface LandingPageProps {
@@ -101,7 +103,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
           </div>
 
           {/* Visualization Area */}
-          <div className="relative h-[600px] w-full hidden lg:flex items-center justify-center">
+          <div className="relative h-[350px] sm:h-[450px] lg:h-[600px] w-full flex items-center justify-center scale-[0.6] sm:scale-75 lg:scale-100 origin-center mt-12 lg:mt-0">
 
             {/* Static Grid Background inside viz */}
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)] opacity-20"></div>
@@ -127,53 +129,113 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
               {/* Data Nodes Container (Rotating Reverse to Radar) */}
               <div className="absolute top-0 left-0 w-full h-full animate-spin-reverse">
 
-                {/* Node 1: Social Media (Ring 2) */}
+                {/* Node 1: Instagram (Ring 2) */}
                 <div className="absolute top-[25%] left-[25%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '0s' }}>
-                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-cyan-200 dark:border-cyan-500/40 group-hover:bg-cyan-50 dark:group-hover:bg-cyan-900/50 group-hover:border-cyan-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(6,182,212,0.2)]">
-                      <Globe size={20} className="text-cyan-500 dark:text-cyan-400" />
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-pink-200 dark:border-pink-500/40 group-hover:bg-pink-50 dark:group-hover:bg-pink-900/50 group-hover:border-pink-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(236,72,153,0.2)]">
+                      <FaInstagram size={24} className="text-pink-500 dark:text-pink-400" />
                     </div>
-                    <span className="text-xs font-medium text-slate-700 dark:text-cyan-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">Social Media</span>
+                    <span className="text-xs font-medium text-slate-700 dark:text-pink-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">Instagram</span>
                   </div>
                 </div>
 
-                {/* Node 2: Dark Web (Ring 3) */}
+                {/* Node 2: Facebook (Ring 3) */}
                 <div className="absolute top-[75%] left-[15%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '1s' }}>
                     <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-blue-200 dark:border-blue-500/40 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/50 group-hover:border-blue-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-                      <Eye size={20} className="text-blue-500 dark:text-blue-400" />
+                      <FaFacebookF size={22} className="text-blue-500 dark:text-blue-400" />
                     </div>
-                    <span className="text-xs font-medium text-slate-700 dark:text-blue-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">Dark Web</span>
+                    <span className="text-xs font-medium text-slate-700 dark:text-blue-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">Facebook</span>
                   </div>
                 </div>
 
-                {/* Node 3: Blockchain (Ring 4) */}
+                {/* Node 3: LinkedIn (Ring 4) */}
                 <div className="absolute top-[10%] left-[60%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '2s' }}>
-                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-teal-200 dark:border-teal-500/40 group-hover:bg-teal-50 dark:group-hover:bg-teal-900/50 group-hover:border-teal-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(20,184,166,0.2)]">
-                      <Database size={20} className="text-teal-500 dark:text-teal-400" />
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-blue-200 dark:border-blue-400/40 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/50 group-hover:border-blue-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                      <FaLinkedinIn size={22} className="text-blue-600 dark:text-blue-400" />
                     </div>
-                    <span className="text-xs font-medium text-slate-700 dark:text-teal-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">Blockchain Data</span>
+                    <span className="text-xs font-medium text-slate-700 dark:text-blue-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">LinkedIn</span>
                   </div>
                 </div>
 
-                {/* Node 4: Telecom (Ring 2) */}
+                {/* Node 4: WhatsApp (Ring 2) */}
                 <div className="absolute top-[80%] left-[80%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '0.5s' }}>
-                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-emerald-200 dark:border-emerald-500/40 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-900/50 group-hover:border-emerald-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-                      <Cpu size={20} className="text-emerald-500 dark:text-emerald-400" />
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-green-200 dark:border-green-500/40 group-hover:bg-green-50 dark:group-hover:bg-green-900/50 group-hover:border-green-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+                      <FaWhatsapp size={24} className="text-green-500 dark:text-green-400" />
                     </div>
-                    <span className="text-xs font-medium text-slate-700 dark:text-emerald-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">Telecom & Devices</span>
+                    <span className="text-xs font-medium text-slate-700 dark:text-green-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">WhatsApp</span>
                   </div>
                 </div>
 
-                {/* Node 5: Identities (Ring 3) */}
+                {/* Node 5: YouTube (Ring 3) */}
                 <div className="absolute top-[40%] left-[85%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '1.5s' }}>
-                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-indigo-200 dark:border-indigo-500/40 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/50 group-hover:border-indigo-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                      <Fingerprint size={20} className="text-indigo-500 dark:text-indigo-400" />
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-red-200 dark:border-red-500/40 group-hover:bg-red-50 dark:group-hover:bg-red-900/50 group-hover:border-red-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+                      <FaYoutube size={24} className="text-red-500 dark:text-red-400" />
                     </div>
-                    <span className="text-xs font-medium text-slate-700 dark:text-indigo-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">Identities</span>
+                    <span className="text-xs font-medium text-slate-700 dark:text-red-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">YouTube</span>
+                  </div>
+                </div>
+
+                {/* Node 6: Snapchat (Ring 4) */}
+                <div className="absolute top-[90%] left-[20%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                  <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '2.5s' }}>
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-yellow-200 dark:border-yellow-500/40 group-hover:bg-yellow-50 dark:group-hover:bg-yellow-900/50 group-hover:border-yellow-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(250,204,21,0.2)]">
+                      <FaSnapchat size={24} className="text-yellow-500 dark:text-yellow-400" />
+                    </div>
+                    <span className="text-xs font-medium text-slate-700 dark:text-yellow-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">Snapchat</span>
+                  </div>
+                </div>
+
+                {/* Node 7: X (Twitter) (Ring 1) */}
+                <div className="absolute top-[35%] left-[65%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                  <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '0.8s' }}>
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-300 dark:border-slate-500/40 group-hover:bg-slate-200 dark:group-hover:bg-slate-800/50 group-hover:border-slate-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(148,163,184,0.2)]">
+                      <FaXTwitter size={22} className="text-slate-900 dark:text-white" />
+                    </div>
+                    <span className="text-xs font-medium text-slate-700 dark:text-slate-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">X (Twitter)</span>
+                  </div>
+                </div>
+
+                {/* Node 8: Pinterest (Ring 3) */}
+                <div className="absolute top-[20%] left-[80%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                  <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '1.2s' }}>
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-red-200 dark:border-red-500/40 group-hover:bg-red-50 dark:group-hover:bg-red-900/50 group-hover:border-red-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+                      <FaPinterest size={22} className="text-red-600 dark:text-red-500" />
+                    </div>
+                    <span className="text-xs font-medium text-slate-700 dark:text-red-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">Pinterest</span>
+                  </div>
+                </div>
+
+                {/* Node 9: Discord (Ring 4) */}
+                <div className="absolute top-[50%] left-[90%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                  <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '2.2s' }}>
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-indigo-200 dark:border-indigo-500/40 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/50 group-hover:border-indigo-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+                      <FaDiscord size={24} className="text-indigo-500 dark:text-indigo-400" />
+                    </div>
+                    <span className="text-xs font-medium text-slate-700 dark:text-indigo-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">Discord</span>
+                  </div>
+                </div>
+
+                {/* Node 10: Telegram (Ring 2) */}
+                <div className="absolute top-[65%] left-[35%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                  <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '0.3s' }}>
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-sky-200 dark:border-sky-500/40 group-hover:bg-sky-50 dark:group-hover:bg-sky-900/50 group-hover:border-sky-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(14,165,233,0.2)]">
+                      <FaTelegram size={24} className="text-sky-500 dark:text-sky-400" />
+                    </div>
+                    <span className="text-xs font-medium text-slate-700 dark:text-sky-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">Telegram</span>
+                  </div>
+                </div>
+
+                {/* Node 11: GitHub (Ring 3) */}
+                <div className="absolute top-[10%] left-[40%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                  <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '1.8s' }}>
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-300 dark:border-slate-500/40 group-hover:bg-slate-200 dark:group-hover:bg-slate-800/50 group-hover:border-slate-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(148,163,184,0.2)]">
+                      <FaGithub size={24} className="text-slate-800 dark:text-white" />
+                    </div>
+                    <span className="text-xs font-medium text-slate-700 dark:text-slate-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">GitHub</span>
                   </div>
                 </div>
 
@@ -183,6 +245,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
           </div>
         </div>
       </section>
+
+      
 
       {/* Feature Section: The Most Accurate and In-Depth Data */}
       <section className="relative py-24 lg:py-32 bg-slate-50 dark:bg-[#0b0f19] overflow-hidden transition-colors duration-300">
@@ -369,6 +433,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
           </div>
         </div>
       </section>
+      {/* AI Assistant Showcase */}
+      {/* <AIAssistantShowcase /> */}
 
       {/* Add padding to the bottom so footer isn't right below hero if we had more sections */}
       <div className="h-32 border-t border-slate-200 dark:border-slate-800/50 bg-slate-50 dark:bg-[#0b0f19] transition-colors duration-300"></div>
