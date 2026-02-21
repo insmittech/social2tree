@@ -25,7 +25,7 @@ const TreeLinks: React.FC<TreeLinksProps> = ({ page, onUpdate, plan }) => {
 
     const isFreePlan = plan === 'free';
     const linkLimit = isFreePlan ? 3 : Infinity;
-    const mainLinks = page.links.filter((l: any) => l.type !== 'social_icon');
+    const mainLinks = (page.links || []).filter((l: any) => l.type !== 'social_icon');
     const hasReachedLimit = mainLinks.length >= linkLimit;
 
     const sensors = useSensors(
@@ -45,7 +45,7 @@ const TreeLinks: React.FC<TreeLinksProps> = ({ page, onUpdate, plan }) => {
             const payload = {
                 title: newTitle,
                 url: newUrl,
-                type: 'social',
+                type: 'link',
                 pageId: page.id,
                 scheduledStart: newScheduledStart || null,
                 scheduledEnd: newScheduledEnd || null,
@@ -53,7 +53,10 @@ const TreeLinks: React.FC<TreeLinksProps> = ({ page, onUpdate, plan }) => {
             };
 
             const res = await client.post('/links/create.php', payload);
-            onUpdate({ links: [...page.links, res.data.link] });
+            const newLink = res?.data?.link;
+            if (newLink) {
+                onUpdate({ links: [...(page.links || []), newLink] });
+            }
 
             setNewTitle('');
             setNewUrl('');
@@ -72,7 +75,7 @@ const TreeLinks: React.FC<TreeLinksProps> = ({ page, onUpdate, plan }) => {
         if (!confirm("Are you sure you want to delete this link?")) return;
         try {
             await client.post('/links/delete.php', { id });
-            onUpdate({ links: page.links.filter((l: any) => l.id !== id) });
+            onUpdate({ links: (page.links || []).filter((l: any) => l.id !== id) });
             showToast('Link deleted', 'info');
         } catch (err) {
             console.error("Failed to delete link", err);
@@ -95,10 +98,11 @@ const TreeLinks: React.FC<TreeLinksProps> = ({ page, onUpdate, plan }) => {
 
     const handleDragEnd = async (event: DragEndEvent) => {
         const { active, over } = event;
+        const links = page.links || [];
         if (over && active.id !== over.id) {
-            const oldIndex = page.links.findIndex((l: any) => l.id === active.id);
-            const newIndex = page.links.findIndex((l: any) => l.id === over.id);
-            const newLinks = arrayMove(page.links, oldIndex, newIndex);
+            const oldIndex = links.findIndex((l: any) => l.id === active.id);
+            const newIndex = links.findIndex((l: any) => l.id === over.id);
+            const newLinks = arrayMove(links, oldIndex, newIndex);
 
             onUpdate({ links: newLinks });
 

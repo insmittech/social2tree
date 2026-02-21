@@ -26,7 +26,7 @@ const TreeEditor: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'links' | 'social' | 'themes' | 'share'>('links');
     const [showMobilePreview, setShowMobilePreview] = useState(false);
 
-    const activePage = profile?.pages?.find(p => p.id === id) || null;
+    const activePage = profile?.pages?.find(p => p.id === id) ?? null;
 
     if (!profile) {
         return (
@@ -53,7 +53,7 @@ const TreeEditor: React.FC = () => {
     ];
 
     const handleProfileUpdate = (updatedPage: any) => {
-        if (!profile) return;
+        if (!profile || !profile.pages) return;
         const newPages = profile.pages.map(p => p.id === id ? { ...p, ...updatedPage } : p);
         updateUser({ pages: newPages });
     };

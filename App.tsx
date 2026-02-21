@@ -60,7 +60,7 @@ const AppRoutes: React.FC = () => {
         {/* Protected Dashboard Routes */}
         <Route
           path="/dashboard"
-          element={isAuthenticated ? <Layout userProfile={user} onLogout={handleLogout}><Dashboard onLogout={handleLogout} /></Layout> : <Navigate to="/login" />}
+          element={isAuthenticated ? <Layout userProfile={user} onLogout={handleLogout}><Dashboard /></Layout> : <Navigate to="/login" />}
         />
         <Route
           path="/dashboard/profile"

@@ -28,7 +28,7 @@ const TreeSocial: React.FC<TreeSocialProps> = ({ page, onUpdate }) => {
     const [selectedPlatform, setSelectedPlatform] = useState('');
     const [socialUrl, setSocialUrl] = useState('');
 
-    const socialIcons = page.links.filter((l: any) => l.type === 'social_icon');
+    const socialIcons = (page.links || []).filter((l: any) => l.type === 'social_icon');
 
     const handleAddSocial = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,7 +43,10 @@ const TreeSocial: React.FC<TreeSocialProps> = ({ page, onUpdate }) => {
                 pageId: page.id
             });
 
-            onUpdate({ links: [...page.links, res.data.link] });
+            const newIcon = res?.data?.link;
+            if (newIcon) {
+                onUpdate({ links: [...(page.links || []), newIcon] });
+            }
             setSelectedPlatform('');
             setSocialUrl('');
             setShowAddForm(false);
@@ -57,7 +60,7 @@ const TreeSocial: React.FC<TreeSocialProps> = ({ page, onUpdate }) => {
     const handleDelete = async (id: string) => {
         try {
             await client.post('/links/delete.php', { id });
-            onUpdate({ links: page.links.filter((l: any) => l.id !== id) });
+            onUpdate({ links: (page.links || []).filter((l: any) => l.id !== id) });
             showToast('Social icon removed', 'info');
         } catch (err) {
             console.error("Failed to delete social icon", err);

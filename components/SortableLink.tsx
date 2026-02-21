@@ -21,10 +21,10 @@ const SortableLink: React.FC<SortableLinkProps> = ({ link, getSocialIcon, handle
         isDragging,
     } = useSortable({ id: link.id });
 
-    const style = {
+    const style: React.CSSProperties = {
         transform: CSS.Transform.toString(transform),
         transition,
-        zIndex: isDragging ? 50 : 'auto',
+        zIndex: isDragging ? 50 : undefined,
         opacity: isDragging ? 0.5 : 1,
     };
 
@@ -61,7 +61,7 @@ const SortableLink: React.FC<SortableLinkProps> = ({ link, getSocialIcon, handle
                         <input
                             type="checkbox"
                             className="sr-only peer"
-                            checked={link.active}
+                            checked={!!link.active}
                             onChange={(e) => handleToggleActive(link.id, e.target.checked)}
                         />
                         <div className="w-10 h-5.5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-emerald-500"></div>

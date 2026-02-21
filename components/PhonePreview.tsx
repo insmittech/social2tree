@@ -32,7 +32,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({ page }) => {
         {/* Content Container */}
         <div className={`w-full h-full overflow-y-auto no-scrollbar ${theme.background} p-6 flex flex-col items-center pt-12`}>
           <img
-            src={page.avatarUrl}
+            src={page.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(page.displayName || 'User')}&background=1e293b&color=fff`}
             alt={page.displayName}
             className="w-20 h-20 rounded-full border-2 border-white/50 mb-3 object-cover shadow-sm"
           />
@@ -40,7 +40,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({ page }) => {
           <p className={`text-xs text-center opacity-80 mb-6 ${theme.textClass}`}>{page.bio}</p>
 
           <div className="w-full space-y-3 mb-6">
-            {page.links.filter(l => l.active && l.type !== 'social_icon').map(link => (
+            {(page.links || []).filter(l => !!l.active && l.type !== 'social_icon').map(link => (
               <a
                 key={link.id}
                 href={link.url}
@@ -54,7 +54,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({ page }) => {
           </div>
 
           <div className="w-full flex flex-wrap justify-center gap-4 mb-8">
-            {page.links.filter(l => l.active && l.type === 'social_icon').map(link => (
+            {(page.links || []).filter(l => !!l.active && l.type === 'social_icon').map(link => (
               <a
                 key={link.id}
                 href={link.url}
