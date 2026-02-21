@@ -4,27 +4,60 @@ json_response();
 include_once __DIR__ . '/../db.php';
 
 /**
- * Resolve geo info from an IP using ip-api.com (free, no key needed).
- * Returns ['country'=>..., 'country_code'=>..., 'city'=>...] or nulls on failure.
+ * Resolve geo info from an IP using ip-api.com.
+ * Handles proxy headers and provides mock data for local IPs.
  */
 function resolve_geo(string $ip): array {
-    // Skip private/local IPs
-    if (in_array($ip, ['127.0.0.1', '::1']) || str_starts_with($ip, '192.168.') || str_starts_with($ip, '10.')) {
-        return ['country' => null, 'country_code' => null, 'city' => null];
+    // Check for proxy/Cloudflare headers
+    if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+        $ip = $_SERVER['HTTP_CF_CONNECTING_IP'];
+    } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ip = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
     }
+
+    // Handle private/local IPs for developer testing
+    $is_local = in_array($ip, ['127.0.0.1', '::1']) || 
+                str_starts_with($ip, '192.168.') || 
+                str_starts_with($ip, '10.') || 
+                str_starts_with($ip, '172.16.');
+
+    if ($is_local) {
+        return [
+            'country'      => 'Local Access',
+            'country_code' => 'LO',
+            'city'         => 'Internals'
+        ];
+    }
+
     try {
-        $ctx = stream_context_create(['http' => ['timeout' => 2]]);
-        $raw = @file_get_contents("http://ip-api.com/json/{$ip}?fields=country,countryCode,city", false, $ctx);
+        $url = "http://ip-api.com/json/{$ip}?fields=country,countryCode,city";
+        
+        if (function_exists('curl_version')) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+            curl_setopt($ch, CURLOPT_USERAGENT, 'Social2Tree/1.0');
+            $raw = curl_exec($ch);
+            curl_close($ch);
+        } else {
+            $ctx = stream_context_create(['http' => ['timeout' => 3]]);
+            $raw = @file_get_contents($url, false, $ctx);
+        }
+
         if ($raw) {
             $geo = json_decode($raw, true);
-            return [
-                'country'      => $geo['country']     ?? null,
-                'country_code' => $geo['countryCode'] ?? null,
-                'city'         => $geo['city']         ?? null,
-            ];
+            if (isset($geo['country'])) {
+                return [
+                    'country'      => $geo['country'],
+                    'country_code' => $geo['countryCode'] ?? 'UN',
+                    'city'         => $geo['city'] ?? 'Unknown'
+                ];
+            }
         }
-    } catch (\Throwable $e) { /* silent fail */ }
-    return ['country' => null, 'country_code' => null, 'city' => null];
+    } catch (\Throwable $e) { /* background task silent */ }
+
+    return ['country' => 'Unknown Origin', 'country_code' => 'UN', 'city' => 'Unknown Sector'];
 }
 
 $data = get_json_input();
@@ -58,8 +91,6 @@ if (isset($data['link_id']) || isset($data['page_id'])) {
             if ($page) {
                 $user_id = $page['user_id'];
                 $final_page_id = $page_id;
-                // Increment profile views
-                $pdo->prepare("UPDATE users SET views = views + 1 WHERE id = ?")->execute([$user_id]);
             }
         }
 

@@ -35,18 +35,9 @@ try {
     $stmt->execute([$page_id]);
     $links = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // 3. Track View
-    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-    $ua = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
-    $visitor_id = hash('sha256', $ip . $ua . date('Y-m-d'));
-    
-    try {
-        $track_sql = "INSERT INTO analytics (user_id, page_id, visitor_id, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)";
-        $track_stmt = $pdo->prepare($track_sql);
-        $track_stmt->execute([$user_id, $page_id, $visitor_id, $ip, $ua]);
-    } catch (PDOException $e) {
-        // Silently fail analytics
-    }
+    // 3. Increment views (Legacy support/Simplified)
+    // Note: robust tracking is now handled by track.php via the frontend
+    $pdo->prepare("UPDATE users SET views = views + 1 WHERE id = ?")->execute([$user_id]);
 
     // 4. Map Data to standard structure
     $profile = [

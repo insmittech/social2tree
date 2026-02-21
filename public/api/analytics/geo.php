@@ -10,7 +10,7 @@ try {
     $country_stmt = $pdo->prepare("
         SELECT country, country_code, COUNT(*) as clicks
         FROM analytics
-        WHERE user_id = ? AND country IS NOT NULL AND country != ''
+        WHERE user_id = ? AND country IS NOT NULL
         GROUP BY country, country_code
         ORDER BY clicks DESC
         LIMIT 15
@@ -22,7 +22,7 @@ try {
     $city_stmt = $pdo->prepare("
         SELECT city, country, country_code, COUNT(*) as clicks
         FROM analytics
-        WHERE user_id = ? AND city IS NOT NULL AND city != ''
+        WHERE user_id = ? AND city IS NOT NULL
         GROUP BY city, country, country_code
         ORDER BY clicks DESC
         LIMIT 10
@@ -30,10 +30,10 @@ try {
     $city_stmt->execute([$user_id]);
     $cities = $city_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Total geo-tracked clicks (for percentage calc on frontend)
+    // Total geo-tracked clicks
     $total_stmt = $pdo->prepare("
         SELECT COUNT(*) as total FROM analytics
-        WHERE user_id = ? AND country IS NOT NULL AND country != ''
+        WHERE user_id = ?
     ");
     $total_stmt->execute([$user_id]);
     $total = (int)($total_stmt->fetchColumn());
