@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { TreePine, ArrowRight, Zap, Palette, BarChart3, QrCode } from 'lucide-react';
+import { Shield, ChevronRight, Activity, Search, Globe, Lock, Cpu, Database, Eye, Fingerprint, Expand, Layers, BoxSelect, Zap, ShieldCheck, Sparkles } from 'lucide-react';
 import client from '../src/api/client';
 
 interface LandingPageProps {
@@ -36,142 +36,290 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
     fetchMenu();
   }, []);
 
+  // Custom Links for the Header as requested
+  const headerLinks = [
+    { label: 'Products', to: '/products' },
+    { label: 'Cases', to: '/cases' },
+    { label: 'Industries', to: '/industries' },
+    { label: 'Resources', to: '/resources' },
+    { label: 'Blog', to: '/blog' },
+    { label: 'About', to: '/about' },
+  ];
+
   return (
-    <div className="min-h-screen bg-slate-50 font-sans tracking-tight">
-      <Navbar
-        isAuthenticated={isAuthenticated}
-        userProfile={userProfile}
-        customLinks={menuLinks.navbar.length > 0 ? menuLinks.navbar : undefined}
-      />
+    <div className="min-h-screen bg-[#0b0f19] text-slate-300 font-sans selection:bg-teal-500/30">
+      
+      {/* Custom Header for OSINT Theme */}
+      <nav className="fixed w-full z-50 top-0 border-b border-teal-900/30 bg-[#0b0f19]/80 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-20 items-center">
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-2 group">
+              <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500/20 to-teal-900/20 border border-teal-500/30 group-hover:border-teal-400 transition-all duration-300">
+                <Shield className="text-teal-400 w-5 h-5 absolute z-10" />
+                <div className="absolute inset-0 bg-teal-500/10 blur-md rounded-xl"></div>
+              </div>
+              <span className="text-xl font-bold tracking-wide text-white">Social<span className="text-teal-400">2Tree</span></span>
+            </Link>
+
+            {/* Navigation */}
+            <div className="hidden md:flex items-center gap-8">
+              {headerLinks.map((link, idx) => (
+                <Link
+                  key={idx}
+                  to={link.to}
+                  className="text-sm font-medium text-slate-300 hover:text-white transition-colors relative group"
+                >
+                  {link.label}
+                  <span className="absolute -bottom-8 left-0 w-full h-0.5 bg-teal-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                </Link>
+              ))}
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-4">
+               <Link to="/login" className="hidden md:block text-sm font-medium text-slate-300 hover:text-white transition-colors">
+                  Log In
+               </Link>
+               <Link 
+                  to="/demo" 
+                  className="relative group overflow-hidden px-6 py-2.5 rounded-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-sm font-semibold tracking-wide hover:shadow-[0_0_20px_rgba(20,184,166,0.4)] transition-all duration-300"
+                >
+                  <span className="relative z-10 flex items-center gap-2">Book a Demo <Activity size={16} /></span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-teal-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+               </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
 
       {/* Hero Section */}
-      <section className="bg-white pt-24 pb-32 px-4 overflow-hidden relative border-b border-slate-100">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
-          <div className="text-center lg:text-left relative z-10">
-            <div className="inline-flex items-center gap-3 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-2xl text-sm font-black uppercase tracking-[0.2em] mb-10 border border-indigo-100 shadow-sm shadow-indigo-100">
-              <Zap size={16} fill="currentColor" /> Premium Identity
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden min-h-screen flex items-center">
+        {/* Background Gradients */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+          <div className="absolute top-[-20%] right-[-10%] w-[80%] h-[80%] rounded-full bg-teal-900/20 blur-[120px]"></div>
+          <div className="absolute bottom-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-cyan-900/10 blur-[100px]"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full grid lg:grid-cols-2 gap-16 items-center">
+          
+          {/* Text Content Area */}
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-500/30 bg-teal-500/10 text-teal-300 text-xs font-semibold tracking-widest uppercase mb-8 backdrop-blur-sm">
+              <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+              Enterprise Intelligence
             </div>
-            <h1 className="text-6xl md:text-9xl font-black text-slate-900 leading-[0.85] tracking-tighter mb-10 italic uppercase">
-              Your World <br />
-              <span className="text-indigo-600">In One Link.</span>
+            
+            <h1 className="text-5xl lg:text-7xl font-bold text-white leading-[1.1] tracking-tight mb-6">
+              Industry-Leading <br />
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-cyan-300">
+                OSINT Solutions
+              </span>
             </h1>
-            <p className="text-xl text-slate-400 max-w-xl mx-auto lg:mx-0 leading-relaxed mb-12 font-bold uppercase tracking-widest">
-              The professional way to connect your audience to all of your content.
+            
+            <p className="text-lg text-slate-400 mb-10 leading-relaxed max-w-xl">
+              Empowering law enforcement and cybersecurity professionals with advanced analytics, extracting actionable intelligence from the deepest layers of the web.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5 mb-12">
-              <div className="relative w-full sm:w-auto rounded-[2rem] overflow-hidden border-4 border-slate-100 bg-white shadow-2xl shadow-slate-200">
-                <span className="absolute left-8 top-1/2 -translate-y-1/2 text-slate-300 font-black text-sm uppercase tracking-widest">s2t.me/</span>
-                <input
-                  type="text"
-                  placeholder="username"
-                  className="w-full sm:w-80 pl-28 pr-8 py-6 bg-transparent outline-none font-black text-lg text-slate-900 uppercase tracking-tighter"
-                />
-              </div>
-              <Link
-                to="/register"
-                className="w-full sm:w-auto bg-indigo-600 text-white px-12 py-6 rounded-[2rem] text-lg font-black uppercase tracking-widest hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-indigo-300 flex items-center justify-center gap-4 group"
+            <div className="flex flex-col sm:flex-row gap-4 mb-14">
+              <Link 
+                to="/demo" 
+                className="px-8 py-4 rounded-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-base font-semibold tracking-wide hover:shadow-[0_0_30px_rgba(20,184,166,0.5)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 group"
               >
-                Join Free <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform" />
+                Book a Demo <ChevronRight className="group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link 
+                to="/cases" 
+                className="px-8 py-4 rounded-full border border-slate-700 bg-slate-800/50 hover:bg-slate-700 hover:text-white text-slate-300 text-base font-semibold transition-all duration-300 flex items-center justify-center backdrop-blur-sm"
+              >
+                Explore Cases
               </Link>
             </div>
 
-            <div className="flex items-center justify-center lg:justify-start gap-8 pt-8 border-t border-slate-50 w-full lg:w-fit">
-              <div className="flex -space-x-4">
-                {[1, 2, 3, 4, 5].map(i => (
-                  <img key={i} src={`https://i.pravatar.cc/150?img=${i + 30}`} className="w-12 h-12 rounded-[1.2rem] border-4 border-white shadow-2xl rotate-3 first:rotate-0" alt="user" />
-                ))}
-              </div>
-              <div className="text-left">
-                <p className="text-2xl font-black text-slate-900 leading-none">5,000,000+</p>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1">Global Creators</p>
+            {/* Trust Badges */}
+            <div className="border-t border-slate-800 pt-8">
+              <p className="text-sm text-slate-500 font-medium mb-4 flex items-center gap-2">
+                <Shield size={16} className="text-teal-500" /> Trusted by global agencies
+              </p>
+              <div className="flex gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+                 {/* Placeholder for real logos */}
+                 <div className="text-xl font-bold tracking-widest uppercase flex items-center gap-1"><Shield size={20}/> Interpol</div>
+                 <div className="text-xl font-bold tracking-widest uppercase flex items-center gap-1"><Activity size={20}/> CyberCom</div>
+                 <div className="text-xl font-bold tracking-widest uppercase flex items-center gap-1"><Lock size={20}/> SecurOps</div>
               </div>
             </div>
           </div>
 
-          <div className="relative lg:block hidden group">
-            <div className="absolute -inset-20 bg-indigo-600/5 rounded-full blur-[120px] group-hover:bg-indigo-600/10 transition-colors duration-1000"></div>
-            <div className="relative bg-slate-950 p-8 rounded-[4.5rem] shadow-[0_60px_120px_-20px_rgba(0,0,0,0.4)] max-w-[360px] mx-auto border-[12px] border-slate-900">
-              <div className="bg-white rounded-[3.5rem] overflow-hidden min-h-[540px] p-10 text-center flex flex-col items-center">
-                <div className="w-28 h-28 rounded-[2.5rem] bg-slate-50 mb-8 p-1.5 border-4 border-slate-50 shadow-inner group-hover:scale-110 transition-transform duration-700">
-                  <img src="https://i.pravatar.cc/400?img=33" className="w-full h-full rounded-[2.2rem] object-cover shadow-2xl" alt="preview" />
-                </div>
-                <div className="mb-10">
-                  <h4 className="font-black text-3xl text-slate-900 tracking-tight italic uppercase">Alex Rivera</h4>
-                  <div className="h-1 w-12 bg-indigo-600 mx-auto mt-4 rounded-full"></div>
-                </div>
-                <div className="w-full space-y-5">
-                  <div className="py-5 bg-slate-50 rounded-[1.5rem] border border-slate-100 text-xs font-black uppercase tracking-[0.2em] text-slate-500 shadow-sm hover:scale-[1.02] transition-transform cursor-pointer">View Portfolio</div>
-                  <div className="py-5 bg-slate-50 rounded-[1.5rem] border border-slate-100 text-xs font-black uppercase tracking-[0.2em] text-slate-500 shadow-sm hover:scale-[1.02] transition-transform cursor-pointer">Latest Art Drop</div>
-                  <div className="py-5 bg-slate-900 rounded-[1.5rem] text-xs font-black uppercase tracking-[0.2em] text-white shadow-2xl hover:bg-indigo-600 transition-colors cursor-pointer">Join Community</div>
-                </div>
+          {/* Visualization Area */}
+          <div className="relative h-[600px] w-full hidden lg:flex items-center justify-center">
+            
+            {/* Static Grid Background inside viz */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)] opacity-20"></div>
+
+            {/* Radar Animation Container */}
+            <div className="relative w-full h-full flex items-center justify-center">
+              
+              {/* Rings */}
+              <div className="radar-ring radar-ring-4"></div>
+              <div className="radar-ring radar-ring-3"></div>
+              <div className="radar-ring radar-ring-2"></div>
+              <div className="radar-ring radar-ring-1"></div>
+
+              {/* Sweeping Radar Line */}
+              <div className="absolute top-1/2 left-1/2 w-[375px] h-[375px] origin-top-left border-l border-teal-500/50 bg-gradient-to-br from-teal-500/10 to-transparent animate-spin-slow rounded-tl-full [mask-image:linear-gradient(to_bottom_right,white,transparent_50%)]"></div>
+
+              {/* Center Node */}
+              <div className="relative z-10 w-24 h-24 rounded-full bg-slate-900 border border-teal-500/50 shadow-[0_0_30px_rgba(20,184,166,0.3)] flex items-center justify-center">
+                <div className="absolute inset-0 rounded-full animate-pulse-ring"></div>
+                <Search size={32} className="text-teal-400" />
               </div>
+
+              {/* Data Nodes Container (Rotating Reverse to Radar) */}
+              <div className="absolute top-0 left-0 w-full h-full animate-spin-reverse">
+                
+                {/* Node 1: Social Media (Ring 2) */}
+                <div className="absolute top-[25%] left-[25%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '0s' }}>
+                      <div className="w-12 h-12 rounded-full bg-[#0b0f19] border border-cyan-500/40 group-hover:bg-cyan-900/50 group-hover:border-cyan-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+                         <Globe size={20} className="text-cyan-400" />
+                      </div>
+                      <span className="text-xs font-medium text-cyan-300/70 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-slate-900 px-2 py-1 rounded">Social Media</span>
+                   </div>
+                </div>
+
+                {/* Node 2: Dark Web (Ring 3) */}
+                <div className="absolute top-[75%] left-[15%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '1s' }}>
+                      <div className="w-12 h-12 rounded-full bg-[#0b0f19] border border-blue-500/40 group-hover:bg-blue-900/50 group-hover:border-blue-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                         <Eye size={20} className="text-blue-400" />
+                      </div>
+                      <span className="text-xs font-medium text-blue-300/70 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-slate-900 px-2 py-1 rounded">Dark Web</span>
+                   </div>
+                </div>
+
+                {/* Node 3: Blockchain (Ring 4) */}
+                <div className="absolute top-[10%] left-[60%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '2s' }}>
+                      <div className="w-12 h-12 rounded-full bg-[#0b0f19] border border-teal-500/40 group-hover:bg-teal-900/50 group-hover:border-teal-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-[0_0_15px_rgba(20,184,166,0.2)]">
+                         <Database size={20} className="text-teal-400" />
+                      </div>
+                      <span className="text-xs font-medium text-teal-300/70 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-slate-900 px-2 py-1 rounded">Blockchain Data</span>
+                   </div>
+                </div>
+
+                {/* Node 4: Telecom (Ring 2) */}
+                <div className="absolute top-[80%] left-[80%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '0.5s' }}>
+                      <div className="w-12 h-12 rounded-full bg-[#0b0f19] border border-emerald-500/40 group-hover:bg-emerald-900/50 group-hover:border-emerald-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                         <Cpu size={20} className="text-emerald-400" />
+                      </div>
+                      <span className="text-xs font-medium text-emerald-300/70 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-slate-900 px-2 py-1 rounded">Telecom & Devices</span>
+                   </div>
+                </div>
+
+                 {/* Node 5: Identities (Ring 3) */}
+                 <div className="absolute top-[40%] left-[85%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '1.5s' }}>
+                      <div className="w-12 h-12 rounded-full bg-[#0b0f19] border border-indigo-500/40 group-hover:bg-indigo-900/50 group-hover:border-indigo-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+                         <Fingerprint size={20} className="text-indigo-400" />
+                      </div>
+                      <span className="text-xs font-medium text-indigo-300/70 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-slate-900 px-2 py-1 rounded">Identities</span>
+                   </div>
+                </div>
+
+              </div>
+
             </div>
           </div>
         </div>
       </section>
 
-      {/* Advanced Features */}
-      <section id="features" className="py-32 bg-white relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 relative z-10">
-          <div className="text-left mb-24">
-            <p className="text-indigo-600 font-black uppercase tracking-[0.4em] text-xs mb-4">Core Ecosystem</p>
-            <h2 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tighter uppercase italic">Designed for Impact.</h2>
+      {/* Feature Section: The Most Accurate and In-Depth Data */}
+      <section className="relative py-24 lg:py-32 bg-[#0b0f19] overflow-hidden">
+        {/* Subtle Background Glows */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-teal-900/50 to-transparent"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(20,184,166,0.03),transparent_70%)] pointer-events-none"></div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          {/* Section Header */}
+          <div className="text-center max-w-3xl mx-auto mb-20">
+            <h2 className="text-4xl lg:text-5xl font-bold tracking-tight text-white mb-6">
+              The Most Accurate and <br className="hidden sm:block"/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-cyan-300">
+                 In-Depth Data
+              </span>
+            </h2>
+            <p className="text-lg text-slate-400 leading-relaxed">
+              Unrivaled access to open-source intelligence. We aggregate, structure, and analyze fragmented endpoints into actionable clarity.
+            </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-12">
+
+          {/* 6-Card Grid Layout */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                icon: <Palette size={40} strokeWidth={2.5} />,
-                title: "Premium Themes",
-                desc: "Every pixel is crafted for luxury. Responsive, fast, and infinitely customizable."
+                icon: <Expand size={28} className="text-teal-400" />,
+                title: "Wide Coverage",
+                desc: "Monitor thousands of sources across the surface, deep, and dark web. Leave no digital footprint undiscovered."
               },
               {
-                icon: <BarChart3 size={40} strokeWidth={2.5} />,
-                title: "Live Insights",
-                desc: "Real-time data visualization. Understand your audience at a molecular level."
+                icon: <Layers size={28} className="text-cyan-400" />,
+                title: "All-in-One Extraction",
+                desc: "Consolidate your investigations. Extract emails, phone numbers, crypto wallets, and social profiles through a single pane of glass."
               },
               {
-                icon: <QrCode size={40} strokeWidth={2.5} />,
-                title: "Dynamic QR",
-                desc: "Bridge physical and digital with high-resolution, trackable QR codes for your brand."
+                icon: <BoxSelect size={28} className="text-emerald-400" />,
+                title: "Maximum Structure",
+                desc: "Unstructured noise transformed into clean, visual graphs and standardized schemas, ready for immediate analysis."
+              },
+              {
+                icon: <Zap size={28} className="text-amber-400" />,
+                title: "Real-Time Data",
+                desc: "Intelligence isn't static. Receive live updates, alerts, and continuous monitoring of target entities with zero latency."
+              },
+              {
+                icon: <ShieldCheck size={28} className="text-blue-400" />,
+                title: "Anonymity Assurance",
+                desc: "Conduct complex, deep investigations behind enterprise-grade proxies and secure infrastructure. Total operational security."
+              },
+              {
+                icon: <Sparkles size={28} className="text-indigo-400" />,
+                title: "AI-Powered Insights",
+                desc: "Leverage advanced machine learning to detect patterns, translate languages, and flag hidden connections automatically."
               }
-            ].map((f, i) => (
-              <div key={i} className="group p-12 rounded-[3.5rem] border-4 border-slate-50 hover:border-indigo-600/10 hover:bg-slate-50/50 transition-all duration-700 hover:shadow-[0_40px_80px_-20px_rgba(79,70,229,0.15)]">
-                <div className="w-20 h-20 bg-slate-900 text-white rounded-[1.8rem] flex items-center justify-center mb-10 group-hover:bg-indigo-600 group-hover:rotate-[10deg] transition-all duration-500 shadow-2xl shadow-indigo-100">
-                  {f.icon}
+            ].map((feature, idx) => (
+              <div 
+                key={idx} 
+                className="group relative p-8 rounded-3xl bg-slate-900/50 backdrop-blur-md border border-teal-500/10 hover:border-teal-400/40 hover:-translate-y-2 transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(20,184,166,0.15)] flex flex-col items-start text-left overflow-hidden"
+              >
+                {/* Inner Glow Hover Effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-teal-500/0 to-cyan-500/0 opacity-0 group-hover:opacity-10 group-hover:from-teal-500/20 group-hover:to-cyan-500/10 transition-all duration-500 z-0 pointer-events-none"></div>
+                
+                {/* Icon Container */}
+                <div className="relative z-10 w-16 h-16 rounded-2xl bg-[#0b0f19] border border-teal-500/20 flex items-center justify-center mb-6 shadow-inner group-hover:shadow-[0_0_15px_rgba(20,184,166,0.3)] transition-shadow duration-500">
+                  {feature.icon}
                 </div>
-                <h3 className="text-2xl font-black text-slate-900 mb-6 tracking-tight uppercase italic">{f.title}</h3>
-                <p className="text-slate-500 font-bold text-sm leading-relaxed uppercase tracking-wider">{f.desc}</p>
+                
+                {/* Content */}
+                <h3 className="relative z-10 text-xl font-bold text-slate-100 uppercase tracking-wide mb-4 group-hover:text-white transition-colors">
+                  {feature.title}
+                </h3>
+                <p className="relative z-10 text-slate-400 leading-relaxed text-sm">
+                  {feature.desc}
+                </p>
               </div>
             ))}
           </div>
+
         </div>
       </section>
 
-      {/* Extreme CTA Section */}
-      <section className="py-32 px-4 bg-white">
-        <div className="max-w-6xl mx-auto bg-slate-950 rounded-[4rem] p-16 md:p-32 text-center text-white relative overflow-hidden group">
-          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(79,70,229,0.2),transparent)]"></div>
-          <div className="relative z-10">
-            <h2 className="text-5xl md:text-9xl font-black mb-12 tracking-tighter uppercase italic leading-[0.8] transition-transform duration-1000 group-hover:scale-[1.02]">
-              Start Your <br />
-              <span className="text-indigo-500">Legacy.</span>
-            </h2>
-            <p className="text-xl text-slate-400 mb-16 max-w-xl mx-auto font-bold uppercase tracking-[0.2em] leading-relaxed">Join the elite creators scaling their reach with Social2Tree Hub.</p>
-            <Link
-              to="/register"
-              className="inline-flex items-center gap-4 bg-white text-slate-950 px-16 py-7 rounded-full text-2xl font-black uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all shadow-2xl hover:px-20 active:scale-95"
-            >
-              Get Started <ArrowRight size={32} strokeWidth={3} />
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Add padding to the bottom so footer isn't right below hero if we had more sections */}
+      <div className="h-32 border-t border-slate-800/50 bg-[#0b0f19]"></div>
 
-      <Footer
-        exploreLinks={menuLinks.footer_explore.length > 0 ? menuLinks.footer_explore : undefined}
-        legalLinks={menuLinks.footer_legal.length > 0 ? menuLinks.footer_legal : undefined}
-      />
+      {/* Render the new Dark OSINT Footer */}
+      <Footer />
     </div>
   );
 };
