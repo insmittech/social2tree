@@ -400,12 +400,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                                             {!isCollapsed && <span className="flex-1 text-left">Admin Panel</span>}
                                         </button>
                                     )}
-                                    {!isCollapsed && (
-                                        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all">
-                                            <HelpCircle size={18} />
-                                            <span>Support</span>
-                                        </button>
-                                    )}
                                 </div>
                             )}
                         </>

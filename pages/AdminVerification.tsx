@@ -11,7 +11,7 @@ const AdminVerification: React.FC = () => {
 
     // Modal state
     const [selectedRequest, setSelectedRequest] = useState<VerificationRequest | null>(null);
-    const [actionType, setActionType] = useState<'approve' | 'reject' | 'info' | null>(null);
+    const [actionType, setActionType] = useState<'approve' | 'reject' | 'details' | null>(null);
     const [reason, setReason] = useState('');
     const [processing, setProcessing] = useState(false);
 
@@ -39,7 +39,6 @@ const AdminVerification: React.FC = () => {
 
         if (actionType === 'approve') targetStatus = 'approved';
         if (actionType === 'reject') targetStatus = 'rejected';
-        if (actionType === 'info') targetStatus = 'more_info';
 
         try {
             await axios.post('/api/admin/verification/update.php', {
@@ -75,8 +74,6 @@ const AdminVerification: React.FC = () => {
                 return <span className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-1.5 w-fit"><CheckCircle2 size={12} /> Approved</span>;
             case 'rejected':
                 return <span className="px-3 py-1 bg-rose-50 text-rose-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-rose-100 flex items-center gap-1.5 w-fit"><XCircle size={12} /> Rejected</span>;
-            case 'more_info':
-                return <span className="px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-amber-100 flex items-center gap-1.5 w-fit"><Info size={12} /> Info Req.</span>;
             default:
                 return <span className="px-3 py-1 bg-slate-100 text-slate-500 dark:text-slate-400 rounded-full text-[10px] font-black uppercase tracking-widest border border-slate-200 dark:border-slate-700/50 flex items-center gap-1.5 w-fit"><Clock size={12} /> Pending</span>;
         }
@@ -102,13 +99,13 @@ const AdminVerification: React.FC = () => {
                     />
                 </div>
                 <div className="flex gap-2">
-                    {['', 'pending', 'approved', 'rejected', 'more_info'].map((s) => (
+                    {['', 'pending', 'approved', 'rejected'].map((s) => (
                         <button
                             key={s}
                             onClick={() => setStatusFilter(s)}
                             className={`px-6 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all shadow-xl dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] ${statusFilter === s
-                                    ? 'bg-indigo-600 text-white shadow-indigo-100'
-                                    : 'bg-white dark:bg-slate-900/40 text-slate-400 dark:text-slate-500 shadow-slate-100 hover:bg-slate-50'
+                                ? 'bg-indigo-600 text-white shadow-indigo-100'
+                                : 'bg-white dark:bg-slate-900/40 text-slate-400 dark:text-slate-500 shadow-slate-100 hover:bg-slate-50'
                                 }`}
                         >
                             {s || 'All'}
@@ -161,7 +158,7 @@ const AdminVerification: React.FC = () => {
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="flex justify-end gap-2">
-                                                {req.status === 'pending' || req.status === 'more_info' ? (
+                                                {req.status === 'pending' ? (
                                                     <>
                                                         <button
                                                             onClick={() => { setSelectedRequest(req); setActionType('approve'); }}
@@ -177,17 +174,10 @@ const AdminVerification: React.FC = () => {
                                                         >
                                                             <XCircle size={18} />
                                                         </button>
-                                                        <button
-                                                            onClick={() => { setSelectedRequest(req); setActionType('info'); }}
-                                                            className="p-2.5 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-100 transition-colors"
-                                                            title="Request More Info"
-                                                        >
-                                                            <MessageSquare size={18} />
-                                                        </button>
                                                     </>
                                                 ) : (
                                                     <button
-                                                        onClick={() => { setSelectedRequest(req); setActionType('info'); }}
+                                                        onClick={() => { setSelectedRequest(req); setActionType('details'); }}
                                                         className="p-2.5 bg-slate-100 text-slate-400 dark:text-slate-500 rounded-xl hover:bg-slate-200 transition-colors text-[10px] font-black uppercase tracking-widest px-4"
                                                     >
                                                         Details
@@ -211,7 +201,7 @@ const AdminVerification: React.FC = () => {
                             <div className="flex justify-between items-start mb-6">
                                 <div>
                                     <h3 className="text-2xl font-black uppercase tracking-tighter text-slate-900 dark:text-white mb-1">
-                                        {actionType === 'approve' ? 'Approve Verification' : actionType === 'reject' ? 'Reject Request' : 'Request More Info'}
+                                        {actionType === 'approve' ? 'Approve Verification' : actionType === 'reject' ? 'Reject Request' : 'Request Details'}
                                     </h3>
                                     <p className="text-slate-400 dark:text-slate-500 text-[10px] font-black uppercase tracking-widest">User: {selectedRequest.username}</p>
                                 </div>
@@ -225,13 +215,13 @@ const AdminVerification: React.FC = () => {
                                 <p className="text-slate-600 dark:text-slate-300 text-sm font-medium">{selectedRequest.details}</p>
                             </div>
 
-                            {(actionType === 'reject' || actionType === 'info') && (
+                            {actionType === 'reject' && (
                                 <div className="mb-6 space-y-2">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 ml-1">Reason / Feedback (Sent to user)</label>
                                     <textarea
                                         value={reason}
                                         onChange={(e) => setReason(e.target.value)}
-                                        placeholder={actionType === 'reject' ? "Explain why the request was rejected..." : "What additional information is needed?"}
+                                        placeholder="Explain why the request was rejected..."
                                         className="w-full h-32 bg-slate-50 dark:bg-[#0b0f19] border-none rounded-2xl p-4 text-sm font-medium focus:ring-2 focus:ring-indigo-600 outline-none resize-none"
                                         required
                                     />
@@ -247,10 +237,10 @@ const AdminVerification: React.FC = () => {
                                 </button>
                                 <button
                                     onClick={handleAction}
-                                    disabled={processing || ((actionType === 'reject' || actionType === 'info') && !reason)}
+                                    disabled={processing || (actionType === 'reject' && !reason)}
                                     className={`flex-1 py-4 text-white font-black uppercase tracking-widest text-xs rounded-2xl transition-all shadow-xl dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] disabled:opacity-50 ${actionType === 'approve' ? 'bg-emerald-600 shadow-emerald-100 hover:bg-emerald-700' :
-                                            actionType === 'reject' ? 'bg-rose-600 shadow-rose-100 hover:bg-rose-700' :
-                                                'bg-indigo-600 shadow-indigo-100 hover:bg-indigo-700'
+                                        actionType === 'reject' ? 'bg-rose-600 shadow-rose-100 hover:bg-rose-700' :
+                                            'bg-indigo-600 shadow-indigo-100 hover:bg-indigo-700'
                                         }`}
                                 >
                                     {processing ? 'Processing...' : actionType === 'approve' ? 'Confirm Approval' : 'Send Update'}

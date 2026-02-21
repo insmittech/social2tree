@@ -63,7 +63,7 @@ export interface VerificationRequest {
   username: string;
   displayName: string;
   email: string;
-  status: 'pending' | 'approved' | 'rejected' | 'more_info';
+  status: 'pending' | 'approved' | 'rejected';
   details: string;
   rejectionReason?: string;
   createdAt: string;

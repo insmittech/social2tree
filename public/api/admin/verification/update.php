@@ -40,7 +40,7 @@ try {
     if ($status === 'approved') {
         $stmt = $pdo->prepare("UPDATE users SET is_verified = 1 WHERE id = ?");
         $stmt->execute([$user_id]);
-    } else if ($status === 'rejected' || $status === 'more_info') {
+    } else if ($status === 'rejected') {
         // If rejected, ensure is_verified is 0 (though it should be already)
         $stmt = $pdo->prepare("UPDATE users SET is_verified = 0 WHERE id = ?");
         $stmt->execute([$user_id]);
