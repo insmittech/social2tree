@@ -28,10 +28,10 @@ function resolve_geo(string $ip): array {
     }
 
     $providers = [
-        "http://ip-api.com/php/{$ip}", // User suggested PHP format
-        "https://demo.ip-api.com/json/{$ip}?fields=66842623", 
+        "https://ipapi.co/{$ip}/json/", // High accuracy city names
+        "http://ip-api.com/php/{$ip}", // Native PHP
+        "https://demo.ip-api.com/json/{$ip}?fields=66842623",
         "http://ipwho.is/{$ip}", 
-        "https://ipapi.co/{$ip}/json/",
         "https://freeipapi.com/api/json/{$ip}"
     ];
 
@@ -74,7 +74,9 @@ function resolve_geo(string $ip): array {
                     return [
                         'country'      => $geo['country'] ?? $geo['country_name'] ?? $geo['countryName'] ?? 'Unknown Origin',
                         'country_code' => $geo['countryCode'] ?? $geo['country_code'] ?? (isset($geo['country']) && strlen($geo['country']) === 2 ? $geo['country'] : 'UN'),
-                        'city'         => $geo['city'] ?? $geo['cityName'] ?? $geo['city_name'] ?? 'Unknown Sector'
+                        'city'         => $geo['city'] ?? $geo['cityName'] ?? $geo['city_name'] ?? 'Unknown Sector',
+                        'isp'          => $geo['isp'] ?? $geo['connection']['isp'] ?? $geo['connection']['org'] ?? 'Unknown Sector',
+                        'org'          => $geo['org'] ?? $geo['connection']['org'] ?? $geo['as'] ?? $geo['org_name'] ?? 'Unknown Sector'
                     ];
                 }
             }
@@ -82,7 +84,13 @@ function resolve_geo(string $ip): array {
     }
 
     // Final Fallback
-    return ['country' => 'Unknown Origin', 'country_code' => 'UN', 'city' => 'Unknown Sector'];
+    return [
+        'country' => 'Unknown Origin', 
+        'country_code' => 'UN', 
+        'city' => 'Unknown Sector',
+        'isp' => 'Unknown Sector',
+        'org' => 'Unknown Sector'
+    ];
 }
 
 $data = get_json_input();
@@ -128,11 +136,11 @@ if (isset($data['link_id']) || isset($data['page_id'])) {
 
             // Store analytics row
             $track_sql = "INSERT INTO analytics
-                          (user_id, page_id, link_id, visitor_id, ip_address, user_agent, country, country_code, city)
-                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                          (user_id, page_id, link_id, visitor_id, ip_address, user_agent, country, country_code, city, isp, org)
+                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $pdo->prepare($track_sql)->execute([
                 $user_id, $final_page_id, $link_id, $visitor_id, $ip, $ua,
-                $geo['country'], $geo['country_code'], $geo['city']
+                $geo['country'], $geo['country_code'], $geo['city'], $geo['isp'], $geo['org']
             ]);
 
             json_response(["message" => "Tracked successfully."]);

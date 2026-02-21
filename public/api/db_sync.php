@@ -174,7 +174,9 @@ try {
         'referrer' => "VARCHAR(255) AFTER user_agent",
         'country' => "VARCHAR(100) AFTER referrer",
         'country_code' => "VARCHAR(10) AFTER country",
-        'city' => "VARCHAR(100) AFTER country_code"
+        'city' => "VARCHAR(100) AFTER country_code",
+        'isp' => "VARCHAR(150) AFTER city",
+        'org' => "VARCHAR(150) AFTER isp"
     ];
 
     foreach ($anColsToAdd as $col => $def) {

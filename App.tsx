@@ -91,6 +91,18 @@ const AppRoutes: React.FC = () => {
           path="/dashboard/analytics"
           element={isAuthenticated ? <Layout userProfile={user} onLogout={handleLogout}><Analytics /></Layout> : <Navigate to="/login" />}
         />
+        <Route
+          path="/dashboard/analytics/traffic"
+          element={isAuthenticated ? <Layout userProfile={user} onLogout={handleLogout}><Analytics /></Layout> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/dashboard/analytics/info"
+          element={isAuthenticated ? <Layout userProfile={user} onLogout={handleLogout}><Analytics /></Layout> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/dashboard/analytics/geo"
+          element={isAuthenticated ? <Layout userProfile={user} onLogout={handleLogout}><Analytics /></Layout> : <Navigate to="/login" />}
+        />
 
         <Route
           path="/dashboard/themes"

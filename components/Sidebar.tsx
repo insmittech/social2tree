@@ -108,7 +108,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
         { to: '/dashboard/profile', icon: <User size={18} />, label: 'Profile' },
         { to: '/dashboard', icon: <LayoutDashboard size={18} />, label: 'Overview' },
         { to: '/dashboard/trees', icon: <Layout size={18} />, label: 'Bio Trees' },
-        { to: '/dashboard/analytics', icon: <BarChart2 size={18} />, label: 'Analytics' },
+        {
+            to: '/dashboard/analytics',
+            icon: <BarChart2 size={18} />,
+            label: 'Analytics',
+            children: [
+                { id: 'an-overview', label: 'Overview', to: '/dashboard/analytics', type: 'internal' },
+                { id: 'an-traffic', label: 'Traffic Hub', to: '/dashboard/analytics/traffic', type: 'internal' },
+                { id: 'an-info', label: 'Device Intelligence', to: '/dashboard/analytics/info', type: 'internal' },
+                { id: 'an-geo', label: 'Geographical Data', to: '/dashboard/analytics/geo', type: 'internal' },
+            ]
+        },
         { to: '/dashboard/plan', icon: <CreditCard size={18} />, label: 'Plan' },
         { to: '/dashboard/saved', icon: <Bookmark size={18} />, label: 'Saved Links' },
         { to: '/dashboard/verification', icon: <ShieldCheck size={18} />, label: 'Verification' },
