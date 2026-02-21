@@ -91,15 +91,15 @@ const Profile: React.FC = () => {
                     <h1 className="text-xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">Account Settings</h1>
                     <p className="text-slate-400 dark:text-slate-500 font-bold text-[11px] sm:text-sm uppercase tracking-wider mt-1">Manage your identity and preferences</p>
                 </div>
-                <div className="bg-indigo-50 border border-indigo-100 px-4 py-2.5 rounded-2xl flex items-center justify-center gap-2 w-full sm:w-auto">
-                    <Zap size={16} className="text-indigo-600" />
-                    <span className="text-xs font-black text-indigo-700 uppercase tracking-widest">{profile?.role === 'admin' ? 'Admin' : 'Pro Plan'}</span>
+                <div className="bg-indigo-50 dark:bg-teal-500/10 border border-indigo-100 dark:border-teal-500/20 px-4 py-2.5 rounded-2xl flex items-center justify-center gap-2 w-full sm:w-auto transition-colors">
+                    <Zap size={16} className="text-indigo-600 dark:text-teal-400" />
+                    <span className="text-xs font-black text-indigo-700 dark:text-teal-400 uppercase tracking-widest">{profile?.role === 'admin' ? 'Admin' : 'Pro Plan'}</span>
                 </div>
             </header>
 
             <div className="grid grid-cols-1 gap-6 sm:gap-10">
                 {/* Profile Card */}
-                <div className="bg-white dark:bg-slate-900/40 rounded-[2rem] shadow-sm dark:shadow-none border border-slate-100 dark:border-slate-800/50 overflow-hidden group hover:shadow-md transition-shadow">
+                <div className="bg-white dark:bg-[#0b121e] rounded-[2rem] shadow-sm dark:shadow-none border border-slate-100 dark:border-slate-800/50 overflow-hidden group hover:shadow-md transition-all">
                     <div className="h-24 sm:h-32 bg-gradient-to-r from-indigo-500 to-violet-500" />
                     <div className="px-5 sm:px-8 pb-8 -mt-12 sm:-mt-16">
                         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
@@ -124,13 +124,13 @@ const Profile: React.FC = () => {
                         </div>
 
                         <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-                            <div className="bg-slate-50 dark:bg-[#0b0f19] p-4 rounded-2xl">
+                            <div className="bg-slate-50 dark:bg-[#05080f] p-4 rounded-2xl transition-colors">
                                 <p className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest mb-1">Plan</p>
-                                <p className="text-indigo-600 font-black flex items-center justify-center gap-1">
-                                    <Shield size={14} /> {profile.plan.toUpperCase()}
+                                <p className="text-indigo-600 dark:text-teal-400 font-black flex items-center justify-center gap-1 uppercase">
+                                    <Shield size={14} /> {profile.plan}
                                 </p>
                             </div>
-                            <div className="bg-slate-50 dark:bg-[#0b0f19] p-4 rounded-2xl">
+                            <div className="bg-slate-50 dark:bg-[#05080f] p-4 rounded-2xl transition-colors">
                                 <p className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-widest mb-1">Joined</p>
                                 <p className="text-slate-700 dark:text-slate-200 font-bold flex items-center justify-center gap-1">
                                     <Calendar size={14} /> {new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
@@ -149,7 +149,7 @@ const Profile: React.FC = () => {
                         <p className="text-indigo-100 font-medium text-sm leading-relaxed mb-6">
                             Your global profile settings affect how your identity is displayed to visitors and other users.
                         </p>
-                        <button className="w-full bg-white dark:bg-slate-900/40 text-indigo-600 py-3 rounded-xl font-black text-sm hover:bg-indigo-50 transition-all shadow-lg dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] active:scale-95">
+                        <button className="w-full bg-white dark:bg-slate-900 text-indigo-600 dark:text-teal-400 py-3 rounded-xl font-black text-sm hover:bg-indigo-50 transition-all shadow-lg active:scale-95">
                             View Public Bio Link
                         </button>
                     </div>
@@ -160,12 +160,12 @@ const Profile: React.FC = () => {
                     {/* Basic Information */}
                     <section className="bg-white dark:bg-slate-900/40 rounded-[2.5rem] p-8 sm:p-10 shadow-sm dark:shadow-none border border-slate-100 dark:border-slate-800/50">
                         <div className="flex items-center gap-3 mb-8">
-                            <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center">
+                            <div className="w-10 h-10 bg-indigo-50 dark:bg-slate-800 text-indigo-600 dark:text-teal-400 rounded-xl flex items-center justify-center transition-colors">
                                 <UserCircle size={22} />
                             </div>
                             <div>
-                                <h3 className="text-xl font-black text-slate-900 dark:text-white">Profile Details</h3>
-                                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Update your public identity and bio</p>
+                                <h3 className="text-xl font-black text-slate-900 dark:text-white transition-colors">Profile Details</h3>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium transition-colors">Update your public identity and bio</p>
                             </div>
                         </div>
 
@@ -224,7 +224,7 @@ const Profile: React.FC = () => {
                             <button
                                 type="submit"
                                 disabled={saving}
-                                className="bg-slate-900 text-white px-10 py-4 rounded-2xl font-black text-sm hover:bg-slate-800 transition-all flex items-center justify-center gap-2 shadow-xl dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-slate-200 active:scale-95 disabled:opacity-50"
+                                className="bg-slate-900 dark:bg-teal-500 text-white dark:text-slate-950 px-10 py-4 rounded-2xl font-black text-sm hover:bg-slate-800 dark:hover:bg-teal-400 transition-all flex items-center justify-center gap-2 shadow-xl dark:shadow-teal-500/20 shadow-slate-200 dark:shadow-none active:scale-95 disabled:opacity-50"
                             >
                                 <Save size={18} /> {saving ? 'Saving...' : 'Save Changes'}
                             </button>
@@ -232,14 +232,14 @@ const Profile: React.FC = () => {
                     </section>
 
                     {/* Security Section */}
-                    <section className="bg-white dark:bg-slate-900/40 rounded-[2.5rem] p-8 sm:p-10 shadow-sm dark:shadow-none border border-slate-100 dark:border-slate-800/50">
+                    <section className="bg-white dark:bg-slate-900/40 rounded-[2.5rem] p-8 sm:p-10 shadow-sm dark:shadow-none border border-slate-100 dark:border-slate-800/50 transition-colors">
                         <div className="flex items-center gap-3 mb-8">
-                            <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center">
+                            <div className="w-10 h-10 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center transition-colors">
                                 <Lock size={20} />
                             </div>
                             <div>
-                                <h3 className="text-xl font-black text-slate-900 dark:text-white">Security</h3>
-                                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Keep your account safe and updated</p>
+                                <h3 className="text-xl font-black text-slate-900 dark:text-white transition-colors">Security</h3>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium transition-colors">Keep your account safe and updated</p>
                             </div>
                         </div>
 
@@ -270,7 +270,7 @@ const Profile: React.FC = () => {
                             <button
                                 type="submit"
                                 disabled={saving || !passwordData.newPassword}
-                                className="bg-amber-600 text-white px-10 py-4 rounded-2xl font-black text-sm hover:bg-amber-700 transition-all flex items-center justify-center gap-2 shadow-xl dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-amber-100 active:scale-95 disabled:opacity-50"
+                                className="bg-amber-600 dark:bg-amber-500 text-white dark:text-slate-950 px-10 py-4 rounded-2xl font-black text-sm hover:bg-amber-700 dark:hover:bg-amber-400 transition-all flex items-center justify-center gap-2 shadow-xl dark:shadow-none shadow-amber-100 active:scale-95 disabled:opacity-50"
                             >
                                 <Lock size={18} /> Update Password
                             </button>
@@ -278,13 +278,13 @@ const Profile: React.FC = () => {
                     </section>
 
                     {/* Danger Zone */}
-                    <section className="bg-red-50/30 rounded-[2.5rem] p-8 sm:p-10 border border-red-100">
+                    <section className="bg-red-50/30 dark:bg-red-950/20 rounded-[2.5rem] p-8 sm:p-10 border border-red-100 dark:border-red-900/30 transition-colors">
                         <div className="flex items-center justify-between gap-6">
                             <div>
-                                <h3 className="text-lg font-black text-red-900">Danger Zone</h3>
-                                <p className="text-red-700 text-xs font-medium mt-1">Permanently delete your account and all associated pages.</p>
+                                <h3 className="text-lg font-black text-red-900 dark:text-red-400">Danger Zone</h3>
+                                <p className="text-red-700 dark:text-red-300 text-xs font-medium mt-1">Permanently delete your account and all associated pages.</p>
                             </div>
-                            <button className="whitespace-nowrap bg-red-600 text-white px-6 py-3 rounded-xl font-black text-xs hover:bg-red-700 transition-all shadow-lg dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-red-100 active:scale-95">
+                            <button className="whitespace-nowrap bg-red-600 dark:bg-red-500 text-white dark:text-slate-950 px-6 py-3 rounded-xl font-black text-xs hover:bg-red-700 dark:hover:bg-red-400 transition-all shadow-lg dark:shadow-none shadow-red-100 active:scale-95">
                                 Delete Account
                             </button>
                         </div>

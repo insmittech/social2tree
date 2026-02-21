@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Info, Clock, AlertCircle, CheckCircle2, Send } from 'lucide-react';
+import { ShieldCheck, Info, Clock, AlertCircle, CheckCircle2, RotateCw, ArrowRight, UserCheck } from 'lucide-react';
 import axios from 'axios';
-import { UserProfile } from '../types';
 import { useAuth } from '../src/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-interface RequestVerificationProps {
-}
-
-const RequestVerification: React.FC<RequestVerificationProps> = () => {
+const RequestVerification: React.FC = () => {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [details, setDetails] = useState('');
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState<'none' | 'pending' | 'approved' | 'rejected' | 'more_info'>('none');
@@ -35,13 +33,13 @@ const RequestVerification: React.FC<RequestVerificationProps> = () => {
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = async (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
         setLoading(true);
         setError('');
 
         try {
-            const response = await axios.post('/api/verification/request.php', { details });
+            const response = await axios.post('/api/verification/request.php', { details: details || 'Requesting verification' });
             if (response.status === 201 || response.status === 200) {
                 setStatus('pending');
                 fetchStatus();
@@ -55,149 +53,196 @@ const RequestVerification: React.FC<RequestVerificationProps> = () => {
 
     if (isInitialLoading || !user) {
         return (
-            <div className="min-h-[400px] flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-indigo-600 border-t-transparent"></div>
+            <div className="min-h-[60vh] flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-600 border-t-transparent"></div>
             </div>
         );
     }
 
-    const canApplyInstantly = user.plan === 'pro' || user.plan === 'vip' || user.plan === 'business';
-
-    if (user.isVerified || status === 'approved') {
-        return (
-            <div className="max-w-2xl mx-auto p-8">
-                <div className="bg-white dark:bg-slate-900/40 rounded-[2rem] p-12 text-center shadow-xl dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 dark:border-slate-800/50">
-                    <div className="w-24 h-24 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-8">
-                        <ShieldCheck className="text-indigo-600 w-12 h-12" />
-                    </div>
-                    <h1 className="text-3xl font-black uppercase tracking-tighter mb-4 text-slate-900 dark:text-white">You are Verified!</h1>
-                    <p className="text-slate-500 dark:text-slate-400 font-medium mb-8">Your account has been officially verified. The blue checkmark is now visible on your public bio-link pages.</p>
-                    <div className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-indigo-100">
-                        <CheckCircle2 size={18} /> Verified Account
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    const isPremiumPlan = user.plan === 'pro' || user.plan === 'vip' || user.plan === 'business' || user.plan === 'agency';
 
     return (
-        <div className="max-w-4xl mx-auto p-4 md:p-8">
-            <div className="mb-12">
-                <h1 className="text-4xl font-black uppercase tracking-tighter text-slate-900 dark:text-white italic mb-2">Verification</h1>
-                <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-xs">Request your professional checkmark</p>
+        <div className="max-w-5xl mx-auto px-4 py-12 md:py-16 font-sans selection:bg-indigo-500/30">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-16">
+                <div>
+                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white mb-2 uppercase italic">
+                        Verification
+                    </h1>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 pl-1">
+                        Step-by-step onboarding guide
+                    </p>
+                </div>
+                <div className="flex items-center gap-3 bg-white dark:bg-[#0b121e] px-5 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm transition-colors">
+                    <div className="flex -space-x-2">
+                        {[1, 2, 3].map((i) => (
+                            <div key={i} className="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-800 flex items-center justify-center overflow-hidden transition-colors">
+                                <img src={`https://i.pravatar.cc/100?u=v${i}`} alt="User" className="w-full h-full object-cover" />
+                            </div>
+                        ))}
+                        <div className="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 bg-indigo-600 dark:bg-teal-500 flex items-center justify-center text-[8px] font-black text-white dark:text-slate-950 transition-colors">
+                            +12k
+                        </div>
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 transition-colors">Join 12,000+ verified users</span>
+                </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-                {/* Info Column */}
-                <div className="space-y-6">
-                    <div className="bg-indigo-600 rounded-[2rem] p-8 text-white shadow-2xl dark:shadow-none shadow-indigo-200">
-                        <ShieldCheck className="w-12 h-12 mb-6" />
-                        <h2 className="text-2xl font-black uppercase tracking-tight mb-4 leading-tight">Why get verified?</h2>
-                        <ul className="space-y-4">
-                            {[
-                                "Enhanced trust with your audience",
-                                "Official recognition of your profile",
-                                "Protection against impersonation",
-                                "Premium aesthetic for your bio-link"
-                            ].map((text, i) => (
-                                <li key={i} className="flex items-start gap-3 text-sm font-medium text-indigo-50">
-                                    <div className="mt-1 bg-white dark:bg-slate-900/40/20 p-1 rounded-md"><CheckCircle2 size={14} /></div>
-                                    {text}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+            {/* Status Section */}
+            <div className="mb-16">
+                <div className="bg-white dark:bg-slate-900/40 rounded-[2.5rem] p-10 md:p-12 border border-slate-100 dark:border-slate-800 shadow-xl dark:shadow-none transition-all hover:shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div className="flex items-center gap-8 text-center md:text-left flex-col md:flex-row">
+                        <div className={`w-24 h-24 rounded-full flex items-center justify-center relative transition-colors
+                            ${status === 'pending' ? 'bg-emerald-50 dark:bg-emerald-500/10' :
+                                status === 'none' ? 'bg-indigo-50 dark:bg-teal-500/10' :
+                                    status === 'approved' ? 'bg-indigo-50 dark:bg-teal-500/10' :
+                                        'bg-rose-50 dark:bg-rose-500/10'}`}>
+                            {status === 'pending' && <RotateCw className="text-emerald-500 w-10 h-10 animate-spin-slow" />}
+                            {status === 'none' && <UserCheck className="text-indigo-600 dark:text-teal-400 w-10 h-10" />}
+                            {status === 'approved' && <ShieldCheck className="text-indigo-600 dark:text-teal-400 w-10 h-10" />}
+                            {status === 'rejected' && <AlertCircle className="text-rose-500 w-10 h-10" />}
 
-                    <div className="bg-white dark:bg-slate-900/40 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800/50 shadow-xl dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
-                        <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                            <Info size={16} className="text-indigo-600" /> Plan Benefits
-                        </h3>
-
-                        <div className={`p-6 rounded-2xl border-2 mb-4 transition-all ${canApplyInstantly ? 'border-indigo-600 bg-indigo-50/30' : 'border-slate-100 dark:border-slate-800/50 grayscale opacity-70'}`}>
-                            <div className="flex justify-between items-start mb-2">
-                                <span className="text-xs font-black uppercase tracking-widest text-indigo-600">Pro & VIP Plans</span>
-                                {canApplyInstantly && <span className="bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full font-black uppercase">Active</span>}
-                            </div>
-                            <p className="text-slate-900 dark:text-white font-black text-lg">Instant Verification</p>
-                            <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">Verified checkmark is granted automatically upon upgrade.</p>
+                            <div className="absolute inset-0 border-4 border-dashed border-slate-100 dark:border-slate-800 rounded-full animate-spin-reverse opacity-50" />
                         </div>
-
-                        <div className={`p-6 rounded-2xl border-2 transition-all ${!canApplyInstantly ? 'border-amber-400 bg-amber-50/30' : 'border-slate-100 dark:border-slate-800/50'}`}>
-                            <span className="text-xs font-black uppercase tracking-widest text-amber-600 mb-2 block">Free Plan</span>
-                            <p className="text-slate-900 dark:text-white font-black text-lg">Manual Review</p>
-                            <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">Standard submission required. Review takes 3-5 business days.</p>
+                        <div>
+                            <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-slate-900 dark:text-white mb-2 italic">
+                                {status === 'none' ? 'Start Verification' :
+                                    status === 'pending' ? 'Request Pending' :
+                                        status === 'approved' ? 'You are Verified!' :
+                                            'Needs Attention'}
+                            </h2>
+                            <p className="text-sm font-bold text-slate-500 dark:text-slate-400 max-w-md leading-relaxed">
+                                {status === 'none' ? "You're just a few steps away from getting your official checkmark. Choose your path below." :
+                                    status === 'pending' ? "We've received your request! Our team will review your profile shortly. Keep an eye on your dashboard for the badge." :
+                                        status === 'approved' ? "Your account is officially verified. The checkmark is now visible on your public bio-link pages." :
+                                            `Your request encountered an issue: ${rejectionReason || 'Please review your details and try again.'}`}
+                            </p>
                         </div>
                     </div>
-                </div>
 
-                {/* Submit Column */}
-                <div className="bg-white dark:bg-slate-900/40 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800/50 shadow-xl dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] self-start">
-                    {status === 'pending' ? (
-                        <div className="text-center py-12">
-                            <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <Clock className="text-emerald-600 w-10 h-10" />
-                            </div>
-                            <h3 className="text-xl font-black uppercase tracking-tight text-slate-900 dark:text-white mb-2">Request Pending</h3>
-                            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-8">We've received your request! Our team will review your profile shortly.</p>
-                            <button
-                                onClick={() => setStatus('none')}
-                                className="w-full py-4 bg-slate-100 text-slate-600 dark:text-slate-300 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-slate-200 transition-all"
-                            >
-                                Edit Details
-                            </button>
-                        </div>
+                    {status === 'none' ? (
+                        <button
+                            onClick={() => handleSubmit()}
+                            disabled={loading}
+                            className="px-10 py-5 bg-indigo-600 dark:bg-teal-500 text-white dark:text-slate-950 rounded-3xl font-black uppercase tracking-widest text-[10px] hover:bg-slate-900 dark:hover:bg-teal-400 transition-all shadow-xl shadow-indigo-100 dark:shadow-teal-500/20 flex items-center gap-3 group"
+                        >
+                            {loading ? 'Processing...' : 'Submit Request'}
+                            {!loading && <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />}
+                        </button>
                     ) : (
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            {(status === 'rejected' || status === 'more_info') && rejectionReason && (
-                                <div className={`p-6 rounded-2xl border-2 ${status === 'rejected' ? 'border-rose-100 bg-rose-50/30' : 'border-amber-100 bg-amber-50/30'}`}>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        {status === 'rejected' ? <AlertCircle className="text-rose-600" size={16} /> : <Info className="text-amber-600" size={16} />}
-                                        <span className={`text-[10px] font-black uppercase tracking-widest ${status === 'rejected' ? 'text-rose-600' : 'text-amber-600'}`}>
-                                            Admin Feedback ({status === 'rejected' ? 'Rejected' : 'Action Required'})
-                                        </span>
-                                    </div>
-                                    <p className="text-slate-700 dark:text-slate-200 text-sm font-bold italic">"{rejectionReason}"</p>
-                                </div>
-                            )}
-
-                            <div className="space-y-2">
-                                <label className="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 ml-1">Verification Details</label>
-                                <textarea
-                                    value={details}
-                                    onChange={(e) => setDetails(e.target.value)}
-                                    placeholder="Tell us why you should be verified (e.g., social media handles, website, professional background...)"
-                                    className="w-full h-48 bg-slate-50 dark:bg-[#0b0f19] border-none rounded-2xl p-6 text-sm font-medium focus:ring-2 focus:ring-indigo-600 outline-none resize-none"
-                                    required
-                                />
-                            </div>
-
-                            {error && (
-                                <div className="p-4 bg-rose-50 text-rose-600 rounded-2xl flex items-center gap-3 text-xs font-black uppercase">
-                                    <AlertCircle size={16} /> {error}
-                                </div>
-                            )}
-
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-indigo-100 hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed group"
-                            >
-                                {loading ? (
-                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                ) : (
-                                    <>
-                                        {status === 'none' ? 'Submit Request' : 'Resubmit Request'} <Send size={16} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                                    </>
-                                )}
-                            </button>
-
-                            {!canApplyInstantly && (
-                                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold text-center uppercase tracking-widest bg-slate-50 dark:bg-[#0b0f19] py-3 rounded-xl px-4 border border-slate-100 dark:border-slate-800/50">
-                                    Tip: Pro users get verified <span className="text-indigo-600">Instantly</span> without review.
-                                </p>
-                            )}
-                        </form>
+                        <button
+                            onClick={() => setStatus('none')}
+                            className="px-10 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-3xl font-black uppercase tracking-widest text-[10px] hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
+                        >
+                            Edit Details
+                        </button>
                     )}
+                </div>
+            </div>
+
+            {/* Verification Path Title */}
+            <div className="flex items-center gap-6 mb-12">
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 flex-shrink-0">Your Verification Path</span>
+                <div className="h-px bg-slate-100 dark:bg-slate-800 flex-grow" />
+            </div>
+
+            {/* Why Get Verified Section */}
+            <div className="mb-16">
+                <div className="bg-indigo-600 dark:bg-teal-500 rounded-[3rem] p-12 md:p-16 text-white dark:text-slate-950 relative overflow-hidden shadow-2xl shadow-indigo-200 dark:shadow-teal-500/20 transition-colors">
+                    <div className="relative z-10 flex flex-col md:flex-row items-center gap-16">
+                        <div className="flex-1">
+                            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-10 backdrop-blur-md">
+                                <ShieldCheck size={32} />
+                            </div>
+                            <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter mb-8 max-w-sm leading-[0.9]">
+                                Why get <br />Verified?
+                            </h2>
+                            <p className="text-indigo-100 font-bold max-w-sm leading-relaxed mb-6">
+                                Establish your professional presence and stand out in the community with our official checkmark system.
+                            </p>
+                            <div className="w-1 h-32 bg-white/20 rounded-full md:block hidden" />
+                        </div>
+
+                        <div className="flex-1">
+                            <ul className="space-y-6">
+                                {[
+                                    "Enhanced trust with your audience",
+                                    "Official recognition of your profile",
+                                    "Protection against impersonation",
+                                    "Premium aesthetic for your bio-link"
+                                ].map((text, i) => (
+                                    <li key={i} className="flex items-center gap-4 group">
+                                        <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-400 group-hover:text-white transition-all duration-300">
+                                            <CheckCircle2 size={14} />
+                                        </div>
+                                        <span className="text-sm md:text-base font-black uppercase tracking-tight text-white/90">{text}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+
+                    {/* Background decoration */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+                </div>
+            </div>
+
+            {/* Connector Line */}
+            <div className="flex justify-center mb-16">
+                <div className="w-px h-24 bg-slate-100 dark:bg-slate-800 pl-4 border-l border-slate-100 dark:border-slate-800" />
+            </div>
+
+            {/* Advantages Section */}
+            <div className="bg-white dark:bg-slate-900/40 rounded-[3rem] p-12 md:p-20 border border-slate-100 dark:border-slate-800 shadow-xl dark:shadow-none">
+                <div className="grid lg:grid-cols-2 gap-20 items-center">
+                    <div>
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center">
+                                <CheckCircle2 size={16} fill="currentColor" />
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Step 2</span>
+                        </div>
+                        <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter mb-8 leading-none">
+                            Unlock your <br />Advantages
+                        </h2>
+                        <p className="text-sm font-bold text-slate-500 dark:text-slate-400 leading-relaxed max-w-md">
+                            Compare our verification tiers and choose the path that best fits your needs.
+                        </p>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                        {/* Instant Verification Card */}
+                        <div className="bg-indigo-50/50 dark:bg-teal-500/5 rounded-[2.5rem] p-8 border-2 border-indigo-600/40 dark:border-teal-500/30 relative group hover:border-indigo-600 dark:hover:border-teal-500 transition-all duration-500">
+                            <div className="flex justify-between items-start mb-4">
+                                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-indigo-600 dark:text-teal-400 transition-colors">Pro & VIP Plans</span>
+                                <span className="bg-indigo-600 dark:bg-teal-500 text-white dark:text-slate-950 text-[8px] px-3 py-1 rounded-full font-black uppercase tracking-widest animate-pulse transition-colors">Fastest</span>
+                            </div>
+                            <h3 className="text-xl font-black uppercase tracking-tight text-slate-900 dark:text-white mb-3 transition-colors">Instant Verification</h3>
+                            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 leading-relaxed mb-10 transition-colors">
+                                Verified checkmark is granted automatically upon subscription upgrade.
+                            </p>
+                            <button
+                                onClick={() => navigate('/dashboard/plan')}
+                                className="text-indigo-600 dark:text-teal-400 font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:gap-4 transition-all"
+                            >
+                                Upgrade Now <ArrowRight size={14} />
+                            </button>
+                        </div>
+
+                        {/* Manual Review Card */}
+                        <div className="bg-slate-50 dark:bg-slate-950/20 rounded-[2.5rem] p-8 border-2 border-transparent hover:border-slate-200 dark:hover:border-slate-800 transition-all duration-500">
+                            <div className="flex justify-between items-start mb-4">
+                                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400">Free Plan</span>
+                            </div>
+                            <h3 className="text-xl font-black uppercase tracking-tight text-slate-900 dark:text-white mb-3">Manual Review</h3>
+                            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 leading-relaxed mb-10">
+                                Standard submission required. Review typically takes 3-5 business days.
+                            </p>
+                            <span className="text-slate-400 font-black text-[10px] uppercase tracking-widest">
+                                {isPremiumPlan ? 'Alternative Path' : 'Currently Active'}
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

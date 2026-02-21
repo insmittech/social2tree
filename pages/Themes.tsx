@@ -90,8 +90,16 @@ const Themes: React.FC = () => {
             </div>
           </header>
 
-          <section className="bg-white dark:bg-slate-900/40 p-6 sm:p-8 rounded-2xl shadow-sm dark:shadow-none border border-slate-200 dark:border-slate-700/50">
-            <h2 className="text-lg font-bold mb-6">Visual Themes</h2>
+          <section className="bg-white dark:bg-[#0b121e] p-6 sm:p-8 rounded-2xl shadow-sm dark:shadow-none border border-slate-200 dark:border-slate-800/50 transition-colors">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 bg-indigo-50 dark:bg-slate-800 text-indigo-600 dark:text-teal-400 rounded-xl flex items-center justify-center transition-colors">
+                <Palette size={22} />
+              </div>
+              <div>
+                <h2 className="text-xl font-black text-slate-900 dark:text-white transition-colors">Visual Themes</h2>
+                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium transition-colors">Choose a pre-designed aesthetic for your bio page</p>
+              </div>
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {Object.values(THEMES).map((theme) => (
                 <button

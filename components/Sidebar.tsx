@@ -206,7 +206,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                         onMouseLeave={handleMouseLeave}
                         className={({ isActive }) => `
                             flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all
-                            ${isActive ? 'bg-slate-50 text-indigo-600 shadow-sm border border-slate-100' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}
+                            ${isActive ? 'bg-slate-50 dark:bg-slate-800 text-indigo-600 dark:text-teal-400 shadow-sm border border-slate-100 dark:border-slate-700' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50'}
                             ${isCollapsed ? 'justify-center' : ''}
                         `}
                     >
@@ -241,7 +241,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
         <aside
             className={`hidden lg:flex flex-col border-r sticky top-0 h-screen transition-all duration-300 ease-in-out relative
                 ${isCollapsed ? 'w-20' : 'w-72'}
-                ${isAdmin ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-100 text-slate-900 shadow-xl shadow-slate-200/50'}
+                ${isAdmin ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white dark:bg-[#0b0f19] border-slate-100 dark:border-slate-800/50 text-slate-900 dark:text-white shadow-xl dark:shadow-none shadow-slate-200/50'}
             `}
         >
             {/* Collapse Toggle */}
@@ -268,8 +268,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                     <div className={`relative flex items-center ${isCollapsed ? 'justify-center' : ''}`}>
                         <div className={`flex items-center rounded-2xl transition-all duration-300
                             ${isCollapsed
-                                ? 'w-10 h-10 justify-center bg-slate-50'
-                                : `w-full px-4 py-3 border ${q ? 'border-indigo-300 bg-indigo-50' : 'border-slate-100 bg-slate-50'}`
+                                ? 'w-10 h-10 justify-center bg-slate-50 dark:bg-slate-800'
+                                : `w-full px-4 py-3 border ${q ? 'border-indigo-300 dark:border-teal-500/50 bg-indigo-50 dark:bg-teal-500/10' : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-[#0b121e]'}`
                             }`}
                         >
                             <Search size={16} className={`flex-shrink-0 ${q ? 'text-indigo-500' : 'text-slate-400'}`} />
@@ -429,9 +429,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                 )}
 
                 {/* Footer */}
-                <div className="p-4 mt-auto border-t border-slate-100">
+                <div className="p-4 mt-auto border-t border-slate-100 dark:border-slate-800">
                     <div className={`rounded-3xl border transition-all duration-300
-                        ${isAdmin ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'}
+                        ${isAdmin ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700'}
                         ${isCollapsed ? 'p-2 flex flex-col items-center gap-2' : 'p-4'}`}
                     >
                         <div className={`flex items-center gap-3 ${isCollapsed ? 'flex-col' : 'mb-4'}`}>

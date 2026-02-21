@@ -90,11 +90,11 @@ const BioTrees: React.FC = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 w-full pb-32 sm:pb-12">
                 <header className="mb-8 sm:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="text-center md:text-left">
-                        <div className="inline-flex items-center px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-black uppercase tracking-widest mb-4">
+                        <div className="inline-flex items-center px-3 py-1 bg-indigo-50 dark:bg-teal-500/10 text-indigo-600 dark:text-teal-400 rounded-full text-xs font-black uppercase tracking-widest mb-4 border border-indigo-100 dark:border-teal-500/20">
                             My Trees
                         </div>
-                        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">Eco-system Overview</h1>
-                        <p className="text-slate-500 dark:text-slate-400 text-[11px] sm:text-sm font-bold uppercase tracking-wider mt-1">Manage and scale your digital identities.</p>
+                        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-tight transition-colors">Eco-system Overview</h1>
+                        <p className="text-slate-500 dark:text-slate-400 text-[11px] sm:text-sm font-bold uppercase tracking-wider mt-1 transition-colors">Manage and scale your digital identities.</p>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                         <button
@@ -106,9 +106,9 @@ const BioTrees: React.FC = () => {
                     </div>
                 </header>
 
-                <div className="bg-white dark:bg-slate-900/40 rounded-[2rem] border border-slate-100 dark:border-slate-800/50 shadow-sm dark:shadow-none overflow-hidden">
+                <div className="bg-white dark:bg-[#0b121e] rounded-[2rem] border border-slate-100 dark:border-slate-800/50 shadow-sm dark:shadow-none overflow-hidden transition-colors">
                     {/* Search & Filters */}
-                    <div className="p-4 sm:p-6 border-b border-slate-50 dark:border-slate-800/50">
+                    <div className="p-4 sm:p-6 border-b border-slate-50 dark:border-slate-800/30">
                         <div className="flex flex-col lg:flex-row gap-4">
                             <div className="flex-1 relative group">
                                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 transition-colors" size={18} />
@@ -121,9 +121,9 @@ const BioTrees: React.FC = () => {
                                 />
                             </div>
                             <div className="flex gap-2">
-                                <div className="flex bg-slate-100 p-1 rounded-[1.25rem]">
-                                    <button className="p-2.5 rounded-xl text-slate-400 dark:text-slate-500 hover:text-slate-600 transition-colors"><LayoutGrid size={18} /></button>
-                                    <button className="p-2.5 rounded-xl bg-white dark:bg-slate-900/40 shadow-sm dark:shadow-none text-indigo-600"><List size={18} /></button>
+                                <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-[1.25rem] transition-colors">
+                                    <button className="p-2.5 rounded-xl text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"><LayoutGrid size={18} /></button>
+                                    <button className="p-2.5 rounded-xl bg-white dark:bg-slate-900/40 shadow-sm dark:shadow-none text-indigo-600 dark:text-teal-400 transition-colors"><List size={18} /></button>
                                 </div>
                                 <button className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3 border border-slate-200 dark:border-slate-700/50 rounded-[1.25rem] text-slate-600 dark:text-slate-300 font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all">
                                     <Filter size={18} /> Filters
@@ -192,7 +192,7 @@ const BioTrees: React.FC = () => {
                                                 </button>
                                                 <button
                                                     onClick={() => handleEditTree(page.id)}
-                                                    className="bg-indigo-50 text-indigo-600 px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-indigo-600 hover:text-white transition-all border border-indigo-100/50"
+                                                    className="bg-indigo-50 dark:bg-teal-500/10 text-indigo-600 dark:text-teal-400 px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-indigo-600 dark:hover:bg-teal-500 hover:text-white dark:hover:text-slate-950 transition-all border border-indigo-100/50 dark:border-teal-500/20"
                                                 >
                                                     Edit <Zap size={14} fill="currentColor" />
                                                 </button>
@@ -221,19 +221,19 @@ const BioTrees: React.FC = () => {
             </div>
 
             {showCreate && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-                    <div className="bg-white dark:bg-slate-900/40 rounded-[2.5rem] shadow-2xl dark:shadow-none w-full max-w-md p-8 relative animate-in fade-in zoom-in duration-300">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-[#05080f]/80 backdrop-blur-sm transition-colors">
+                    <div className="bg-white dark:bg-[#0b121e] rounded-[2.5rem] shadow-2xl dark:shadow-none w-full max-w-md p-8 relative animate-in fade-in zoom-in duration-300 border dark:border-slate-800">
                         <button onClick={closeModal}
-                            className="absolute top-6 right-6 p-2 text-slate-400 dark:text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all">
+                            className="absolute top-6 right-6 p-2 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all">
                             <X size={20} />
                         </button>
                         <div className="flex items-center gap-4 mb-8">
-                            <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-indigo-200">
+                            <div className="w-12 h-12 bg-indigo-600 dark:bg-teal-500 rounded-2xl flex items-center justify-center text-white dark:text-slate-950 shadow-lg dark:shadow-teal-500/20 shadow-indigo-200">
                                 <Plus size={24} />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-black text-slate-900 dark:text-white leading-tight">Create New Tree</h2>
-                                <p className="text-[11px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-0.5">Start your digital identity</p>
+                                <h2 className="text-2xl font-black text-slate-900 dark:text-white leading-tight transition-colors">Create New Tree</h2>
+                                <p className="text-[11px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-0.5 transition-colors">Start your digital identity</p>
                             </div>
                         </div>
 
@@ -246,14 +246,14 @@ const BioTrees: React.FC = () => {
                                     onKeyDown={e => e.key === 'Enter' && handleCreate()}
                                     placeholder="e.g. My Portfolio"
                                     autoFocus
-                                    className="w-full px-5 py-3.5 rounded-2xl border-2 border-slate-50 dark:border-slate-800/50 bg-slate-50 dark:bg-[#0b0f19] text-slate-900 dark:text-white font-bold text-sm focus:border-indigo-400 focus:bg-white outline-none transition-all"
+                                    className="w-full px-5 py-3.5 rounded-2xl border-2 border-slate-50 dark:border-slate-800 bg-slate-50 dark:bg-[#0b0f19] text-slate-900 dark:text-white font-bold text-sm focus:border-indigo-400 dark:focus:border-teal-500 focus:bg-white dark:focus:bg-slate-900/50 outline-none transition-all"
                                 />
                             </label>
 
                             <label className="block">
                                 <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-2 px-1">Custom Link</span>
-                                <div className="flex items-center border-2 border-slate-50 dark:border-slate-800/50 bg-slate-50 dark:bg-[#0b0f19] rounded-2xl overflow-hidden focus-within:border-indigo-400 focus-within:bg-white transition-all">
-                                    <span className="px-4 py-3.5 text-xs font-black text-slate-400 dark:text-slate-500 bg-slate-100/50 select-none border-r border-slate-100 dark:border-slate-800/50 whitespace-nowrap">s2t.me/</span>
+                                <div className="flex items-center border-2 border-slate-50 dark:border-slate-800 bg-slate-50 dark:bg-[#0b0f19] rounded-2xl overflow-hidden focus-within:border-indigo-400 dark:focus-within:border-teal-500 focus-within:bg-white dark:focus-within:bg-slate-900/50 transition-all">
+                                    <span className="px-4 py-3.5 text-xs font-black text-slate-400 dark:text-slate-500 bg-slate-100/50 dark:bg-slate-800/50 select-none border-r border-slate-100 dark:border-slate-800 whitespace-nowrap">s2t.me/</span>
                                     <input
                                         value={createSlug}
                                         onChange={e => setCreateSlug(slugify(e.target.value))}
@@ -265,7 +265,7 @@ const BioTrees: React.FC = () => {
                             </label>
 
                             {createError && (
-                                <div className="bg-rose-50 border border-rose-100 rounded-2xl px-5 py-4 text-xs font-bold text-rose-600 flex items-center gap-3">
+                                <div className="bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-900/20 rounded-2xl px-5 py-4 text-xs font-bold text-rose-600 dark:text-rose-400 flex items-center gap-3">
                                     <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
                                     {createError}
                                 </div>
@@ -274,7 +274,7 @@ const BioTrees: React.FC = () => {
                             <button
                                 onClick={handleCreate}
                                 disabled={creating || !createName.trim() || !createSlug.trim()}
-                                className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black py-4 rounded-2xl transition-all flex items-center justify-center gap-3 shadow-xl dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-indigo-100 mt-4 active:scale-[0.98]"
+                                className="w-full bg-indigo-600 dark:bg-teal-500 hover:bg-indigo-700 dark:hover:bg-teal-400 disabled:opacity-50 disabled:cursor-not-allowed text-white dark:text-slate-950 font-black py-4 rounded-2xl transition-all flex items-center justify-center gap-3 shadow-xl dark:shadow-teal-500/20 shadow-indigo-100 mt-4 active:scale-[0.98]"
                             >
                                 {creating
                                     ? <><Loader2 size={18} className="animate-spin" /> Creating Your Tree…</>

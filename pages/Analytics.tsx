@@ -165,7 +165,7 @@ const Analytics: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#05080f] pb-32 sm:pb-24 font-sans selection:bg-indigo-500/30 overflow-x-hidden">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#05080f] pb-32 sm:pb-24 font-sans selection:bg-indigo-500/30 overflow-x-hidden transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-10 py-6 sm:py-10 space-y-8">
 
         {/* Navigation & Header - Reference Matched + Dropdown in Right Corner */}
@@ -188,10 +188,10 @@ const Analytics: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setShowPageSelector(!showPageSelector)}
-                className="flex items-center gap-2 p-1.5 pr-4 bg-white dark:bg-slate-900 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all active:scale-95"
+                className="flex items-center gap-2 p-1.5 pr-4 bg-white dark:bg-[#0b121e] rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all active:scale-95"
               >
                 <div className="flex -space-x-2">
-                  <div className="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 bg-indigo-600 flex items-center justify-center text-[10px] font-black uppercase text-white shadow-sm">
+                  <div className="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 bg-indigo-600 dark:bg-teal-500 flex items-center justify-center text-[10px] font-black uppercase text-white dark:text-slate-950 shadow-sm">
                     {activePage.slug.substring(0, 2).toUpperCase()}
                   </div>
                 </div>
@@ -200,8 +200,8 @@ const Analytics: React.FC = () => {
               </button>
 
               {showPageSelector && (
-                <div className="absolute right-0 mt-3 w-64 bg-white dark:bg-slate-900 rounded-[1.5rem] border border-slate-100 dark:border-slate-800 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200">
-                  <div className="p-4 border-b border-slate-50 dark:border-slate-800">
+                <div className="absolute right-0 mt-3 w-64 bg-white dark:bg-[#0b121e] rounded-[1.5rem] border border-slate-100 dark:border-slate-800 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200">
+                  <div className="p-4 border-b border-slate-50 dark:border-slate-800/30">
                     <span className="text-[9px] font-black uppercase text-slate-400 tracking-[0.2em]">Switch Workspace</span>
                   </div>
                   <div className="p-2 max-h-[300px] overflow-y-auto no-scrollbar">
@@ -212,9 +212,9 @@ const Analytics: React.FC = () => {
                           setSelectedPageId(p.id);
                           setShowPageSelector(false);
                         }}
-                        className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all ${p.id === selectedPageId ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600' : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300'}`}
+                        className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all ${p.id === selectedPageId ? 'bg-indigo-50 dark:bg-teal-500/10 text-indigo-600 dark:text-teal-400' : 'hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-300'}`}
                       >
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-[10px] font-black uppercase ${p.id === selectedPageId ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800'}`}>
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-[10px] font-black uppercase ${p.id === selectedPageId ? 'bg-indigo-600 dark:bg-teal-500 text-white dark:text-slate-950' : 'bg-slate-100 dark:bg-slate-800'}`}>
                           {p.slug.substring(0, 2).toUpperCase()}
                         </div>
                         <div className="flex-1 text-left">
@@ -225,8 +225,8 @@ const Analytics: React.FC = () => {
                       </button>
                     ))}
                   </div>
-                  <div className="p-2 border-t border-slate-50 dark:border-slate-800">
-                    <button className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-[#0f172a] text-white text-[11px] font-black uppercase tracking-widest hover:opacity-90">
+                  <div className="p-2 border-t border-slate-50 dark:border-slate-800/30">
+                    <button className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-[#0f172a] dark:bg-teal-500 text-white dark:text-slate-950 text-[11px] font-black uppercase tracking-widest hover:opacity-90">
                       <Plus size={14} /> New Tree
                     </button>
                   </div>
@@ -237,8 +237,8 @@ const Analytics: React.FC = () => {
         </div>
 
         {/* Filters Panel - Reference Matched (Capsule Row) */}
-        <div className="bg-white dark:bg-slate-900/50 p-4 rounded-[1.5rem] border border-slate-100 dark:border-slate-800/50 shadow-sm flex flex-col lg:flex-row items-center gap-4">
-          <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800 px-5 py-3 rounded-2xl flex-1 w-full lg:w-auto border border-slate-100 dark:border-slate-800 transition-all focus-within:ring-2 focus-within:ring-indigo-500/20">
+        <div className="bg-white dark:bg-[#0b121e] p-4 rounded-[1.5rem] border border-slate-100 dark:border-slate-800/50 shadow-sm flex flex-col lg:flex-row items-center gap-4 transition-colors">
+          <div className="flex items-center gap-3 bg-slate-50 dark:bg-[#05080f] px-5 py-3 rounded-2xl flex-1 w-full lg:w-auto border border-slate-100 dark:border-slate-800 transition-all focus-within:ring-2 focus-within:ring-indigo-500/20">
             <Filter size={20} className="text-slate-400" />
             <select
               value={selectedLink}
@@ -262,7 +262,7 @@ const Analytics: React.FC = () => {
                 className="bg-transparent text-xs font-black text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
               />
             </div>
-            <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800 px-5 py-3 rounded-2xl w-full sm:w-auto border border-slate-100 dark:border-slate-800">
+            <div className="flex items-center gap-3 bg-slate-50 dark:bg-[#05080f] px-5 py-3 rounded-2xl w-full sm:w-auto border border-slate-100 dark:border-slate-800">
               <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">To</span>
               <input
                 type="date"
@@ -271,7 +271,7 @@ const Analytics: React.FC = () => {
                 className="bg-transparent text-xs font-black text-slate-700 dark:text-slate-200 outline-none cursor-pointer"
               />
             </div>
-            <button onClick={fetchData} className="bg-indigo-600 p-3.5 rounded-2xl text-white hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 dark:shadow-none active:scale-95 flex items-center justify-center w-full sm:w-auto">
+            <button onClick={fetchData} className="bg-indigo-600 dark:bg-teal-500 p-3.5 rounded-2xl text-white dark:text-slate-950 hover:bg-indigo-700 dark:hover:bg-teal-400 transition-all shadow-lg shadow-indigo-100 dark:shadow-none active:scale-95 flex items-center justify-center w-full sm:w-auto">
               <Search size={22} strokeWidth={3} />
             </button>
           </div>
@@ -341,7 +341,7 @@ const Analytics: React.FC = () => {
             </div>
 
             {/* Recent Activity Log - Full Screen Responsive Layout */}
-            <div className="bg-white dark:bg-slate-900/40 rounded-[2.5rem] border border-slate-100 dark:border-slate-800/50 shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-[#0b121e] rounded-[2.5rem] border border-slate-100 dark:border-slate-800/50 shadow-sm overflow-hidden transition-colors">
               <div className="p-8 sm:p-10 pb-6 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="bg-indigo-50 dark:bg-slate-800 p-3 rounded-2xl text-indigo-600 shadow-sm"><Clock size={20} /></div>
@@ -394,7 +394,7 @@ const Analytics: React.FC = () => {
             </div>
 
             {/* Audience Behavior Breakdown - Ref Matched SVG Circles */}
-            <div className="bg-white dark:bg-slate-900/40 p-10 rounded-[3rem] border border-slate-100 dark:border-slate-800/50 shadow-sm relative overflow-hidden">
+            <div className="bg-white dark:bg-[#0b121e] p-10 rounded-[3rem] border border-slate-100 dark:border-slate-800/50 shadow-sm relative overflow-hidden transition-colors">
               <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/50 dark:bg-indigo-900/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl -z-10" />
               <div className="flex items-center gap-4 mb-14">
                 <div className="bg-blue-50 dark:bg-slate-800 p-3 rounded-2xl text-blue-600"><Compass size={22} /></div>
@@ -410,7 +410,7 @@ const Analytics: React.FC = () => {
             {/* Charts Section - Bottom Row */}
             <div className="grid lg:grid-cols-3 gap-10">
               {/* Signal Frequency - Grouped Bar Aesthetics */}
-              <div className="lg:col-span-2 bg-white dark:bg-slate-900/40 p-10 rounded-[3rem] border border-slate-100 dark:border-slate-800/50 shadow-sm">
+              <div className="lg:col-span-2 bg-white dark:bg-[#0b121e] p-10 rounded-[3rem] border border-slate-100 dark:border-slate-800/50 shadow-sm transition-colors">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12">
                   <div>
                     <h3 className="font-black text-slate-900 dark:text-white text-base uppercase tracking-[0.1em]">Signal Frequency</h3>

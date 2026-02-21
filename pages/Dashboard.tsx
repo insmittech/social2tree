@@ -94,7 +94,7 @@ const Dashboard: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
         <div>
           <h1 className="text-xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-tight transition-colors">
-            Welcome back, <span className="text-indigo-600 dark:text-teal-500 transition-colors">{profile?.displayName?.split(' ')[0] || 'User'}</span> 👋
+            Welcome back, <span className="text-indigo-600 dark:text-teal-400 transition-colors">{profile?.displayName?.split(' ')[0] || 'User'}</span> 👋
           </h1>
           <p className="text-slate-400 dark:text-slate-500 font-bold text-[11px] sm:text-sm mt-1 uppercase tracking-wider transition-colors">Activity Overview</p>
         </div>
@@ -113,12 +113,12 @@ const Dashboard: React.FC = () => {
       {/* Stats row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
-          { label: 'Total Views', value: totalViews.toLocaleString(), icon: <Eye size={18} />, color: 'text-indigo-600 bg-indigo-50', trend: '+12%' },
-          { label: 'Total Clicks', value: totalClicks.toLocaleString(), icon: <MousePointerClick size={18} />, color: 'text-violet-600 bg-violet-50', trend: '+8%' },
-          { label: 'Click Rate', value: `${ctr}%`, icon: <TrendingUp size={18} />, color: 'text-emerald-600 bg-emerald-50', trend: null },
-          { label: 'Bio Trees', value: (profile?.pages?.length || 0).toString(), icon: <Layout size={18} />, color: 'text-amber-600 bg-amber-50', trend: null },
+          { label: 'Total Views', value: totalViews.toLocaleString(), icon: <Eye size={18} />, color: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10', trend: '+12%' },
+          { label: 'Total Clicks', value: totalClicks.toLocaleString(), icon: <MousePointerClick size={18} />, color: 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-500/10', trend: '+8%' },
+          { label: 'Click Rate', value: `${ctr}%`, icon: <TrendingUp size={18} />, color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10', trend: null },
+          { label: 'Bio Trees', value: (profile?.pages?.length || 0).toString(), icon: <Layout size={18} />, color: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10', trend: null },
         ].map(stat => (
-          <div key={stat.label} className="bg-white dark:bg-slate-900/40 rounded-[2rem] border border-slate-100 dark:border-slate-800/50 p-4 sm:p-5 shadow-sm dark:shadow-none hover:shadow-md transition-all duration-300">
+          <div key={stat.label} className="bg-white dark:bg-[#0b121e] rounded-[2rem] border border-slate-100 dark:border-slate-800/50 p-4 sm:p-5 shadow-sm dark:shadow-none hover:shadow-md transition-all duration-300">
             <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4 transition-colors bg-opacity-10 dark:bg-opacity-20 ${stat.color}`}>
               {stat.icon}
             </div>

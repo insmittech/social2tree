@@ -46,13 +46,13 @@ const Plan: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-32">
             <header className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-8">
                 <div>
-                    <div className="inline-flex items-center px-4 py-1.5 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 border border-indigo-100">
+                    <div className="inline-flex items-center px-4 py-1.5 bg-indigo-50 dark:bg-teal-500/10 text-indigo-600 dark:text-teal-400 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 border border-indigo-100 dark:border-teal-500/20 transition-colors">
                         Subscription Management
                     </div>
-                    <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-tight italic uppercase">
-                        Empower your <span className="text-indigo-600">Growth</span>
+                    <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-tight italic uppercase transition-colors">
+                        Empower your <span className="text-indigo-600 dark:text-teal-400 transition-colors">Growth</span>
                     </h1>
-                    <p className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-[0.2em] mt-2">
+                    <p className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-[0.2em] mt-2 transition-colors">
                         Unlock premium features and scale your digital empire.
                     </p>
                 </div>
@@ -61,13 +61,13 @@ const Plan: React.FC = () => {
             {/* Current Plan Overview */}
             <div className="grid lg:grid-cols-3 gap-8 mb-16">
                 <div className="lg:col-span-1">
-                    <div className="bg-white dark:bg-slate-900/40 rounded-[2.5rem] border border-slate-100 dark:border-slate-800/50 shadow-xl dark:shadow-none p-8 h-full flex flex-col justify-between">
+                    <div className="bg-white dark:bg-[#0b121e] rounded-[2.5rem] border border-slate-100 dark:border-slate-800/50 shadow-xl dark:shadow-none p-8 h-full flex flex-col justify-between transition-colors">
                         <div>
-                            <div className="w-16 h-16 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200 dark:shadow-none mb-6">
+                            <div className="w-16 h-16 bg-indigo-600 dark:bg-teal-500 text-white dark:text-slate-950 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200 dark:shadow-teal-500/20 mb-6 transition-all">
                                 <CreditCard size={32} strokeWidth={2.5} />
                             </div>
-                            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 mb-2">Current Active Tier</h2>
-                            <p className="text-4xl font-black text-slate-900 dark:text-white capitalize italic">{currentPlan}</p>
+                            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500 mb-2 transition-colors">Current Active Tier</h2>
+                            <p className="text-4xl font-black text-slate-900 dark:text-white capitalize italic transition-colors">{currentPlan}</p>
 
                             <div className="mt-8 space-y-4">
                                 <div className="flex items-center gap-3">
@@ -102,7 +102,7 @@ const Plan: React.FC = () => {
                             </p>
                             <button
                                 onClick={() => setBilling('yearly')}
-                                className="bg-white text-indigo-600 px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-indigo-900/20"
+                                className="bg-white dark:bg-teal-500 text-indigo-600 dark:text-slate-950 px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-indigo-900/20 dark:shadow-teal-500/20"
                             >
                                 Switch to Yearly
                             </button>
