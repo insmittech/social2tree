@@ -1,5 +1,6 @@
 import React from 'react';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import { BarChart3, Globe, Palette, Shield, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../src/context/AuthContext';
 
@@ -30,32 +31,32 @@ const Features: React.FC = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-[#0b0f19] text-slate-300 font-sans selection:bg-teal-500/30">
             <Navbar isAuthenticated={isAuthenticated} userProfile={user} />
 
-            <header className="py-20 px-4 bg-white border-b border-slate-100 text-center">
+            <header className="pt-32 pb-20 px-4 border-b border-teal-900/30 text-center">
                 <div className="max-w-4xl mx-auto">
-                    <div className="inline-flex items-center px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold mb-6">
-                        Features
+                    <div className="inline-flex items-center px-4 py-1.5 border border-teal-500/30 bg-teal-500/10 text-teal-400 rounded-full text-xs font-bold mb-6 backdrop-blur-sm">
+                        <span>Capabilities</span>
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight mb-6">Built for simplicity.</h1>
-                    <p className="text-lg text-slate-600 max-w-2xl mx-auto">Everything you need to manage your digital presence, without the clutter.</p>
+                    <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-6">Built for precision.</h1>
+                    <p className="text-lg text-slate-400 max-w-2xl mx-auto">Everything you need to extract and manage intelligence, without the clutter.</p>
                 </div>
             </header>
 
             <section className="py-24 px-4 max-w-7xl mx-auto">
                 <div className="grid md:grid-cols-2 gap-12">
                     {features.map((feature, i) => (
-                        <div key={i} className="bg-slate-50 p-10 rounded-xl border border-slate-200">
-                            <div className="w-12 h-12 bg-white text-indigo-600 rounded-lg flex items-center justify-center mb-6 border border-slate-200">
+                        <div key={i} className="bg-slate-900/50 p-10 rounded-2xl border border-slate-800 backdrop-blur-xl">
+                            <div className="w-12 h-12 bg-teal-500/10 text-teal-400 rounded-xl border border-teal-500/30 flex items-center justify-center mb-6">
                                 {feature.icon}
                             </div>
-                            <h2 className="text-2xl font-bold text-slate-900 mb-4">{feature.title}</h2>
-                            <p className="text-slate-600 leading-relaxed mb-6">{feature.desc}</p>
+                            <h2 className="text-2xl font-bold text-white mb-4">{feature.title}</h2>
+                            <p className="text-slate-400 leading-relaxed mb-6">{feature.desc}</p>
                             <ul className="space-y-3 text-sm font-medium text-slate-500">
-                                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-indigo-600" /> Fast loading</li>
-                                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-indigo-600" /> Easy setup</li>
-                                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-indigo-600" /> Clean interface</li>
+                                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-teal-500" /> Fast loading</li>
+                                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-teal-500" /> Easy setup</li>
+                                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-teal-500" /> Secure platform</li>
                             </ul>
                         </div>
                     ))}
@@ -63,26 +64,29 @@ const Features: React.FC = () => {
             </section>
 
             {/* Quick Stats */}
-            <section className="py-20 bg-slate-900 text-white">
+            {/* Quick Stats */}
+            <section className="py-20 bg-[#05080f] border-t border-slate-800 text-white">
                 <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
                     <div>
                         <h4 className="text-3xl font-bold mb-1">99.9%</h4>
-                        <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Uptime</p>
+                        <p className="text-xs font-bold uppercase tracking-widest text-teal-400">Uptime</p>
                     </div>
                     <div>
-                        <h4 className="text-3xl font-bold mb-1">5M+</h4>
-                        <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Users</p>
+                        <h4 className="text-3xl font-bold mb-1">2M+</h4>
+                        <p className="text-xs font-bold uppercase tracking-widest text-teal-400">Queries</p>
                     </div>
                     <div>
                         <h4 className="text-3xl font-bold mb-1">24/7</h4>
-                        <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Support</p>
+                        <p className="text-xs font-bold uppercase tracking-widest text-teal-400">Support</p>
                     </div>
                     <div>
-                        <h4 className="text-3xl font-bold mb-1">Free</h4>
-                        <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Starter Plan</p>
+                        <h4 className="text-3xl font-bold mb-1">Scale</h4>
+                        <p className="text-xs font-bold uppercase tracking-widest text-teal-400">Enterprise Ready</p>
                     </div>
                 </div>
             </section>
+            
+            <Footer />
         </div>
     );
 };

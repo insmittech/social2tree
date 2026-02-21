@@ -49,49 +49,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
   return (
     <div className="min-h-screen bg-[#0b0f19] text-slate-300 font-sans selection:bg-teal-500/30">
       
-      {/* Custom Header for OSINT Theme */}
-      <nav className="fixed w-full z-50 top-0 border-b border-teal-900/30 bg-[#0b0f19]/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-20 items-center">
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-2 group">
-              <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500/20 to-teal-900/20 border border-teal-500/30 group-hover:border-teal-400 transition-all duration-300">
-                <Shield className="text-teal-400 w-5 h-5 absolute z-10" />
-                <div className="absolute inset-0 bg-teal-500/10 blur-md rounded-xl"></div>
-              </div>
-              <span className="text-xl font-bold tracking-wide text-white">Social<span className="text-teal-400">2Tree</span></span>
-            </Link>
-
-            {/* Navigation */}
-            <div className="hidden md:flex items-center gap-8">
-              {headerLinks.map((link, idx) => (
-                <Link
-                  key={idx}
-                  to={link.to}
-                  className="text-sm font-medium text-slate-300 hover:text-white transition-colors relative group"
-                >
-                  {link.label}
-                  <span className="absolute -bottom-8 left-0 w-full h-0.5 bg-teal-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
-                </Link>
-              ))}
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-4">
-               <Link to="/login" className="hidden md:block text-sm font-medium text-slate-300 hover:text-white transition-colors">
-                  Log In
-               </Link>
-               <Link 
-                  to="/demo" 
-                  className="relative group overflow-hidden px-6 py-2.5 rounded-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-sm font-semibold tracking-wide hover:shadow-[0_0_20px_rgba(20,184,166,0.4)] transition-all duration-300"
-                >
-                  <span className="relative z-10 flex items-center gap-2">Book a Demo <Activity size={16} /></span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-teal-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-               </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      {/* Standardized OSINT Navbar */}
+      <Navbar />
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden min-h-screen flex items-center">
