@@ -3,7 +3,6 @@ include_once __DIR__ . '/../utils.php';
 include_once __DIR__ . '/../db.php';
 
 $user_id = require_auth();
-json_response();
 
 try {
     // Top countries

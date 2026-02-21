@@ -3,7 +3,6 @@ include_once __DIR__ . '/../utils.php';
 include_once __DIR__ . '/../db.php';
 
 $user_id = require_auth();
-json_response();
 
 try {
     $stats = [
@@ -69,10 +68,14 @@ try {
     $ref_stmt->execute([$user_id]);
     $stats['referrers'] = $ref_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // 4. Live Activity Feed
+    // 4. Live Activity Feed (Handle NULLs)
     $act_stmt = $pdo->prepare("
         SELECT 
-            id, type, country, city, country_code, created_at,
+            id, 
+            COALESCE(NULLIF(country, ''), 'Unknown Origin') as country,
+            COALESCE(NULLIF(city, ''), 'Unknown Sector') as city,
+            COALESCE(NULLIF(country_code, ''), 'UN') as country_code,
+            created_at,
             CASE WHEN link_id IS NOT NULL THEN 'link_click' ELSE 'page_view' END as event_type
         FROM analytics 
         WHERE user_id = ? 
@@ -82,21 +85,46 @@ try {
     $act_stmt->execute([$user_id]);
     $stats['activity'] = $act_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // 5. Advanced Totals
+    // 5. Advanced Totals (Handle legacy NULL data & ensure integers)
     $total_stmt = $pdo->prepare("
         SELECT 
             COUNT(*) as total_events,
-            COUNT(DISTINCT visitor_id) as unique_visitors,
-            COUNT(DISTINCT city) as total_cities
+            COUNT(DISTINCT COALESCE(visitor_id, ip_address)) as unique_visitors
         FROM analytics 
         WHERE user_id = ?
     ");
     $total_stmt->execute([$user_id]);
-    $stats['totals'] = $total_stmt->fetch(PDO::FETCH_ASSOC);
+    $res = $total_stmt->fetch(PDO::FETCH_ASSOC);
+    
+    $stats['totals'] = [
+        'total_events' => (int)($res['total_events'] ?? 0),
+        'unique_visitors' => (int)($res['unique_visitors'] ?? 0)
+    ];
+    
+    // Explicit Urban Coverage count
+    $city_count_stmt = $pdo->prepare("
+        SELECT COUNT(DISTINCT city_name) FROM (
+            SELECT COALESCE(NULLIF(city, ''), 'Unknown Sector') as city_name 
+            FROM analytics 
+            WHERE user_id = ?
+        ) as t
+    ");
+    $city_count_stmt->execute([$user_id]);
+    $stats['totals']['total_cities'] = (int)$city_count_stmt->fetchColumn();
+    
+    // Add node interactions (total link clicks)
+    $click_stmt = $pdo->prepare("SELECT SUM(clicks) FROM links WHERE user_id = ?");
+    $click_stmt->execute([$user_id]);
+    $stats['totals']['node_interactions'] = (int)$click_stmt->fetchColumn();
+
+    // Fetch total views from users table for fallback
+    $u_stmt = $pdo->prepare("SELECT views FROM users WHERE id = ?");
+    $u_stmt->execute([$user_id]);
+    $stats['totals']['total_views'] = (int)$u_stmt->fetchColumn();
 
     json_response($stats);
 
-} catch (PDOException $e) {
-    json_response(["message" => "Database error: " . $e->getMessage()], 500);
+} catch (Exception $e) {
+    json_response(["message" => "Error: " . $e->getMessage()], 500);
 }
 ?>

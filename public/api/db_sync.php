@@ -168,7 +168,12 @@ try {
     $existingAnCols = $stmt->fetchAll(PDO::FETCH_COLUMN);
     
     $anColsToAdd = [
+        'visitor_id' => "VARCHAR(64) AFTER link_id",
+        'ip_address' => "VARCHAR(45) AFTER visitor_id",
+        'user_agent' => "TEXT AFTER ip_address",
+        'referrer' => "VARCHAR(255) AFTER user_agent",
         'country' => "VARCHAR(100) AFTER referrer",
+        'country_code' => "VARCHAR(10) AFTER country",
         'city' => "VARCHAR(100) AFTER country_code"
     ];
 

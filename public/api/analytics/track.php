@@ -1,6 +1,5 @@
 <?php
 include_once __DIR__ . '/../utils.php';
-json_response();
 include_once __DIR__ . '/../db.php';
 
 /**
