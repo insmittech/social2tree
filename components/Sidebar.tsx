@@ -401,6 +401,23 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                     )}
                 </div>
 
+                {/* Admin → User panel switch button */}
+                {isAdmin && (
+                    <div className={`px-4 pb-3 border-t border-slate-800 pt-3`}>
+                        <button
+                            onClick={() => navigate('/dashboard')}
+                            onMouseEnter={(e) => handleMouseEnter('User Dashboard', e)}
+                            onMouseLeave={handleMouseLeave}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all
+                                bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300
+                                ${isCollapsed ? 'justify-center' : ''}`}
+                        >
+                            <LayoutDashboard size={18} />
+                            {!isCollapsed && <span className="flex-1 text-left">User Dashboard</span>}
+                        </button>
+                    </div>
+                )}
+
                 {/* Footer */}
                 <div className="p-4 mt-auto border-t border-slate-100">
                     <div className={`rounded-3xl border transition-all duration-300

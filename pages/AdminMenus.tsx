@@ -256,12 +256,18 @@ const AdminMenus: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [settingsRes, pagesRes] = await Promise.all([
-                    client.get('/admin/settings/get.php'),
-                    client.get('/admin/settings/get_all_pages.php')
-                ]);
+                // Fetch settings (critical)
+                const settingsRes = await client.get('/admin/settings/get.php');
                 const s = settingsRes.data.settings || {};
-                setAllPages(pagesRes.data.pages || []);
+
+                // Fetch pages list (optional — don't let it break menu loading)
+                try {
+                    const pagesRes = await client.get('/admin/settings/get_all_pages.php');
+                    setAllPages(pagesRes.data.pages || []);
+                } catch {
+                    setAllPages([]);
+                }
+
                 setMenus({
                     navbar: JSON.parse(s.navbar_links || '[]').map((m: any, i: number) => ({ ...m, type: m.type || 'custom', id: m.id || `nav-${i}` })),
                     footer_explore: JSON.parse(s.footer_explore_links || '[]').map((m: any, i: number) => ({ ...m, type: m.type || 'custom', id: m.id || `exp-${i}` })),
