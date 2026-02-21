@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import MobileThemeShowcase from '../components/MobileThemeShowcase';
 import { Shield, ChevronRight, Activity, Search, Globe, Lock, Cpu, Database, Eye, Fingerprint, Expand, Layers, BoxSelect, Zap, ShieldCheck, Sparkles, Network, User } from 'lucide-react';
 import client from '../src/api/client';
 
@@ -622,6 +623,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
 
         </div>
       </section>
+
+      {/* Explore Interface Themes (Mobile Theme Showcase) */}
+      <MobileThemeShowcase />
       
       {/* Add padding to the bottom so footer isn't right below hero if we had more sections */}
       <div className="h-32 border-t border-slate-800/50 bg-[#0b0f19]"></div>
