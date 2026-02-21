@@ -134,14 +134,28 @@ if (isset($data['link_id']) || isset($data['page_id'])) {
             $visitor_id = hash('sha256', $ip . $ua . date('Y-m-d'));
             $geo        = resolve_geo($ip);
 
+            // Get referrer from payload or header
+            $referrer = $data['referrer'] ?? $_SERVER['HTTP_REFERER'] ?? null;
+            if ($referrer) {
+                $ref_parsed = parse_url($referrer);
+                $referrer = $ref_parsed['host'] ?? $referrer;
+                $referrer = str_replace('www.', '', $referrer);
+            }
+
             // Store analytics row
             $track_sql = "INSERT INTO analytics
-                          (user_id, page_id, link_id, visitor_id, ip_address, user_agent, country, country_code, city, isp, org)
-                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                          (user_id, page_id, link_id, visitor_id, ip_address, user_agent, referrer, country, country_code, city, isp, org)
+                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $pdo->prepare($track_sql)->execute([
-                $user_id, $final_page_id, $link_id, $visitor_id, $ip, $ua,
+                $user_id, $final_page_id, $link_id, $visitor_id, $ip, $ua, $referrer,
                 $geo['country'], $geo['country_code'], $geo['city'], $geo['isp'], $geo['org']
             ]);
+            
+            // Increment aggregate views
+            $pdo->prepare("UPDATE users SET views = views + 1 WHERE id = ?")->execute([$user_id]);
+            if ($final_page_id) {
+                $pdo->prepare("UPDATE pages SET views = views + 1 WHERE id = ?")->execute([$final_page_id]);
+            }
 
             json_response(["message" => "Tracked successfully."]);
         } else {

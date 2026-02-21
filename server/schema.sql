@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS users (
     plan ENUM('free', 'pro', 'business') DEFAULT 'free',
     role ENUM('user', 'admin') DEFAULT 'user',
     status ENUM('active', 'suspended') DEFAULT 'active',
+    is_verified TINYINT(1) DEFAULT 0,
+    views INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_username (username),
@@ -44,6 +46,7 @@ CREATE TABLE IF NOT EXISTS analytics (
     user_agent VARCHAR(255),
     referrer VARCHAR(255),
     country_code VARCHAR(3),
+    city VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_analytics_user (user_id, created_at)

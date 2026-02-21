@@ -49,7 +49,10 @@ const PublicProfile: React.FC = () => {
   useEffect(() => {
     if (profile?.id) {
       try {
-        client.post('/analytics/track.php', { page_id: profile.id });
+        client.post('/analytics/track.php', {
+          page_id: profile.id,
+          referrer: document.referrer
+        });
       } catch (e) {
         console.error("Failed to track page view", e);
       }
@@ -65,7 +68,10 @@ const PublicProfile: React.FC = () => {
     }
 
     try {
-      client.post('/analytics/track.php', { link_id: id });
+      client.post('/analytics/track.php', {
+        link_id: id,
+        referrer: document.referrer
+      });
     } catch (e) {
       console.error(e);
     }
@@ -76,7 +82,10 @@ const PublicProfile: React.FC = () => {
     if (passwordModal && enteredPassword === passwordModal.correctPassword) {
       const { linkId, url } = passwordModal;
       try {
-        client.post('/analytics/track.php', { link_id: linkId });
+        client.post('/analytics/track.php', {
+          link_id: linkId,
+          referrer: document.referrer
+        });
       } catch (e) {
         console.error(e);
       }

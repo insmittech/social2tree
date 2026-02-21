@@ -106,86 +106,117 @@ const BioTrees: React.FC = () => {
                     </div>
                 </header>
 
-                <div className="bg-white dark:bg-slate-900/40 p-4 sm:p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800/50 shadow-sm dark:shadow-none mb-10">
-                    <div className="flex flex-col lg:flex-row gap-4">
-                        <div className="flex-1 relative group">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 transition-colors" size={18} />
-                            <input
-                                type="text"
-                                placeholder="Search by name or slug..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-100 dark:border-slate-800/50 rounded-[1.25rem] focus:ring-4 focus:ring-indigo-600/5 focus:border-indigo-400 focus:bg-white transition-all outline-none font-bold text-sm"
-                            />
-                        </div>
-                        <div className="flex gap-2">
-                            <div className="flex bg-slate-100 p-1 rounded-[1.25rem]">
-                                <button className="p-2.5 rounded-xl bg-white dark:bg-slate-900/40 shadow-sm dark:shadow-none text-indigo-600"><LayoutGrid size={18} /></button>
-                                <button className="p-2.5 rounded-xl text-slate-400 dark:text-slate-500 hover:text-slate-600 transition-colors"><List size={18} /></button>
+                <div className="bg-white dark:bg-slate-900/40 rounded-[2rem] border border-slate-100 dark:border-slate-800/50 shadow-sm dark:shadow-none overflow-hidden">
+                    {/* Search & Filters */}
+                    <div className="p-4 sm:p-6 border-b border-slate-50 dark:border-slate-800/50">
+                        <div className="flex flex-col lg:flex-row gap-4">
+                            <div className="flex-1 relative group">
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                                <input
+                                    type="text"
+                                    placeholder="Search by name or slug..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-[#0b0f19] border border-slate-100 dark:border-slate-800/50 rounded-[1.25rem] focus:ring-4 focus:ring-indigo-600/5 focus:border-indigo-400 focus:bg-white transition-all outline-none font-bold text-sm"
+                                />
                             </div>
-                            <button className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3 border border-slate-200 dark:border-slate-700/50 rounded-[1.25rem] text-slate-600 dark:text-slate-300 font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all">
-                                <Filter size={18} /> Filters
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10">
-                    {filteredPages.map(page => (
-                        <div
-                            key={page.id}
-                            onClick={() => handleEditTree(page.id)}
-                            className="group bg-white dark:bg-slate-900/40 rounded-[2rem] p-6 sm:p-8 border border-slate-100 dark:border-slate-800/50 shadow-sm dark:shadow-none hover:shadow-xl hover:border-indigo-100 transition-all cursor-pointer relative overflow-hidden"
-                        >
-                            <div className="flex items-start justify-between mb-8">
-                                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-[1.75rem] bg-slate-50 dark:bg-[#0b0f19] p-1 border-4 border-slate-50 dark:border-slate-800/50 shadow-inner group-hover:scale-105 transition-transform duration-500">
-                                    <img
-                                        src={page.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(page.displayName || page.slug)}&background=1e293b&color=fff`}
-                                        className="w-full h-full rounded-[1.5rem] object-cover"
-                                        alt={page.displayName}
-                                    />
+                            <div className="flex gap-2">
+                                <div className="flex bg-slate-100 p-1 rounded-[1.25rem]">
+                                    <button className="p-2.5 rounded-xl text-slate-400 dark:text-slate-500 hover:text-slate-600 transition-colors"><LayoutGrid size={18} /></button>
+                                    <button className="p-2.5 rounded-xl bg-white dark:bg-slate-900/40 shadow-sm dark:shadow-none text-indigo-600"><List size={18} /></button>
                                 </div>
-                                <div className="bg-slate-50 dark:bg-[#0b0f19] p-2.5 rounded-2xl text-slate-400 dark:text-slate-500 group-hover:text-indigo-600 group-hover:bg-indigo-50 transition-colors">
-                                    <ExternalLink size={20} />
-                                </div>
-                            </div>
-
-                            <div className="space-y-1">
-                                <h3 className="text-xl font-black text-slate-900 dark:text-white leading-tight">{page.displayName}</h3>
-                                <p className="text-slate-400 dark:text-slate-500 font-bold text-sm">s2t.me/{page.slug}</p>
-                            </div>
-
-                            <div className="mt-8 pt-8 border-t border-slate-50 dark:border-slate-800/50 flex items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Views</span>
-                                        <span className="text-sm font-black text-slate-900 dark:text-white">{profile.views?.toLocaleString() || 0}</span>
-                                    </div>
-                                    <div className="w-px h-6 bg-slate-100" />
-                                    <div className="flex flex-col">
-                                        <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Links</span>
-                                        <span className="text-sm font-black text-slate-900 dark:text-white">{page.links?.length || 0}</span>
-                                    </div>
-                                </div>
-                                <button className="text-indigo-600 font-black text-xs uppercase tracking-widest hover:translate-x-1 transition-transform flex items-center gap-1">
-                                    Edit <Zap size={12} fill="currentColor" />
+                                <button className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3 border border-slate-200 dark:border-slate-700/50 rounded-[1.25rem] text-slate-600 dark:text-slate-300 font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all">
+                                    <Filter size={18} /> Filters
                                 </button>
                             </div>
                         </div>
-                    ))}
+                    </div>
 
-                    <button
-                        onClick={() => setShowCreate(true)}
-                        className="group border-2 border-dashed border-slate-200 dark:border-slate-700/50 rounded-[2rem] p-8 flex flex-col items-center justify-center text-center space-y-4 hover:border-indigo-300 hover:bg-indigo-50/30 transition-all min-h-[280px]"
-                    >
-                        <div className="w-16 h-16 bg-slate-50 dark:bg-[#0b0f19] rounded-[1.5rem] flex items-center justify-center text-slate-300 group-hover:bg-white group-hover:text-indigo-600 group-hover:shadow-md transition-all">
-                            <Plus size={32} />
-                        </div>
-                        <div>
-                            <h4 className="font-black text-slate-900 dark:text-white text-lg">New Bio Tree</h4>
-                            <p className="text-slate-400 dark:text-slate-500 text-[10px] font-black uppercase tracking-widest mt-1">Create a fresh profile</p>
-                        </div>
-                    </button>
+                    {/* Table View */}
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="border-b border-slate-50 dark:border-slate-800/50 uppercase">
+                                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 dark:text-slate-500 tracking-widest">
+                                        <div className="flex items-center gap-1 cursor-pointer hover:text-indigo-600 transition-colors">
+                                            Bio Tree <MoreVertical size={12} className="opacity-40" />
+                                        </div>
+                                    </th>
+                                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 dark:text-slate-500 tracking-widest hidden md:table-cell">
+                                        <div className="flex items-center gap-1 cursor-pointer hover:text-indigo-600 transition-colors">
+                                            Slug <MoreVertical size={12} className="opacity-40" />
+                                        </div>
+                                    </th>
+                                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 dark:text-slate-500 tracking-widest text-center hidden md:table-cell">
+                                        <div className="flex items-center justify-center gap-1 cursor-pointer hover:text-indigo-600 transition-colors">
+                                            Views <MoreVertical size={12} className="opacity-40" />
+                                        </div>
+                                    </th>
+                                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 dark:text-slate-500 tracking-widest text-center hidden md:table-cell">
+                                        <div className="flex items-center justify-center gap-1 cursor-pointer hover:text-indigo-600 transition-colors">
+                                            Links <MoreVertical size={12} className="opacity-40" />
+                                        </div>
+                                    </th>
+                                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 dark:text-slate-500 tracking-widest text-right">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredPages.map(page => (
+                                    <tr key={page.id} className="group hover:bg-indigo-50/10 transition-all border-b border-slate-50 dark:border-slate-800/50">
+                                        <td className="px-8 py-5">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center font-black text-sm uppercase shadow-lg">
+                                                    {page.displayName.substring(0, 2).toUpperCase()}
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm sm:text-base font-black text-slate-900 dark:text-white leading-tight">{page.displayName}</span>
+                                                    <span className="text-[10px] text-slate-400 font-bold md:hidden">s2t.me/{page.slug}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-5 hidden md:table-cell">
+                                            <span className="text-sm font-bold text-slate-400">s2t.me/{page.slug}</span>
+                                        </td>
+                                        <td className="px-8 py-5 text-center hidden md:table-cell">
+                                            <span className="text-sm font-black text-slate-900 dark:text-white">{page.views?.toLocaleString() ?? 0}</span>
+                                        </td>
+                                        <td className="px-8 py-5 text-center hidden md:table-cell">
+                                            <span className="text-sm font-black text-slate-900 dark:text-white">{page.links?.length ?? 0}</span>
+                                        </td>
+                                        <td className="px-8 py-5 text-right">
+                                            <div className="flex items-center justify-end gap-4">
+                                                <button onClick={() => window.open(`http://s2t.me/${page.slug}`, '_blank')} className="text-slate-400 hover:text-indigo-600 transition-colors p-2">
+                                                    <ExternalLink size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleEditTree(page.id)}
+                                                    className="bg-indigo-50 text-indigo-600 px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-indigo-600 hover:text-white transition-all border border-indigo-100/50"
+                                                >
+                                                    Edit <Zap size={14} fill="currentColor" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {/* Footer Add Row */}
+                                <tr onClick={() => setShowCreate(true)} className="group cursor-pointer hover:bg-indigo-50/10 transition-all">
+                                    <td colSpan={5} className="px-8 py-8 text-center border-t border-slate-50 dark:border-slate-800/50">
+                                        <div className="flex items-center justify-center gap-4">
+                                            <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
+                                                <Plus size={18} />
+                                            </div>
+                                            <div className="text-left">
+                                                <h4 className="font-black text-slate-900 dark:text-white text-sm leading-tight">Add New Bio Tree</h4>
+                                                <p className="text-slate-400 dark:text-slate-500 text-[10px] font-black uppercase tracking-widest">Create a fresh profile</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 

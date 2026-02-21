@@ -113,6 +113,7 @@ try {
             COALESCE(NULLIF(country_code, ''), 'UN') as country_code,
             COALESCE(NULLIF(isp, ''), 'Unknown Sector') as isp,
             COALESCE(NULLIF(org, ''), 'Unknown Sector') as org,
+            user_agent,
             created_at,
             CASE WHEN link_id IS NOT NULL THEN 'link_click' ELSE 'page_view' END as event_type
         FROM analytics 
@@ -129,15 +130,38 @@ try {
     $total_stmt = $pdo->prepare("
         SELECT 
             COUNT(*) as total_events,
-            COUNT(DISTINCT COALESCE(visitor_id, ip_address)) as unique_visitors
+            COUNT(DISTINCT visitor_id) as unique_visitors,
+            COUNT(CASE WHEN link_id IS NOT NULL THEN 1 END) as node_interactions,
+            COUNT(CASE WHEN link_id IS NULL THEN 1 END) as page_views
         FROM analytics 
         WHERE user_id = ? $tot_filters
     ");
     $total_stmt->execute($tot_params);
     $res = $total_stmt->fetch(PDO::FETCH_ASSOC);
     
-    $stats['totals']['total_events'] = (int)($res['total_events'] ?? 0);
-    $stats['totals']['unique_visitors'] = (int)($res['unique_visitors'] ?? 0);
+    $total_events = (int)($res['total_events'] ?? 0);
+    $unique_visitors = (int)($res['unique_visitors'] ?? 0);
+    $node_interactions = (int)($res['node_interactions'] ?? 0);
+    $page_views = (int)($res['page_views'] ?? 0);
+
+    $stats['totals']['total_events'] = $total_events;
+    $stats['totals']['unique_visitors'] = $unique_visitors;
+    $stats['totals']['node_interactions'] = $node_interactions;
+    
+    // Average Session Duration (approximate by visitor timeframe)
+    $session_stmt = $pdo->prepare("
+        SELECT AVG(duration) FROM (
+            SELECT (UNIX_TIMESTAMP(MAX(created_at)) - UNIX_TIMESTAMP(MIN(created_at))) as duration 
+            FROM analytics 
+            WHERE user_id = ? $tot_filters 
+            GROUP BY visitor_id
+        ) as t
+    ");
+    $session_stmt->execute($tot_params);
+    $avg_duration = (int)$session_stmt->fetchColumn();
+    
+    $stats['totals']['avg_session_seconds'] = $avg_duration;
+    $stats['totals']['avg_session_display'] = floor($avg_duration / 60) . 'm ' . ($avg_duration % 60) . 's';
     
     // Urban Coverage count
     $city_params = [$user_id];
@@ -151,21 +175,55 @@ try {
     ");
     $city_count_stmt->execute($city_params);
     $stats['totals']['total_cities'] = (int)$city_count_stmt->fetchColumn();
-    
-    // Node interactions (total link clicks) - This one still from links table but should respect page_id
-    $link_sql = "SELECT SUM(clicks) FROM links WHERE user_id = ?";
-    $link_params = [$user_id];
-    if ($page_id) {
-        $link_sql .= " AND page_id = ?";
-        $link_params[] = $page_id;
+
+    // 6. Behavioral Metrics
+    // Conversion Rate: Clicks / Views
+    $stats['totals']['conversion_rate'] = $page_views > 0 ? round(($node_interactions / $page_views) * 100, 2) : 0;
+
+    // Active Nodes: Links that received at least one click in the period
+    $active_nodes_stmt = $pdo->prepare("
+        SELECT COUNT(DISTINCT link_id) 
+        FROM analytics 
+        WHERE user_id = ? AND link_id IS NOT NULL $tot_filters
+    ");
+    $active_nodes_stmt->execute($tot_params);
+    $stats['totals']['active_nodes'] = (int)$active_nodes_stmt->fetchColumn();
+
+    // Bounce Rate: Percentage of visitors with only one event in the period
+    $bounce_stmt = $pdo->prepare("
+        SELECT COUNT(*) as single_event_visitors FROM (
+            SELECT visitor_id FROM analytics 
+            WHERE user_id = ? $tot_filters 
+            GROUP BY visitor_id HAVING COUNT(*) = 1
+        ) as sub
+    ");
+    $bounce_stmt->execute($tot_params);
+    $single_event_count = (int)$bounce_stmt->fetchColumn();
+    $stats['totals']['bounce_rate'] = $unique_visitors > 0 ? round(($single_event_count / $unique_visitors) * 100, 2) : 0;
+
+    // User Loyalty: Percentage of returning visitors (more than 1 visit in any period, but let's define as returning within OUR filter)
+    $loyalty_stmt = $pdo->prepare("
+        SELECT COUNT(*) as returning_visitors FROM (
+            SELECT visitor_id FROM analytics 
+            WHERE user_id = ? $tot_filters 
+            GROUP BY visitor_id HAVING COUNT(*) > 1
+        ) as sub
+    ");
+    $loyalty_stmt->execute($tot_params);
+    $returning_count = (int)$loyalty_stmt->fetchColumn();
+    $stats['totals']['user_loyalty'] = $unique_visitors > 0 ? round(($returning_count / $unique_visitors) * 100, 2) : 0;
+
+    // Traffic Sources Breakdown for CircularProgress
+    $stats['sources'] = [];
+    $total_ref = 0;
+    foreach($stats['referrers'] as $ref) $total_ref += (int)$ref['value'];
+    foreach($stats['referrers'] as $ref) {
+        $stats['sources'][] = [
+            'name' => $ref['name'],
+            'value' => (int)$ref['value'],
+            'percent' => $total_events > 0 ? round(((int)$ref['value'] / $total_events) * 100) : 0
+        ];
     }
-    if ($link_id) {
-        $link_sql .= " AND id = ?";
-        $link_params[] = $link_id;
-    }
-    $click_stmt = $pdo->prepare($link_sql);
-    $click_stmt->execute($link_params);
-    $stats['totals']['node_interactions'] = (int)$click_stmt->fetchColumn();
 
     json_response($stats);
 

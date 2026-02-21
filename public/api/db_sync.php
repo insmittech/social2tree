@@ -97,6 +97,7 @@ try {
             theme VARCHAR(50) DEFAULT 'default',
             button_style VARCHAR(50) DEFAULT 'rounded-lg',
             custom_domain VARCHAR(255) NULL,
+            views INT DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -185,6 +186,15 @@ try {
             $pdo->exec("ALTER TABLE analytics ADD $col $def");
             echo "<span class='success'>✅ Done</span><br>";
         }
+    }
+
+    // Check pages table columns
+    $stmt = $pdo->query("DESCRIBE pages");
+    $existingPageCols = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    if (!in_array('views', $existingPageCols)) {
+        echo "Adding <code>pages.views</code>... ";
+        $pdo->exec("ALTER TABLE pages ADD views INT DEFAULT 0 AFTER custom_domain");
+        echo "<span class='success'>✅ Done</span><br>";
     }
 
     // -------------------------------------------------------------------------

@@ -33,6 +33,7 @@ export interface LinkPage {
   theme: string;
   buttonStyle: ButtonStyle;
   customDomain?: string | null;
+  views: number;
   links: Link[];
 }
 

@@ -35,9 +35,11 @@ try {
     $stmt->execute([$page_id]);
     $links = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // 3. Increment views (Legacy support/Simplified)
-    // Note: robust tracking is now handled by track.php via the frontend
+    // 3. Increment views
+    // Increment User views (legacy/overview)
     $pdo->prepare("UPDATE users SET views = views + 1 WHERE id = ?")->execute([$user_id]);
+    // Increment Page views (granular)
+    $pdo->prepare("UPDATE pages SET views = views + 1 WHERE id = ?")->execute([$page_id]);
 
     // 4. Map Data to standard structure
     $profile = [

@@ -19,11 +19,41 @@ interface GeoCountry { country: string; country_code: string; clicks: number; }
 interface GeoCity { city: string; country: string; country_code: string; clicks: number; }
 interface TimelineData { date: string; views: number; clicks: number; }
 interface StatItem { name: string; value: number; }
-interface ActivityEvent { id: number; event_type: string; country: string; city: string; country_code: string; isp: string; org: string; created_at: string; }
+interface ActivityEvent { id: number; event_type: string; country: string; city: string; country_code: string; isp: string; org: string; user_agent: string; created_at: string; }
 
 const flag = (code: string) => {
   if (!code || code.length !== 2) return '🌐';
   return [...code.toUpperCase()].map(c => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65)).join('');
+};
+
+const parseUA = (ua: string) => {
+  if (!ua) return 'Unknown Node';
+  const browsers: Record<string, RegExp> = {
+    'Chrome': /Chrome\/([0-9.]+)/,
+    'Safari': /Version\/([0-9.]+).*Safari/,
+    'Firefox': /Firefox\/([0-9.]+)/,
+    'Edge': /Edg\/([0-9.]+)/,
+    'Opera': /OPR\/([0-9.]+)/
+  };
+  const os: Record<string, RegExp> = {
+    'iOS': /iPhone|iPad|iPod/,
+    'Android': /Android/,
+    'Windows': /Windows NT/,
+    'macOS': /Macintosh/,
+    'Linux': /Linux/
+  };
+
+  let bName = 'Other Browser';
+  for (const [name, reg] of Object.entries(browsers)) {
+    if (reg.test(ua)) { bName = name; break; }
+  }
+
+  let oName = 'Unknown OS';
+  for (const [name, reg] of Object.entries(os)) {
+    if (reg.test(ua)) { oName = name; break; }
+  }
+
+  return `${bName} / ${oName}`;
 };
 
 const CircularProgress = ({ percent, label, value, subValue, color }: { percent: number, label: string, value: string, subValue: string, color: string }) => {
@@ -72,6 +102,7 @@ const Analytics: React.FC = () => {
   const [browsers, setBrowsers] = useState<StatItem[]>([]);
   const [devices, setDevices] = useState<StatItem[]>([]);
   const [referrers, setReferrers] = useState<StatItem[]>([]);
+  const [sources, setSources] = useState<any[]>([]);
   const [activity, setActivity] = useState<ActivityEvent[]>([]);
   const [totals, setTotals] = useState<any>(null);
   const [geoCountries, setGeoCountries] = useState<GeoCountry[]>([]);
@@ -91,7 +122,7 @@ const Analytics: React.FC = () => {
 
       const [geoRes, advancedRes] = await Promise.all([
         client.get('/analytics/geo.php', { params }).catch(e => ({ data: { countries: [], cities: [], total: 0 } })),
-        client.get('/analytics/advanced_stats.php', { params }).catch(e => ({ data: { timeline: [], browsers: [], devices: [], referrers: [], activity: [], totals: null } }))
+        client.get('/analytics/advanced_stats.php', { params }).catch(e => ({ data: { timeline: [], browsers: [], devices: [], referrers: [], activity: [], totals: null, sources: [] } }))
       ]);
 
       setGeoCountries(geoRes.data.countries || []);
@@ -100,6 +131,7 @@ const Analytics: React.FC = () => {
       setBrowsers(advancedRes.data.browsers || []);
       setDevices(advancedRes.data.devices || []);
       setReferrers(advancedRes.data.referrers || []);
+      setSources(advancedRes.data.sources || []);
       setActivity(advancedRes.data.activity || []);
       setTotals(advancedRes.data.totals || null);
     } catch (err) {
@@ -120,10 +152,9 @@ const Analytics: React.FC = () => {
     return 'overview';
   }, [currentPath]);
 
-  // Mini Sparkline Data helper
-  const sparkData = [
-    { v: 10 }, { v: 15 }, { v: 8 }, { v: 12 }, { v: 18 }, { v: 14 }, { v: 20 }, { v: 16 }
-  ];
+  // Derived Sparkline Data from real timeline
+  const viewsSpark = useMemo(() => timeline.map(t => ({ v: t.views })), [timeline]);
+  const clicksSpark = useMemo(() => timeline.map(t => ({ v: t.clicks })), [timeline]);
 
   if (!profile || !activePage) {
     return (
@@ -253,10 +284,10 @@ const Analytics: React.FC = () => {
             {/* Main Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
-                { label: 'Total Intersections', value: totals?.total_events || 24812, icon: <Zap className="text-amber-500" />, sub: 'Signals', trend: '+12.5%', color: 'from-amber-50 to-white' },
-                { label: 'Unique Subjects', value: totals?.unique_visitors || 1402, icon: <Users className="text-indigo-500" />, sub: 'Distinct IPs', trend: '+6.2%', color: 'from-indigo-50 to-white' },
-                { label: 'Node Interactions', value: totals?.node_interactions || 8930, icon: <MousePointer2 className="text-rose-500" />, sub: 'Total Clicks', trend: '-2.4%', color: 'from-rose-50 to-white', down: true },
-                { label: 'Urban Coverage', value: totals?.total_cities || 154, icon: <MapPin className="text-emerald-500" />, sub: 'Cities Identified', trend: '+18.7%', color: 'from-emerald-50 to-white' },
+                { label: 'Total Intersections', value: totals?.total_events || 0, icon: <Zap className="text-amber-500" />, sub: 'Signals', trend: '+12.5%', color: 'from-amber-50 to-white' },
+                { label: 'Unique Subjects', value: totals?.unique_visitors || 0, icon: <Users className="text-indigo-500" />, sub: 'Distinct IPs', trend: '+6.2%', color: 'from-indigo-50 to-white' },
+                { label: 'Node Interactions', value: totals?.node_interactions || 0, icon: <MousePointer2 className="text-rose-500" />, sub: 'Total Clicks', trend: '-2.4%', color: 'from-rose-50 to-white', down: (totals?.node_interactions < 10) },
+                { label: 'Urban Coverage', value: totals?.total_cities || 0, icon: <MapPin className="text-emerald-500" />, sub: 'Cities Identified', trend: '+18.7%', color: 'from-emerald-50 to-white' },
               ].map((stat, i) => (
                 <div key={i} className={`bg-gradient-to-br ${stat.color} dark:from-slate-900/50 dark:to-slate-900/20 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800/50 shadow-sm relative overflow-hidden group hover:shadow-xl transition-all duration-500`}>
                   <div className="flex items-start justify-between mb-6">
@@ -282,10 +313,10 @@ const Analytics: React.FC = () => {
             {/* Sparkline Stats Grid - Ref Matched */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
-                { label: 'Avg Session', value: '4m 32s', color: '#10b981', trend: sparkData },
-                { label: 'Conversion', value: '3.42%', color: '#3b82f6', trend: [...sparkData].reverse() },
-                { label: 'Bounce Rate', value: '42.1%', color: '#f43f5e', trend: [5, 12, 8, 15, 10, 18, 14, 20] },
-                { label: 'Active Nodes', value: '12.4k', color: '#8b5cf6', trend: [10, 8, 12, 14, 16, 18, 20, 22] },
+                { label: 'Avg Session', value: totals?.avg_session_display || '0m 00s', color: '#10b981', trend: viewsSpark },
+                { label: 'Conversion', value: `${totals?.conversion_rate || 0}%`, color: '#3b82f6', trend: clicksSpark },
+                { label: 'Bounce Rate', value: `${totals?.bounce_rate || 0}%`, color: '#f43f5e', trend: viewsSpark },
+                { label: 'Active Nodes', value: totals?.active_nodes || 0, color: '#8b5cf6', trend: clicksSpark },
               ].map((stat, i) => (
                 <div key={i} className="bg-white dark:bg-slate-900/40 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800/50 shadow-sm flex items-center justify-between overflow-hidden group hover:border-indigo-100 transition-colors">
                   <div>
@@ -294,7 +325,7 @@ const Analytics: React.FC = () => {
                   </div>
                   <div className="w-24 h-12 -mr-2">
                     <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={stat.trend.map(v => ({ v: typeof v === 'number' ? v : v.v }))}>
+                      <AreaChart data={stat.trend.length > 0 ? stat.trend : [{ v: 0 }, { v: 0 }]}>
                         <defs>
                           <linearGradient id={`grad-${i}`} x1="0" y1="0" x2="0" y2="1">
                             <stop offset="0%" stopColor={stat.color} stopOpacity={0.2} />
@@ -334,7 +365,9 @@ const Analytics: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50 dark:divide-slate-800/40">
-                    {activity.map((ev) => (
+                    {activity.length === 0 ? (
+                      <tr><td colSpan={6} className="py-20 text-center text-slate-400 font-bold uppercase text-[10px] tracking-widest">No signals detected in this period</td></tr>
+                    ) : activity.map((ev) => (
                       <tr key={ev.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-all cursor-default">
                         <td className="py-8 pl-10 text-xs font-black text-slate-800 dark:text-slate-200 tabular-nums">{new Date(ev.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</td>
                         <td className="py-8">
@@ -349,7 +382,7 @@ const Analytics: React.FC = () => {
                           </div>
                         </td>
                         <td className="py-8 text-xs font-bold text-slate-400 tracking-tight font-mono opacity-80">{ev.isp?.substring(0, 20)}...</td>
-                        <td className="py-8 text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-tighter">Safari / iOS 17.2</td>
+                        <td className="py-8 text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-tighter">{parseUA(ev.user_agent)}</td>
                         <td className="py-8 pr-10 text-center">
                           <div className="w-2 h-2 rounded-full bg-emerald-500 mx-auto animate-pulse shadow-[0_0_10px_rgb(16,185,129,0.5)]" />
                         </td>
@@ -368,9 +401,9 @@ const Analytics: React.FC = () => {
                 <h3 className="font-black text-slate-900 dark:text-white text-base uppercase tracking-[0.12em]">Audience Behavior Breakdown</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-16 lg:gap-20">
-                <CircularProgress percent={65} label="Device" value="16,127" subValue="8,845" color="#3b82f6" />
-                <CircularProgress percent={42} label="Source" value="10,421" subValue="14,391" color="#10b981" />
-                <CircularProgress percent={28} label="User Loyalty" value="6,947" subValue="17,865" color="#f59e0b" />
+                <CircularProgress percent={devices.find(d => d.name === 'Mobile')?.value ? Math.round((devices.find(d => d.name === 'Mobile')!.value / devices.reduce((acc, d) => acc + d.value, 0)) * 100) : 0} label="Device" value={devices.find(d => d.name === 'Mobile')?.value.toString() || '0'} subValue="Mobile" color="#3b82f6" />
+                <CircularProgress percent={sources[0]?.percent || 0} label="Source" value={sources[0]?.value.toString() || '0'} subValue={sources[0]?.name || 'Direct'} color="#10b981" />
+                <CircularProgress percent={totals?.user_loyalty || 0} label="User Loyalty" value={Math.round((totals?.user_loyalty / 100) * totals?.unique_visitors || 0).toString()} subValue="Returning" color="#f59e0b" />
               </div>
             </div>
 
@@ -467,16 +500,15 @@ const Analytics: React.FC = () => {
                 Comprehensive breakdown of signal entry origins, referral headers, and path redirection vectors across your entire node ecosystem.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-                {[
-                  { label: 'Organic Search', val: '4,102', share: '34%' },
-                  { label: 'Direct Entry', val: '2,940', share: '24%' },
-                  { label: 'Social Referral', val: '3,842', share: '31%' },
-                  { label: 'Email Vector', val: '1,328', share: '11%' },
-                ].map((c, i) => (
+                {sources.length === 0 ? (
+                  <div className="col-span-4 p-12 text-center text-slate-400 font-black uppercase text-[10px] tracking-widest bg-slate-50 dark:bg-slate-800/20 rounded-[2rem]">
+                    No entry vectors identified yet
+                  </div>
+                ) : sources.slice(0, 4).map((c, i) => (
                   <div key={i} className="p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">{c.label}</p>
-                    <p className="text-xl font-black text-slate-900 dark:text-white leading-none mb-1">{c.val}</p>
-                    <p className="text-[10px] font-bold text-indigo-500 uppercase">{c.share} Signal Share</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">{c.name}</p>
+                    <p className="text-xl font-black text-slate-900 dark:text-white leading-none mb-1">{c.value.toLocaleString()}</p>
+                    <p className="text-[10px] font-bold text-indigo-500 uppercase">{c.percent}% Signal Share</p>
                   </div>
                 ))}
               </div>

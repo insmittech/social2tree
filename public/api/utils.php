@@ -137,6 +137,7 @@ function get_user_profile($pdo, $user_id) {
                     'theme' => $page['theme'],
                     'buttonStyle' => $page['button_style'],
                     'customDomain' => $page['custom_domain'],
+                    'views' => (int)($page['views'] ?? 0),
                     'links' => array_map(function ($link) {
                         return [
                             'id' => (string)$link['id'],
