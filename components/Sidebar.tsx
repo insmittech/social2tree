@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import client from '../src/api/client';
 import {
     TreePine,
@@ -18,16 +18,28 @@ import {
     CheckCircle,
     ChevronLeft,
     ChevronRight,
+    ChevronDown,
     Search,
-    Bell,
     Activity,
-    ListTodo,
     HelpCircle,
-    Home,
     Menu,
-    TableProperties,
-    Palette
+    Palette,
+    X,
 } from 'lucide-react';
+
+interface SubMenuItem {
+    id: string;
+    label: string;
+    to: string;
+    type: string;
+}
+
+interface NavLinkItem {
+    to: string;
+    icon: React.ReactNode;
+    label: string;
+    children?: SubMenuItem[];
+}
 
 interface SidebarProps {
     isAdmin?: boolean;
@@ -38,17 +50,37 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCollapsed, setIsCollapsed }) => {
-    const [dynamicUserLinks, setDynamicUserLinks] = React.useState<any[]>([]);
+    const [dynamicUserLinks, setDynamicUserLinks] = React.useState<NavLinkItem[]>([]);
     const [tooltip, setTooltip] = useState<{ label: string; y: number } | null>(null);
+    const [flyout, setFlyout] = useState<{ label: string; y: number; children: SubMenuItem[] } | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+    const navigate = useNavigate();
+    const isUserAdmin = userProfile?.roles?.includes('admin') || userProfile?.role === 'admin';
 
-    const handleMouseEnter = (label: string, e: React.MouseEvent) => {
-        if (isCollapsed) {
-            const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-            setTooltip({ label, y: rect.top + rect.height / 2 });
-        }
+    const toggleGroup = (label: string) => {
+        setOpenGroups(prev => ({ ...prev, [label]: !prev[label] }));
     };
 
-    const handleMouseLeave = () => setTooltip(null);
+    const handleMouseEnter = (label: string, e: React.MouseEvent, children?: SubMenuItem[]) => {
+        if (isCollapsed) {
+            const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+            const y = rect.top + rect.height / 2;
+            if (children && children.length > 0) {
+                setFlyout({ label, y, children });
+                setTooltip(null);
+            } else {
+                setTooltip({ label, y });
+                setFlyout(null);
+            }
+        }
+    };
+    const handleMouseLeave = () => {
+        setTooltip(null);
+    };
+    const handleFlyoutLeave = () => {
+        setFlyout(null);
+    };
 
     React.useEffect(() => {
         if (!isAdmin) {
@@ -58,7 +90,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                     const s = res.data.settings || {};
                     const links = JSON.parse(s.dashboard_menu_links || '[]');
                     if (links.length > 0) {
-                        setDynamicUserLinks(links);
+                        setDynamicUserLinks(links.map((l: any) => ({
+                            ...l,
+                            icon: <LayoutDashboard size={18} />,
+                            children: l.children || []
+                        })));
                     }
                 } catch (err) {
                     console.error('Failed to load dynamic sidebar links:', err);
@@ -68,7 +104,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
         }
     }, [isAdmin]);
 
-    const userLinks = [
+    const userLinks: NavLinkItem[] = [
         { to: '/dashboard/profile', icon: <User size={18} />, label: 'Profile' },
         { to: '/dashboard', icon: <LayoutDashboard size={18} />, label: 'Overview' },
         { to: '/dashboard/trees', icon: <Layout size={18} />, label: 'Bio Trees' },
@@ -111,30 +147,103 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
         }
     ];
 
-    const links = isAdmin ? [] : (dynamicUserLinks.length > 0 ? dynamicUserLinks.map(l => ({
-        ...l,
-        icon: <LayoutDashboard size={18} /> // Default icon for dynamic links
-    })) : userLinks);
+    const links: NavLinkItem[] = isAdmin ? [] : (dynamicUserLinks.length > 0 ? dynamicUserLinks : userLinks);
+
+    // --- Deep search ---
+    const q = searchQuery.toLowerCase().trim();
+
+    const flatLinks = links.flatMap(l =>
+        [l, ...(l.children || []).map(c => ({ to: c.to, icon: l.icon, label: `${l.label} › ${c.label}`, children: [] }))]
+    );
+    const filteredUserLinks = q ? flatLinks.filter(l => l.label.toLowerCase().includes(q)) : links;
+    const filteredAdminGroups = q
+        ? adminLinkGroups.map(g => ({ ...g, links: g.links.filter(l => l.label.toLowerCase().includes(q)) })).filter(g => g.links.length > 0)
+        : adminLinkGroups;
+    const hasSearchResults = isAdmin ? filteredAdminGroups.length > 0 : filteredUserLinks.length > 0;
 
     const sidebarWidth = isCollapsed ? 80 : 288;
+
+    // Render a single nav link with optional children
+    const renderNavLink = (link: NavLinkItem) => {
+        const hasChildren = (link.children || []).length > 0;
+        const isOpen = openGroups[link.label];
+
+        return (
+            <div key={link.label + link.to}>
+                {hasChildren ? (
+                    // Parent with children — not navigable itself, just a toggle
+                    <button
+                        onClick={() => !isCollapsed && toggleGroup(link.label)}
+                        onMouseEnter={(e) => handleMouseEnter(link.label, e, link.children)}
+                        onMouseLeave={handleMouseLeave}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all
+                            ${isCollapsed ? 'justify-center' : ''}
+                            text-slate-500 hover:text-slate-900 hover:bg-slate-50`}
+                    >
+                        <span className={`${isCollapsed ? 'scale-110' : ''} transition-transform flex-shrink-0`}>{link.icon}</span>
+                        {!isCollapsed && (
+                            <>
+                                <span className="flex-1 text-left">{link.label}</span>
+                                <ChevronDown size={14} className={`transition-transform ${isOpen ? 'rotate-180' : ''} text-slate-400`} />
+                            </>
+                        )}
+                    </button>
+                ) : (
+                    <NavLink
+                        to={link.to}
+                        end={link.to === '/dashboard'}
+                        onMouseEnter={(e) => handleMouseEnter(link.label, e)}
+                        onMouseLeave={handleMouseLeave}
+                        className={({ isActive }) => `
+                            flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all
+                            ${isActive ? 'bg-slate-50 text-indigo-600 shadow-sm border border-slate-100' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}
+                            ${isCollapsed ? 'justify-center' : ''}
+                        `}
+                    >
+                        <span className={`${isCollapsed ? 'scale-110' : ''} transition-transform flex-shrink-0`}>{link.icon}</span>
+                        {!isCollapsed && <span className="flex-1">{link.label}</span>}
+                    </NavLink>
+                )}
+
+                {/* Inline children — only in expanded mode */}
+                {hasChildren && isOpen && !isCollapsed && (
+                    <div className="ml-5 mt-1 mb-1 border-l-2 border-slate-100 pl-3 space-y-0.5">
+                        {(link.children || []).map(child => (
+                            <NavLink
+                                key={child.id}
+                                to={child.to}
+                                className={({ isActive }) => `
+                                    flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold transition-all
+                                    ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-50'}
+                                `}
+                            >
+                                <span className="w-1.5 h-1.5 rounded-full bg-current opacity-50 flex-shrink-0" />
+                                {child.label}
+                            </NavLink>
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+    };
 
     return (
         <aside
             className={`hidden lg:flex flex-col border-r sticky top-0 h-screen transition-all duration-300 ease-in-out relative
-                ${isCollapsed ? 'w-20' : 'w-72'} 
+                ${isCollapsed ? 'w-20' : 'w-72'}
                 ${isAdmin ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-100 text-slate-900 shadow-xl shadow-slate-200/50'}
             `}
         >
-            {/* Collapse Toggle Button */}
+            {/* Collapse Toggle */}
             <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className={`absolute -right-3.5 top-8 w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform z-50`}
+                className="absolute -right-3.5 top-8 w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform z-50"
             >
                 {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
             </button>
 
             <div className="flex flex-col h-full overflow-hidden">
-                {/* Logo Section */}
+                {/* Logo */}
                 <div className={`p-6 mb-2 flex items-center transition-all duration-300 ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
                     <div className="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-200 flex-shrink-0">
                         <TreePine className="text-white w-6 h-6" />
@@ -144,113 +253,160 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                     )}
                 </div>
 
-                {/* Search Section */}
-                <div className="px-6 mb-8 mt-4">
-                    <div className={`relative group flex items-center ${isCollapsed ? 'justify-center' : ''}`}>
-                        <div className={`flex items-center bg-slate-50 rounded-2xl transition-all duration-300 ${isCollapsed ? 'w-10 h-10 justify-center' : 'w-full px-4 py-3 border border-slate-100'}`}>
-                            <Search size={18} className="text-slate-400 group-focus-within:text-indigo-600" />
+                {/* Search */}
+                <div className="px-4 mb-4 mt-1">
+                    <div className={`relative flex items-center ${isCollapsed ? 'justify-center' : ''}`}>
+                        <div className={`flex items-center rounded-2xl transition-all duration-300
+                            ${isCollapsed
+                                ? 'w-10 h-10 justify-center bg-slate-50'
+                                : `w-full px-4 py-3 border ${q ? 'border-indigo-300 bg-indigo-50' : 'border-slate-100 bg-slate-50'}`
+                            }`}
+                        >
+                            <Search size={16} className={`flex-shrink-0 ${q ? 'text-indigo-500' : 'text-slate-400'}`} />
                             {!isCollapsed && (
                                 <input
                                     type="text"
-                                    placeholder="Search.."
-                                    className="bg-transparent border-none outline-none text-sm font-bold ml-2 w-full text-slate-600 placeholder:text-slate-400"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder="Search menus..."
+                                    className="bg-transparent border-none outline-none text-sm font-bold ml-2 w-full text-slate-700 placeholder:text-slate-400"
                                 />
+                            )}
+                            {!isCollapsed && q && (
+                                <button onClick={() => setSearchQuery('')} className="ml-1 text-slate-400 hover:text-slate-600 flex-shrink-0">
+                                    <X size={14} />
+                                </button>
                             )}
                         </div>
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto no-scrollbar px-4 pb-8">
-                    <div className={`mb-4 px-2 ${isCollapsed ? 'text-center' : ''}`}>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Menu</p>
-                    </div>
-
-                    <nav className="space-y-1">
-                        {!isAdmin ? (
-                            links.map((link) => {
-                                const hasBadge = !isAdmin && (link.label === 'Bio Trees' || link.label === 'Verification');
-                                const badgeValue = link.label === 'Bio Trees' ? '26' : (link.label === 'Verification' ? '17' : null);
-
-                                return (
-                                    <NavLink
-                                        key={link.to}
-                                        to={link.to}
-                                        end={link.to === '/dashboard' || link.to === '/admin'}
-                                        onMouseEnter={(e) => handleMouseEnter(link.label, e)}
-                                        onMouseLeave={handleMouseLeave}
-                                        className={({ isActive }) => `
-                                            flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all relative group
-                                            ${isActive
-                                                ? 'bg-slate-50 text-indigo-600 shadow-sm border border-slate-100'
-                                                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
-                                            }
-                                            ${isCollapsed ? 'justify-center' : ''}
-                                        `}
-                                    >
-                                        <span className={`${isCollapsed ? 'scale-110' : ''} transition-transform`}>{link.icon}</span>
-                                        {!isCollapsed && (
-                                            <>
-                                                <span className="flex-1">{link.label}</span>
-                                                {hasBadge && (
-                                                    <span className="bg-rose-400 text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow-sm">
-                                                        {badgeValue}
-                                                    </span>
-                                                )}
-                                            </>
-                                        )}
-                                    </NavLink>
-                                );
-                            })
-                        ) : (
-                            adminLinkGroups.map((group) => (
-                                <div key={group.title} className="mb-4">
-                                    {!isCollapsed && (
-                                        <div className="px-4 py-2">
-                                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{group.title}</p>
-                                        </div>
-                                    )}
-                                    <div className="space-y-1">
-                                        {group.links.map((link) => (
-                                            <NavLink
-                                                key={link.to}
-                                                to={link.to}
-                                                end={link.to === '/admin'}
-                                                onMouseEnter={(e) => handleMouseEnter(link.label, e)}
-                                                onMouseLeave={handleMouseLeave}
-                                                className={({ isActive }) => `
-                                                    flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all relative group
-                                                    ${isActive
-                                                        ? 'bg-white/10 text-white'
-                                                        : 'text-slate-500 hover:text-white hover:bg-white/5'
-                                                    }
-                                                    ${isCollapsed ? 'justify-center' : ''}
-                                                `}
-                                            >
-                                                <span className={`${isCollapsed ? 'scale-110' : ''} transition-transform`}>{link.icon}</span>
-                                                {!isCollapsed && <span className="flex-1">{link.label}</span>}
-                                            </NavLink>
-                                        ))}
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </nav>
-
-                    {!isAdmin && !isCollapsed && (
-                        <div className="mt-8 pt-6 border-t border-slate-50">
+                {/* Nav area */}
+                <div className="flex-1 overflow-y-auto no-scrollbar px-4 pb-6">
+                    {q && !isCollapsed ? (
+                        /* --- SEARCH RESULTS --- */
+                        <div>
+                            <p className={`text-[10px] font-black uppercase tracking-[0.2em] px-2 mb-3 ${hasSearchResults ? 'text-indigo-400' : 'text-rose-400'}`}>
+                                {hasSearchResults ? `Results for "${searchQuery}"` : 'No results found'}
+                            </p>
+                            {!hasSearchResults && (
+                                <p className="text-center text-slate-400 text-xs font-bold py-6">Nothing matched your search.</p>
+                            )}
                             <nav className="space-y-1">
-                                <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-all">
-                                    <HelpCircle size={18} />
-                                    <span>Support</span>
-                                </button>
+                                {isAdmin
+                                    ? filteredAdminGroups.map(group => (
+                                        <div key={group.title} className="mb-4">
+                                            <div className="px-4 py-1">
+                                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{group.title}</p>
+                                            </div>
+                                            {group.links.map(link => (
+                                                <NavLink
+                                                    key={link.to}
+                                                    to={link.to}
+                                                    onClick={() => setSearchQuery('')}
+                                                    className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all
+                                                        ${isActive ? 'bg-white/10 text-white' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
+                                                >
+                                                    <span>{link.icon}</span>
+                                                    <span className="flex-1">{link.label}</span>
+                                                </NavLink>
+                                            ))}
+                                        </div>
+                                    ))
+                                    : filteredUserLinks.map(link => (
+                                        <NavLink
+                                            key={link.to + link.label}
+                                            to={link.to}
+                                            onClick={() => setSearchQuery('')}
+                                            className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all
+                                                ${isActive
+                                                    ? 'bg-slate-50 text-indigo-600 shadow-sm border border-slate-100'
+                                                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+                                        >
+                                            <span>{link.icon}</span>
+                                            <span className="flex-1">{link.label}</span>
+                                        </NavLink>
+                                    ))
+                                }
                             </nav>
                         </div>
+                    ) : (
+                        /* --- NORMAL MENU --- */
+                        <>
+                            <div className={`mb-4 px-2 ${isCollapsed ? 'text-center' : ''}`}>
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Menu</p>
+                            </div>
+
+                            {!isAdmin ? (
+                                <nav className="space-y-0.5">
+                                    {links.map(link => renderNavLink(link))}
+                                </nav>
+                            ) : (
+                                <nav className="space-y-1">
+                                    {adminLinkGroups.map((group) => (
+                                        <div key={group.title} className="mb-4">
+                                            {!isCollapsed && (
+                                                <div className="px-4 py-2">
+                                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{group.title}</p>
+                                                </div>
+                                            )}
+                                            <div className="space-y-0.5">
+                                                {group.links.map((link) => (
+                                                    <NavLink
+                                                        key={link.to}
+                                                        to={link.to}
+                                                        end={link.to === '/admin'}
+                                                        onMouseEnter={(e) => handleMouseEnter(link.label, e)}
+                                                        onMouseLeave={handleMouseLeave}
+                                                        className={({ isActive }) => `
+                                                            flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all
+                                                            ${isActive ? 'bg-white/10 text-white' : 'text-slate-500 hover:text-white hover:bg-white/5'}
+                                                            ${isCollapsed ? 'justify-center' : ''}
+                                                        `}
+                                                    >
+                                                        <span className={`${isCollapsed ? 'scale-110' : ''} transition-transform`}>{link.icon}</span>
+                                                        {!isCollapsed && <span className="flex-1">{link.label}</span>}
+                                                    </NavLink>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </nav>
+                            )}
+
+                            {/* Admin Panel button — user sidebar only */}
+                            {!isAdmin && (
+                                <div className="mt-4 pt-4 border-t border-slate-100">
+                                    {isUserAdmin && (
+                                        <button
+                                            onClick={() => navigate('/admin')}
+                                            onMouseEnter={(e) => handleMouseEnter('Admin Panel', e)}
+                                            onMouseLeave={handleMouseLeave}
+                                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all mb-1 bg-indigo-50 text-indigo-600 hover:bg-indigo-100
+                                                ${isCollapsed ? 'justify-center' : ''}`}
+                                        >
+                                            <Shield size={18} />
+                                            {!isCollapsed && <span className="flex-1 text-left">Admin Panel</span>}
+                                        </button>
+                                    )}
+                                    {!isCollapsed && (
+                                        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-all">
+                                            <HelpCircle size={18} />
+                                            <span>Support</span>
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
 
-                {/* Footer Section */}
+                {/* Footer */}
                 <div className="p-4 mt-auto border-t border-slate-100">
-                    <div className={`rounded-3xl border transition-all duration-300 ${isAdmin ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'} ${isCollapsed ? 'p-2 flex flex-col items-center gap-2' : 'p-4'}`}>
+                    <div className={`rounded-3xl border transition-all duration-300
+                        ${isAdmin ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'}
+                        ${isCollapsed ? 'p-2 flex flex-col items-center gap-2' : 'p-4'}`}
+                    >
                         <div className={`flex items-center gap-3 ${isCollapsed ? 'flex-col' : 'mb-4'}`}>
                             <img
                                 src={userProfile?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile?.displayName || 'User')}&background=6366f1&color=fff`}
@@ -275,7 +431,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                         {isCollapsed && (
                             <button
                                 onClick={onLogout}
-                                className="mt-2 w-full flex items-center justify-center p-2 text-slate-400 hover:text-rose-600 transition-colors"
+                                className="mt-1 w-full flex items-center justify-center p-2 text-slate-400 hover:text-rose-600 transition-colors"
                                 title="Logout"
                             >
                                 <LogOut size={18} />
@@ -285,7 +441,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                 </div>
             </div>
 
-            {/* Fixed tooltip — renders outside all overflow contexts */}
+            {/* Fixed tooltip (no children) */}
             {tooltip && isCollapsed && (
                 <div
                     className="fixed z-[999] px-3 py-2 bg-slate-900 text-white text-xs font-bold rounded-lg whitespace-nowrap shadow-xl pointer-events-none"
@@ -293,6 +449,32 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                 >
                     {tooltip.label}
                     <div className="absolute top-1/2 -translate-y-1/2 -left-1 w-2 h-2 bg-slate-900 rotate-45" />
+                </div>
+            )}
+
+            {/* Flyout submenu (items with children, collapsed mode) */}
+            {flyout && isCollapsed && (
+                <div
+                    className="fixed z-[999] bg-white border border-slate-100 rounded-2xl shadow-2xl shadow-slate-200 py-2 min-w-[160px]"
+                    style={{ top: flyout.y - 20, left: sidebarWidth + 12 }}
+                    onMouseEnter={() => {/* keep open */ }}
+                    onMouseLeave={handleFlyoutLeave}
+                >
+                    <div className="px-4 py-2 border-b border-slate-50 mb-1">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{flyout.label}</p>
+                    </div>
+                    {flyout.children.map(child => (
+                        <NavLink
+                            key={child.id}
+                            to={child.to}
+                            onClick={() => setFlyout(null)}
+                            className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 text-sm font-bold transition-all
+                                ${isActive ? 'text-indigo-600 bg-indigo-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}
+                        >
+                            <span className="w-1.5 h-1.5 rounded-full bg-current opacity-50 flex-shrink-0" />
+                            {child.label}
+                        </NavLink>
+                    ))}
                 </div>
             )}
         </aside>
