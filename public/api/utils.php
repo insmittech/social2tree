@@ -59,6 +59,22 @@ function require_auth() {
     return $_SESSION['user_id'];
 }
 
+function set_user_timezone($pdo, $user_id) {
+    try {
+        $stmt = $pdo->prepare("SELECT timezone FROM users WHERE id = ?");
+        $stmt->execute([$user_id]);
+        $tz = $stmt->fetchColumn();
+        
+        if ($tz) {
+            date_default_timezone_set($tz);
+            $pdo->exec("SET time_zone = '" . $tz . "'"); // Try to set DB timezone too
+        }
+    } catch (Exception $e) {
+        // Silently fail if timezone is invalid or DB error
+    }
+}
+
+
 function require_admin() {
     $user_id = require_auth();
     if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
@@ -79,7 +95,7 @@ function sanitize_input($data)
 function get_user_profile($pdo, $user_id) {
     try {
         // Fetch User Details
-        $stmt = $pdo->prepare("SELECT id, username, email, display_name, bio, avatar_url, role, plan, status, is_verified, views, created_at FROM users WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT id, username, email, display_name, bio, avatar_url, role, plan, status, is_verified, views, created_at, timezone, time_format FROM users WHERE id = ?");
         $stmt->execute([$user_id]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -96,6 +112,8 @@ function get_user_profile($pdo, $user_id) {
                 'isVerified' => (bool)$user['is_verified'],
                 'createdAt' => $user['created_at'],
                 'views' => (int)($user['views'] ?? 0),
+                'timezone' => $user['timezone'] ?? 'UTC',
+                'timeFormat' => $user['time_format'] ?? '12h',
                 'pages' => [],
                 'roles' => [],
                 'permissions' => []

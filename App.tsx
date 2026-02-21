@@ -29,6 +29,7 @@ import Pricing from './pages/Pricing';
 import Contact from './pages/Contact';
 import Blog from './pages/Blog';
 import About from './pages/About';
+import UserSettings from './pages/UserSettings';
 import Layout from './components/Layout';
 import { ToastProvider } from './src/context/ToastContext';
 import { ToastContainer } from './components/Toast';
@@ -119,6 +120,10 @@ const AppRoutes: React.FC = () => {
         <Route
           path="/dashboard/verification"
           element={isAuthenticated ? <Layout userProfile={user} onLogout={handleLogout}><RequestVerification /></Layout> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/dashboard/settings"
+          element={isAuthenticated ? <Layout userProfile={user} onLogout={handleLogout}><UserSettings /></Layout> : <Navigate to="/login" />}
         />
 
         {/* Admin Routes */}

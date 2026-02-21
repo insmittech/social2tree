@@ -24,6 +24,21 @@ $options = [
 
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
+
+    // Automatically set timezone if user is logged in
+    if (session_status() !== PHP_SESSION_NONE && isset($_SESSION['user_id'])) {
+        $stmt = $pdo->prepare("SELECT timezone FROM users WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $tz = $stmt->fetchColumn();
+        if ($tz) {
+            date_default_timezone_set($tz);
+            try {
+                $pdo->exec("SET time_zone = '$tz'");
+            } catch (Exception $e) {
+                // Some MySQL setups might not have timezone data populated
+            }
+        }
+    }
 } catch (\PDOException $e) {
     if (function_exists('json_response')) {
         json_response(['error' => 'Database connection failed: ' . $e->getMessage()], 500);

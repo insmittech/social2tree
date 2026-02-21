@@ -122,6 +122,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
         { to: '/dashboard/plan', icon: <CreditCard size={18} />, label: 'Plan' },
         { to: '/dashboard/saved', icon: <Bookmark size={18} />, label: 'Saved Links' },
         { to: '/dashboard/verification', icon: <ShieldCheck size={18} />, label: 'Verification' },
+        { to: '/dashboard/settings', icon: <Settings size={18} />, label: 'Settings' },
     ];
 
     const adminLinkGroups = [

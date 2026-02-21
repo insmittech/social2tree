@@ -34,7 +34,9 @@ try {
         'email' => 'email',
         'displayName' => 'display_name',
         'bio' => 'bio',
-        'avatarUrl' => 'avatar_url'
+        'avatarUrl' => 'avatar_url',
+        'timezone' => 'timezone',
+        'timeFormat' => 'time_format'
     ];
 
     foreach ($allowed_fields as $json_key => $db_column) {

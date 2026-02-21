@@ -53,6 +53,8 @@ export interface UserProfile {
   views: number;
   roles: string[];
   permissions: string[];
+  timezone?: string;
+  timeFormat?: '12h' | '24h';
 }
 
 export interface VerificationRequest {

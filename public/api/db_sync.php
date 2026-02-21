@@ -58,7 +58,9 @@ try {
         'status' => "ENUM('active', 'suspended') DEFAULT 'active' AFTER role",
         'custom_domain' => "VARCHAR(255) NULL AFTER status",
         'is_verified' => "TINYINT(1) DEFAULT 0 AFTER custom_domain",
-        'views' => "INT DEFAULT 0 AFTER is_verified"
+        'views' => "INT DEFAULT 0 AFTER is_verified",
+        'timezone' => "VARCHAR(100) DEFAULT 'UTC' AFTER views",
+        'time_format' => "ENUM('12h', '24h') DEFAULT '12h' AFTER timezone"
     ];
 
     foreach ($userColsToAdd as $col => $def) {
