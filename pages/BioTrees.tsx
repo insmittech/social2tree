@@ -99,7 +99,7 @@ const BioTrees: React.FC = () => {
                     <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                         <button
                             onClick={() => setShowCreate(true)}
-                            className="bg-indigo-600 text-white px-6 py-3.5 sm:py-3 rounded-[1.25rem] sm:rounded-2xl font-black text-sm hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-lg dark:shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-indigo-100"
+                            className="bg-indigo-600 dark:bg-teal-500 text-white dark:text-slate-950 px-6 py-3.5 sm:py-3 rounded-[1.25rem] sm:rounded-2xl font-black text-sm hover:bg-indigo-700 dark:hover:bg-teal-400 transition-all flex items-center justify-center gap-2 shadow-lg dark:shadow-teal-500/20 shadow-indigo-100"
                         >
                             <Plus size={18} /> New Tree
                         </button>
@@ -125,7 +125,7 @@ const BioTrees: React.FC = () => {
                                     <button className="p-2.5 rounded-xl text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"><LayoutGrid size={18} /></button>
                                     <button className="p-2.5 rounded-xl bg-white dark:bg-slate-900/40 shadow-sm dark:shadow-none text-indigo-600 dark:text-teal-400 transition-colors"><List size={18} /></button>
                                 </div>
-                                <button className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3 border border-slate-200 dark:border-slate-700/50 rounded-[1.25rem] text-slate-600 dark:text-slate-300 font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all">
+                                <button className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3 border border-slate-200 dark:border-slate-800/50 rounded-[1.25rem] text-slate-600 dark:text-slate-400 font-black text-xs uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all">
                                     <Filter size={18} /> Filters
                                 </button>
                             </div>
@@ -164,7 +164,7 @@ const BioTrees: React.FC = () => {
                             </thead>
                             <tbody>
                                 {filteredPages.map(page => (
-                                    <tr key={page.id} className="group hover:bg-indigo-50/10 transition-all border-b border-slate-50 dark:border-slate-800/50">
+                                    <tr key={page.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all border-b border-slate-50 dark:border-slate-800/50">
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center font-black text-sm uppercase shadow-lg">
@@ -201,10 +201,10 @@ const BioTrees: React.FC = () => {
                                     </tr>
                                 ))}
                                 {/* Footer Add Row */}
-                                <tr onClick={() => setShowCreate(true)} className="group cursor-pointer hover:bg-indigo-50/10 transition-all">
+                                <tr onClick={() => setShowCreate(true)} className="group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all">
                                     <td colSpan={5} className="px-8 py-8 text-center border-t border-slate-50 dark:border-slate-800/50">
                                         <div className="flex items-center justify-center gap-4">
-                                            <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
+                                            <div className="w-10 h-10 bg-indigo-50 dark:bg-teal-500/10 text-indigo-600 dark:text-teal-400 rounded-full flex items-center justify-center group-hover:bg-indigo-600 dark:group-hover:bg-teal-500 group-hover:text-white dark:group-hover:text-slate-950 transition-all shadow-sm">
                                                 <Plus size={18} />
                                             </div>
                                             <div className="text-left">

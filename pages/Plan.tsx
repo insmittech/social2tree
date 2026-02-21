@@ -28,7 +28,7 @@ const Plan: React.FC = () => {
     if (!profile || loading) {
         return (
             <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
-                <Loader2 size={40} className="animate-spin text-indigo-600" />
+                <Loader2 size={40} className="animate-spin text-indigo-600 dark:text-teal-400" />
                 <p className="text-xs font-black uppercase tracking-widest text-slate-400">Syncing your account status...</p>
             </div>
         );
@@ -81,14 +81,14 @@ const Plan: React.FC = () => {
                             </div>
                         </div>
 
-                        <button className="mt-10 flex items-center gap-2 text-indigo-600 font-black text-[10px] uppercase tracking-widest hover:gap-4 transition-all group">
+                        <button className="mt-10 flex items-center gap-2 text-indigo-600 dark:text-teal-400 font-black text-[10px] uppercase tracking-widest hover:gap-4 transition-all group">
                             View Billing History <ArrowRight size={14} className="group-hover:translate-x-1" />
                         </button>
                     </div>
                 </div>
 
                 <div className="lg:col-span-2">
-                    <div className="bg-indigo-600 rounded-[2.5rem] p-10 text-white relative overflow-hidden h-full flex flex-col justify-center">
+                    <div className="bg-indigo-600 dark:bg-indigo-700/50 border border-transparent dark:border-indigo-500/30 rounded-[2.5rem] p-10 text-white relative overflow-hidden h-full flex flex-col justify-center">
                         <div className="relative z-10">
                             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 backdrop-blur-md">
                                 <Zap size={12} fill="currentColor" /> Exclusive Offer
@@ -109,24 +109,24 @@ const Plan: React.FC = () => {
                         </div>
 
                         {/* Decorative Background Circles */}
-                        <div className="absolute -top-10 -right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-                        <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-indigo-400/20 rounded-full blur-2xl" />
+                        <div className="absolute -top-10 -right-10 w-64 h-64 bg-white/10 dark:bg-teal-400/10 rounded-full blur-3xl opacity-50" />
+                        <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-indigo-400/20 rounded-full blur-2xl opacity-50" />
                     </div>
                 </div>
             </div>
 
             {/* Billing Toggle */}
             <div className="flex flex-col items-center mb-12">
-                <div className="bg-slate-100 dark:bg-slate-900 p-2 rounded-3xl inline-flex gap-1 shadow-inner group">
+                <div className="bg-slate-100 dark:bg-[#05080f] p-2 rounded-3xl inline-flex gap-1 shadow-inner group transition-colors">
                     <button
                         onClick={() => setBilling('monthly')}
-                        className={`px-10 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${billing === 'monthly' ? 'bg-white dark:bg-slate-800 text-indigo-600 shadow-xl' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
+                        className={`px-10 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${billing === 'monthly' ? 'bg-white dark:bg-[#0b121e] text-indigo-600 dark:text-teal-400 shadow-xl dark:shadow-none' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
                     >
                         Monthly
                     </button>
                     <button
                         onClick={() => setBilling('yearly')}
-                        className={`px-10 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all relative ${billing === 'yearly' ? 'bg-white dark:bg-slate-800 text-indigo-600 shadow-xl' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
+                        className={`px-10 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all relative ${billing === 'yearly' ? 'bg-white dark:bg-[#0b121e] text-indigo-600 dark:text-teal-400 shadow-xl dark:shadow-none' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
                     >
                         Yearly
                         <span className="absolute -top-3 -right-3 bg-emerald-500 text-white text-[8px] px-2 py-0.5 rounded-full shadow-lg font-black group-hover:scale-110 transition-transform">

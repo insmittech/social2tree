@@ -18,7 +18,7 @@ const Layout: React.FC<LayoutProps> = ({ children, userProfile, onLogout, isAdmi
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     return (
-        <div className="min-h-screen bg-slate-50 flex">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#0b0f19] flex transition-colors duration-300">
             {/* Sidebar for Desktop */}
             <Sidebar
                 isAdmin={isAdmin || isAdminPath}

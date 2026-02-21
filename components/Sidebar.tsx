@@ -392,7 +392,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                                             onClick={() => navigate('/admin')}
                                             onMouseEnter={(e) => handleMouseEnter('Admin Panel', e)}
                                             onMouseLeave={handleMouseLeave}
-                                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all mb-1 bg-indigo-50 text-indigo-600 hover:bg-indigo-100
+                                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all mb-1 bg-indigo-50 dark:bg-teal-500/10 text-indigo-600 dark:text-teal-400 hover:bg-indigo-100 dark:hover:bg-teal-500/20 border border-transparent dark:border-teal-500/20
                                                 ${isCollapsed ? 'justify-center' : ''}`}
                                         >
                                             <Shield size={18} />
@@ -400,7 +400,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                                         </button>
                                     )}
                                     {!isCollapsed && (
-                                        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-all">
+                                        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all">
                                             <HelpCircle size={18} />
                                             <span>Support</span>
                                         </button>
@@ -429,28 +429,28 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                 )}
 
                 {/* Footer */}
-                <div className="p-4 mt-auto border-t border-slate-100 dark:border-slate-800">
+                <div className="p-4 mt-auto border-t border-slate-100 dark:border-slate-800/50">
                     <div className={`rounded-3xl border transition-all duration-300
-                        ${isAdmin ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700'}
+                        ${isAdmin ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 dark:bg-[#0b121e] border-slate-200 dark:border-slate-800/50'}
                         ${isCollapsed ? 'p-2 flex flex-col items-center gap-2' : 'p-4'}`}
                     >
                         <div className={`flex items-center gap-3 ${isCollapsed ? 'flex-col' : 'mb-4'}`}>
                             <img
                                 src={userProfile?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile?.displayName || 'User')}&background=6366f1&color=fff`}
-                                className="w-9 h-9 rounded-2xl border-2 border-white shadow-sm object-cover flex-shrink-0"
+                                className="w-9 h-9 rounded-2xl border-2 border-white dark:border-slate-800 shadow-sm object-cover flex-shrink-0"
                                 alt="Avatar"
                             />
                             {!isCollapsed && (
                                 <div className="overflow-hidden">
-                                    <p className="text-xs font-black truncate text-slate-900">{userProfile?.displayName}</p>
-                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest truncate">{userProfile?.role}</p>
+                                    <p className="text-xs font-black truncate text-slate-900 dark:text-white">{userProfile?.displayName}</p>
+                                    <p className="text-[10px] text-slate-500 dark:text-slate-500 font-bold uppercase tracking-widest truncate">{userProfile?.role}</p>
                                 </div>
                             )}
                         </div>
                         {!isCollapsed && (
                             <button
                                 onClick={onLogout}
-                                className="w-full py-3 bg-white text-slate-600 border border-slate-100 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:text-rose-600 hover:bg-rose-50 transition-all flex items-center justify-center gap-2 shadow-sm"
+                                className="w-full py-3 bg-white dark:bg-[#05080f] text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-slate-800/50 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all flex items-center justify-center gap-2 shadow-sm"
                             >
                                 <LogOut size={14} /> Logout
                             </button>
@@ -458,7 +458,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                         {isCollapsed && (
                             <button
                                 onClick={onLogout}
-                                className="mt-1 w-full flex items-center justify-center p-2 text-slate-400 hover:text-rose-600 transition-colors"
+                                className="mt-1 w-full flex items-center justify-center p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
                                 title="Logout"
                             >
                                 <LogOut size={18} />
@@ -471,24 +471,24 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
             {/* Fixed tooltip (no children) */}
             {tooltip && isCollapsed && (
                 <div
-                    className="fixed z-[999] px-3 py-2 bg-slate-900 text-white text-xs font-bold rounded-lg whitespace-nowrap shadow-xl pointer-events-none"
+                    className="fixed z-[999] px-3 py-2 bg-slate-900 dark:bg-[#0b121e] border dark:border-slate-800 text-white text-xs font-bold rounded-lg whitespace-nowrap shadow-xl pointer-events-none transition-colors"
                     style={{ top: tooltip.y - 12, left: sidebarWidth + 12 }}
                 >
                     {tooltip.label}
-                    <div className="absolute top-1/2 -translate-y-1/2 -left-1 w-2 h-2 bg-slate-900 rotate-45" />
+                    <div className="absolute top-1/2 -translate-y-1/2 -left-1 w-2 h-2 bg-slate-900 dark:bg-[#0b121e] border-l border-b dark:border-slate-800 rotate-45" />
                 </div>
             )}
 
             {/* Flyout submenu (items with children, collapsed mode) */}
             {flyout && isCollapsed && (
                 <div
-                    className="fixed z-[999] bg-white border border-slate-100 rounded-2xl shadow-2xl shadow-slate-200 py-2 min-w-[160px]"
+                    className="fixed z-[999] bg-white dark:bg-[#0b121e] border border-slate-100 dark:border-slate-800 rounded-2xl shadow-2xl shadow-slate-200/50 dark:shadow-none py-2 min-w-[160px] animate-in fade-in slide-in-from-left-2 duration-200"
                     style={{ top: flyout.y - 20, left: sidebarWidth + 12 }}
                     onMouseEnter={() => {/* keep open */ }}
                     onMouseLeave={handleFlyoutLeave}
                 >
-                    <div className="px-4 py-2 border-b border-slate-50 mb-1">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{flyout.label}</p>
+                    <div className="px-4 py-2 border-b border-slate-50 dark:border-slate-800/50 mb-1">
+                        <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{flyout.label}</p>
                     </div>
                     {flyout.children.map(child => (
                         <NavLink
@@ -496,7 +496,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                             to={child.to}
                             onClick={() => setFlyout(null)}
                             className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 text-sm font-bold transition-all
-                                ${isActive ? 'text-indigo-600 bg-indigo-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}
+                                ${isActive ? 'text-indigo-600 dark:text-teal-400 bg-indigo-50 dark:bg-teal-500/10' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}
                         >
                             <span className="w-1.5 h-1.5 rounded-full bg-current opacity-50 flex-shrink-0" />
                             {child.label}

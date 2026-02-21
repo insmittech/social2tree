@@ -142,8 +142,8 @@ const RequestVerification: React.FC = () => {
 
             {/* Verification Path Title */}
             <div className="flex items-center gap-6 mb-12">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 flex-shrink-0">Your Verification Path</span>
-                <div className="h-px bg-slate-100 dark:bg-slate-800 flex-grow" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500 flex-shrink-0 transition-colors">Your Verification Path</span>
+                <div className="h-px bg-slate-100 dark:bg-slate-800/50 flex-grow transition-colors" />
             </div>
 
             {/* Why Get Verified Section */}
@@ -189,7 +189,7 @@ const RequestVerification: React.FC = () => {
 
             {/* Connector Line */}
             <div className="flex justify-center mb-16">
-                <div className="w-px h-24 bg-slate-100 dark:bg-slate-800 pl-4 border-l border-slate-100 dark:border-slate-800" />
+                <div className="w-px h-24 bg-slate-100 dark:bg-slate-800/50 pl-4 border-l border-slate-100 dark:border-slate-800/50 transition-colors" />
             </div>
 
             {/* Advantages Section */}

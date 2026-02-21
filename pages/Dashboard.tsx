@@ -75,13 +75,13 @@ const Dashboard: React.FC = () => {
   const verificationBadge = () => {
     switch (verificationStatus) {
       case 'approved':
-        return { icon: <CheckCircle2 size={16} className="text-emerald-500" />, label: 'Verified', color: 'bg-emerald-50 text-emerald-700 border-emerald-100' };
+        return { icon: <CheckCircle2 size={16} className="text-emerald-500" />, label: 'Verified', color: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20' };
       case 'pending':
-        return { icon: <Clock size={16} className="text-amber-500" />, label: 'Pending Review', color: 'bg-amber-50 text-amber-700 border-amber-100' };
+        return { icon: <Clock size={16} className="text-amber-500" />, label: 'Pending Review', color: 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-500/20' };
       case 'rejected':
-        return { icon: <XCircle size={16} className="text-rose-500" />, label: 'Rejected', color: 'bg-rose-50 text-rose-700 border-rose-100' };
+        return { icon: <XCircle size={16} className="text-rose-500" />, label: 'Rejected', color: 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-500/20' };
       default:
-        return { icon: <AlertCircle size={16} className="text-slate-400" />, label: 'Not Submitted', color: 'bg-slate-50 text-slate-500 border-slate-100' };
+        return { icon: <AlertCircle size={16} className="text-slate-400" />, label: 'Not Submitted', color: 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-100 dark:border-slate-800' };
     }
   };
 
@@ -211,11 +211,11 @@ const Dashboard: React.FC = () => {
               { label: 'Link Clicks', value: totalClicks, max: Math.max(totalViews, 1), color: 'bg-violet-500' },
             ].map(bar => (
               <div key={bar.label}>
-                <div className="flex justify-between text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wide">
+                <div className="flex justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wide">
                   <span>{bar.label}</span>
                   <span className="text-slate-900 dark:text-white transition-colors">{bar.value.toLocaleString()}</span>
                 </div>
-                <div className="h-2.5 bg-slate-50 rounded-full overflow-hidden border border-slate-100">
+                <div className="h-2.5 bg-slate-50 dark:bg-[#05080f] rounded-full overflow-hidden border border-slate-100 dark:border-slate-800/50">
                   <div
                     className={`h-full ${bar.color} rounded-full transition-all duration-1000`}
                     style={{ width: `${Math.min((bar.value / bar.max) * 100, 100)}%` }}
@@ -262,15 +262,15 @@ const Dashboard: React.FC = () => {
           <h3 className="text-base font-black text-slate-900 dark:text-white mb-4 transition-colors">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { label: 'Manage Trees', icon: <Layout size={18} />, to: '/dashboard/trees', color: 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100' },
-              { label: 'Analytics', icon: <BarChart2 size={18} />, to: '/dashboard/analytics', color: 'bg-violet-50 text-violet-600 hover:bg-violet-100' },
-              { label: 'Saved Links', icon: <Zap size={18} />, to: '/dashboard/saved', color: 'bg-amber-50 text-amber-600 hover:bg-amber-100' },
-              { label: 'Account', icon: <CheckCircle2 size={18} />, to: '/dashboard/profile', color: 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' },
+              { label: 'Manage Trees', icon: <Layout size={18} />, to: '/dashboard/trees', color: 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20' },
+              { label: 'Analytics', icon: <BarChart2 size={18} />, to: '/dashboard/analytics', color: 'bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-500/20' },
+              { label: 'Saved Links', icon: <Zap size={18} />, to: '/dashboard/saved', color: 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-500/20' },
+              { label: 'Account', icon: <CheckCircle2 size={18} />, to: '/dashboard/profile', color: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20' },
             ].map(action => (
               <button
                 key={action.label}
                 onClick={() => navigate(action.to)}
-                className={`flex items-center gap-3 px-4 py-4 rounded-2xl text-[13px] font-black transition-all ${action.color} active:scale-95`}
+                className={`flex items-center gap-3 px-4 py-4 rounded-2xl text-[13px] font-black transition-all ${action.color} border border-transparent dark:border-white/5 active:scale-95`}
               >
                 {action.icon} {action.label}
               </button>
