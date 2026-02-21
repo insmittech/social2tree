@@ -78,10 +78,30 @@ try {
 
     // Core Tables
     $coreTables = [
+        'audit_logs' => "CREATE TABLE IF NOT EXISTS audit_logs (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NULL,
+            event VARCHAR(255) NOT NULL,
+            ip_address VARCHAR(45) NOT NULL,
+            user_agent TEXT,
+            severity ENUM('info', 'warning', 'danger') DEFAULT 'info',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+        'ip_blacklist' => "CREATE TABLE IF NOT EXISTS ip_blacklist (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            ip_address VARCHAR(45) NOT NULL UNIQUE,
+            reason TEXT,
+            blocked_by INT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (blocked_by) REFERENCES users(id) ON DELETE SET NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
         'verification_requests' => "CREATE TABLE IF NOT EXISTS verification_requests (
             id INT AUTO_INCREMENT PRIMARY KEY,
             user_id INT NOT NULL,
-            status ENUM('pending', 'approved', 'rejected', 'more_info') DEFAULT 'pending',
+            status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
             details TEXT,
             rejection_reason TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -350,6 +370,9 @@ try {
         'free_link_limit' => '3',
         'pro_link_limit' => '100',
         'auto_verify_on_upgrade' => 'true',
+        'security_2fa_admin' => 'true',
+        'security_login_limit' => '5',
+        'security_session_timeout' => '30',
         'available_themes' => '["default", "dark", "glass", "minimal"]'
     ];
     $sStmt = $pdo->prepare("INSERT IGNORE INTO settings (setting_key, setting_value) VALUES (?, ?)");

@@ -59,7 +59,6 @@ const RequestVerification: React.FC = () => {
         );
     }
 
-    const isPremiumPlan = user.plan === 'pro' || user.plan === 'vip' || user.plan === 'business' || user.plan === 'agency';
     const isAdmin = user.role === 'admin';
 
     return (

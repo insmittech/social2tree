@@ -187,4 +187,20 @@ function get_json_input()
     $json = file_get_contents('php://input');
     return json_decode($json, true);
 }
+
+/**
+ * Log a security or system event to audit_logs table
+ */
+function log_audit_event($pdo, $event, $severity = 'info', $user_id = null) {
+    try {
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'system';
+        $ua = $_SERVER['HTTP_USER_AGENT'] ?? null;
+        
+        $stmt = $pdo->prepare("INSERT INTO audit_logs (user_id, event, ip_address, user_agent, severity) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$user_id, $event, $ip, $ua, $severity]);
+    } catch (Exception $e) {
+        // Silently fail to prevent breaking main logic
+        error_log("Audit Logging Error: " . $e->getMessage());
+    }
+}
 ?>
