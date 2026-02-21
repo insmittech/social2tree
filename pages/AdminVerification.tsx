@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Search, Filter, CheckCircle2, XCircle, Clock, Info, ExternalLink, Mail, MessageSquare } from 'lucide-react';
-import axios from 'axios';
+import { ShieldCheck, Search, Filter, CheckCircle2, XCircle, Clock, Info, ExternalLink, X, History } from 'lucide-react';
+import { useAuth } from '../src/context/AuthContext';
+import { formatDate } from '../src/utils/dateUtils';
+import client from '../src/api/client';
+import Pagination from '../components/Pagination';
 import { VerificationRequest } from '../types';
 
 const AdminVerification: React.FC = () => {
+    const { user } = useAuth();
     const [requests, setRequests] = useState<VerificationRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     // Modal state
     const [selectedRequest, setSelectedRequest] = useState<VerificationRequest | null>(null);
@@ -22,7 +28,7 @@ const AdminVerification: React.FC = () => {
     const fetchRequests = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`/api/admin/verification/list.php${statusFilter ? `?status=${statusFilter}` : ''}`);
+            const response = await client.get(`/api/admin/verification/list.php${statusFilter ? `?status=${statusFilter}` : ''}`);
             setRequests(response.data.requests || []);
         } catch (error) {
             console.error('Failed to fetch verification requests', error);
@@ -41,7 +47,7 @@ const AdminVerification: React.FC = () => {
         if (actionType === 'reject') targetStatus = 'rejected';
 
         try {
-            await axios.post('/api/admin/verification/update.php', {
+            await client.post('/api/admin/verification/update.php', {
                 id: selectedRequest.id,
                 status: targetStatus,
                 reason: reason
@@ -66,6 +72,12 @@ const AdminVerification: React.FC = () => {
         r.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
         r.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         r.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+    const paginatedRequests = filteredRequests.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
 
     const getStatusBadge = (status: VerificationRequest['status']) => {
@@ -139,7 +151,7 @@ const AdminVerification: React.FC = () => {
                                     <td colSpan={5} className="px-8 py-12 text-center text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest text-xs">No requests found</td>
                                 </tr>
                             ) : (
-                                filteredRequests.map((req) => (
+                                paginatedRequests.map((req) => (
                                     <tr key={req.id} className="hover:bg-slate-50/50 transition-colors">
                                         <td className="px-8 py-6">
                                             <div className="flex flex-col">
@@ -151,7 +163,7 @@ const AdminVerification: React.FC = () => {
                                             <p className="text-slate-500 dark:text-slate-400 text-xs font-medium truncate">{req.details}</p>
                                         </td>
                                         <td className="px-8 py-6 text-center">
-                                            <span className="text-slate-400 dark:text-slate-500 text-[10px] font-black">{new Date(req.createdAt).toLocaleDateString()}</span>
+                                            <span className="text-slate-400 dark:text-slate-500 text-[10px] font-black">{formatDate(req.createdAt, user?.timezone, user?.timeFormat)}</span>
                                         </td>
                                         <td className="px-8 py-6">
                                             {getStatusBadge(req.status)}
@@ -191,6 +203,12 @@ const AdminVerification: React.FC = () => {
                         </tbody>
                     </table>
                 </div>
+
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
             </div>
 
             {/* Action Modal */}

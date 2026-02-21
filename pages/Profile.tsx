@@ -5,6 +5,7 @@ import client from '../src/api/client';
 import { UserProfile } from '../types';
 import { useToast } from '../src/context/ToastContext';
 import { useAuth } from '../src/context/AuthContext';
+import { formatDate } from '../src/utils/dateUtils';
 
 const Profile: React.FC = () => {
     const { showToast } = useToast();
@@ -127,7 +128,7 @@ const Profile: React.FC = () => {
                                     {profile?.displayName}
                                 </h2>
                                 <p className="text-slate-400 dark:text-slate-500 font-bold text-xs uppercase tracking-widest flex items-center gap-2">
-                                    @{profile?.username} · <Calendar size={12} className="inline" /> Joined {new Date(profile.createdAt).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
+                                    @{profile?.username} · <Calendar size={12} className="inline" /> Joined {formatDate(profile.createdAt, profile.timezone, profile.timeFormat, false)}
                                 </p>
                             </div>
 

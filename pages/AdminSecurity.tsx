@@ -6,6 +6,9 @@ import {
   ShieldOff, LockKeyhole, Clock
 } from 'lucide-react';
 import axios from 'axios';
+import { useAuth } from '../src/context/AuthContext';
+import { formatDate } from '../src/utils/dateUtils';
+import Pagination from '../components/Pagination';
 
 interface AuditLog {
   id: number;
@@ -29,6 +32,7 @@ interface AdminSecurityProps {
 }
 
 const AdminSecurity: React.FC<AdminSecurityProps> = () => {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [mfaEnabled, setMfaEnabled] = useState(false);
   const [loginLimit, setLoginLimit] = useState('5');
@@ -37,6 +41,9 @@ const AdminSecurity: React.FC<AdminSecurityProps> = () => {
   const [blockedIps, setBlockedIps] = useState<BlockedIp[]>([]);
   const [showAddIpModal, setShowAddIpModal] = useState(false);
   const [newIp, setNewIp] = useState('');
+  const [searchLogs, setSearchLogs] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [ipReason, setIpReason] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -119,14 +126,31 @@ const AdminSecurity: React.FC<AdminSecurityProps> = () => {
     }
   };
 
+  const filteredLogs = auditLogs.filter(log =>
+    log.event.toLowerCase().includes(searchLogs.toLowerCase()) ||
+    (log.username && log.username.toLowerCase().includes(searchLogs.toLowerCase())) ||
+    log.ip_address.includes(searchLogs)
+  );
+
+  const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
+  const paginatedLogs = filteredLogs.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll table into view if needed
+  };
+
   const exportLogs = () => {
     const headers = ['Event', 'User', 'IP Address', 'Severity', 'Time'];
-    const rows = auditLogs.map(l => [
+    const rows = filteredLogs.map(l => [
       l.event,
       l.username || 'System',
       l.ip_address,
       l.severity,
-      l.created_at
+      formatDate(l.created_at, user?.timezone, user?.timeFormat)
     ]);
 
     const csvContent = "data:text/csv;charset=utf-8,"
@@ -380,12 +404,12 @@ const AdminSecurity: React.FC<AdminSecurityProps> = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-              {auditLogs.length === 0 ? (
+              {paginatedLogs.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-10 py-20 text-center font-black text-slate-300 uppercase italic tracking-widest">No activity data found</td>
                 </tr>
               ) : (
-                auditLogs.map((log) => (
+                paginatedLogs.map((log) => (
                   <tr key={log.id} className="hover:bg-slate-50/50 dark:hover:bg-indigo-500/5 transition-all">
                     <td className="px-10 py-6">
                       <div className="flex items-center gap-3">
@@ -400,7 +424,7 @@ const AdminSecurity: React.FC<AdminSecurityProps> = () => {
                       <span className="text-[10px] font-black font-mono text-slate-400 p-2 bg-slate-50 dark:bg-slate-800 rounded-xl">{log.ip_address}</span>
                     </td>
                     <td className="px-8 py-6 text-sm text-slate-500 font-bold uppercase tracking-tight">
-                      {new Date(log.created_at).toLocaleString()}
+                      {formatDate(log.created_at, user?.timezone, user?.timeFormat)}
                     </td>
                     <td className="px-10 py-6 text-center">
                       <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-[0.1em] border shadow-sm ${log.severity === 'info' ? 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:border-emerald-500/20' :

@@ -5,6 +5,7 @@ import { Search, Filter, MoreHorizontal, UserCheck, ShieldAlert, CreditCard, Ext
 import { Link } from 'react-router-dom';
 import client from '../src/api/client';
 import { useToast } from '../src/context/ToastContext';
+import Pagination from '../components/Pagination';
 
 interface AdminUsersProps {
   onLogout: () => void;
@@ -16,6 +17,8 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
   const [allRoles, setAllRoles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
 
@@ -53,6 +56,12 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
   const filteredUsers = users.filter(u =>
     u.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     u.username.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const paginatedUsers = filteredUsers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   if (loading) {
@@ -114,7 +123,7 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
               </tr>
             </thead>
             <tbody className="divide-y-2 divide-slate-50">
-              {filteredUsers.map((user) => (
+              {paginatedUsers.map((user) => (
                 <tr key={user.id} className="group hover:bg-slate-50/50 transition-colors">
                   <td className="px-4 sm:px-8 py-6">
                     <div className="flex items-center gap-3 sm:gap-4">
@@ -180,12 +189,20 @@ const AdminUsers: React.FC<AdminUsersProps> = ({ onLogout }) => {
             </tbody>
           </table>
         </div>
-        {filteredUsers.length === 0 && (
+        {paginatedUsers.length === 0 && (
           <div className="p-20 text-center">
             <p className="text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest text-xs">No users found.</p>
           </div>
         )}
       </div>
+
+      {paginatedUsers.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      )}
 
       {/* Role Assignment Modal */}
       {isRoleModalOpen && selectedUser && (

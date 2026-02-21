@@ -7,12 +7,15 @@ import { useAuth } from '../src/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { usePageSelector } from '../src/hooks/usePageSelector';
 import client from '../src/api/client';
+import Pagination from '../components/Pagination';
 
 const BioTrees: React.FC = () => {
     const navigate = useNavigate();
     const { user: profile, refreshProfile } = useAuth();
     const { setSelectedPageId } = usePageSelector();
     const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     // ── Create Modal state ──────────────────────────────────────────────────
     const [showCreate, setShowCreate] = useState(false);
@@ -83,6 +86,12 @@ const BioTrees: React.FC = () => {
     const filteredPages = pages.filter(p =>
         p.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.slug.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const totalPages = Math.ceil(filteredPages.length / itemsPerPage);
+    const paginatedPages = filteredPages.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
 
     return (
@@ -163,7 +172,7 @@ const BioTrees: React.FC = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredPages.map(page => (
+                                {paginatedPages.map(page => (
                                     <tr key={page.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all border-b border-slate-50 dark:border-slate-800/50">
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-4">
@@ -217,6 +226,12 @@ const BioTrees: React.FC = () => {
                             </tbody>
                         </table>
                     </div>
+
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
                 </div>
             </div>
 

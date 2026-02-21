@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { usePageSelector } from '../src/hooks/usePageSelector';
 import { useAuth } from '../src/context/AuthContext';
+import { formatDate } from '../src/utils/dateUtils';
+import Pagination from '../components/Pagination';
 
 interface GeoCountry { country: string; country_code: string; clicks: number; }
 interface GeoCity { city: string; country: string; country_code: string; clicks: number; }
@@ -108,6 +110,8 @@ const Analytics: React.FC = () => {
   const [geoCountries, setGeoCountries] = useState<GeoCountry[]>([]);
   const [geoCities, setGeoCities] = useState<GeoCity[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const activePage = profile?.pages?.find(p => p.id === selectedPageId) || profile?.pages?.[0] || null;
 
@@ -144,6 +148,12 @@ const Analytics: React.FC = () => {
   useEffect(() => {
     fetchData();
   }, [selectedPageId, selectedLink, dateRange]);
+
+  const totalPages = Math.ceil(activity.length / itemsPerPage);
+  const paginatedActivity = activity.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const viewType = useMemo(() => {
     if (currentPath.endsWith('/traffic')) return 'traffic';
@@ -367,9 +377,11 @@ const Analytics: React.FC = () => {
                   <tbody className="divide-y divide-slate-50 dark:divide-slate-800/40">
                     {activity.length === 0 ? (
                       <tr><td colSpan={6} className="py-20 text-center text-slate-400 font-bold uppercase text-[10px] tracking-widest">No signals detected in this period</td></tr>
-                    ) : activity.map((ev) => (
+                    ) : paginatedActivity.map((ev) => (
                       <tr key={ev.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-all cursor-default">
-                        <td className="py-8 pl-10 text-xs font-black text-slate-800 dark:text-slate-200 tabular-nums">{new Date(ev.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</td>
+                        <td className="py-8 pl-10 text-xs font-black text-slate-800 dark:text-slate-200 tabular-nums">
+                          {formatDate(ev.created_at, profile?.timezone, profile?.timeFormat)}
+                        </td>
                         <td className="py-8">
                           <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.1em] shadow-sm ${ev.event_type === 'link_click' ? 'bg-rose-100 text-rose-600 dark:bg-rose-900/30' : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30'}`}>
                             {ev.event_type === 'link_click' ? 'Click Event' : 'Page View'}
@@ -391,6 +403,12 @@ const Analytics: React.FC = () => {
                   </tbody>
                 </table>
               </div>
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
             </div>
 
             {/* Audience Behavior Breakdown - Ref Matched SVG Circles */}

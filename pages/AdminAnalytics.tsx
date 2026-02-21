@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Activity, TrendingUp, Users, MousePointer2, QrCode, Download, Filter, Globe } from 'lucide-react';
 import client from '../src/api/client';
 import { useToast } from '../src/context/ToastContext';
+import Pagination from '../components/Pagination';
 
 interface AdminAnalyticsProps {
   onLogout: () => void;
@@ -21,6 +22,8 @@ const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ onLogout }) => {
   const [growthData, setGrowthData] = useState([]);
   const [planDistribution, setPlanDistribution] = useState([]);
   const [topUsers, setTopUsers] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -34,8 +37,8 @@ const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ onLogout }) => {
 
         const usersRes = await client.get('/admin/users/list.php');
         if (usersRes.data.users) {
-          // Sort by views and take top 5
-          const sorted = [...usersRes.data.users].sort((a, b) => b.views - a.views).slice(0, 5);
+          // Sort by views
+          const sorted = [...usersRes.data.users].sort((a, b) => b.views - a.views);
           setTopUsers(sorted);
         }
       } catch (err) {
@@ -55,6 +58,12 @@ const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ onLogout }) => {
       </div>
     );
   }
+
+  const totalPages = Math.ceil(topUsers.length / itemsPerPage);
+  const paginatedTopUsers = topUsers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const aggregateStats = stats;
   const growthStats = growthData;
@@ -177,7 +186,7 @@ const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ onLogout }) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {topUsers.map((user) => {
+              {paginatedTopUsers.map((user) => {
                 const convRate = user.views > 0 ? ((user.totalClicks / user.views) * 100).toFixed(1) : 0;
                 return (
                   <tr key={user.id} className="group hover:bg-slate-50/30 transition-colors">
@@ -203,6 +212,12 @@ const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ onLogout }) => {
             </tbody>
           </table>
         </div>
+
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </div>
     </div>
   );

@@ -15,6 +15,7 @@ import {
 import client from '../src/api/client';
 import { useToast } from '../src/context/ToastContext';
 import { useAuth } from '../src/context/AuthContext';
+import { getCurrentTime } from '../src/utils/dateUtils';
 
 const UserSettings: React.FC = () => {
     const { showToast } = useToast();
@@ -77,17 +78,7 @@ const UserSettings: React.FC = () => {
     };
 
     const currentTime = useMemo(() => {
-        try {
-            return new Intl.DateTimeFormat('en-US', {
-                timeZone: settings.timezone,
-                hour: 'numeric',
-                minute: 'numeric',
-                second: 'numeric',
-                hour12: settings.timeFormat === '12h'
-            }).format(new Date());
-        } catch (e) {
-            return 'Invalid Timezone';
-        }
+        return getCurrentTime(settings.timezone, settings.timeFormat);
     }, [settings.timezone, settings.timeFormat]);
 
     if (!profile) {
@@ -163,8 +154,8 @@ const UserSettings: React.FC = () => {
                                                 type="button"
                                                 onClick={() => setSettings(prev => ({ ...prev, timezone: tz }))}
                                                 className={`flex items-center justify-between px-4 py-3 rounded-xl text-left text-xs font-bold transition-all ${settings.timezone === tz
-                                                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100'
-                                                        : 'bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100'
+                                                    : 'bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                                                     }`}
                                             >
                                                 <span className="truncate">{tz.replace(/_/g, ' ')}</span>
@@ -187,8 +178,8 @@ const UserSettings: React.FC = () => {
                                                 type="button"
                                                 onClick={() => setSettings(prev => ({ ...prev, timeFormat: format.id as '12h' | '24h' }))}
                                                 className={`flex-1 p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${settings.timeFormat === format.id
-                                                        ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-500/5 dark:border-teal-500'
-                                                        : 'border-slate-100 dark:border-slate-800 bg-transparent hover:border-slate-200'
+                                                    ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-500/5 dark:border-teal-500'
+                                                    : 'border-slate-100 dark:border-slate-800 bg-transparent hover:border-slate-200'
                                                     }`}
                                             >
                                                 <Type size={20} className={settings.timeFormat === format.id ? 'text-indigo-600 dark:text-teal-400' : 'text-slate-400'} />
