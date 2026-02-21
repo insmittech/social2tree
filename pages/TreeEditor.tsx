@@ -8,7 +8,8 @@ import {
     Eye,
     QrCode,
     MousePointer2,
-    X
+    X,
+    PanelsTopLeft
 } from 'lucide-react';
 import { useAuth } from '../src/context/AuthContext';
 import PhonePreview from '../components/PhonePreview';
@@ -87,6 +88,12 @@ const TreeEditor: React.FC = () => {
                         >
                             <ExternalLink size={16} /> <span className="hidden sm:inline">Preview</span>
                         </a>
+                        <button
+                            onClick={() => navigate(`/dashboard/builder/${id}`)}
+                            className="bg-white text-indigo-600 border border-indigo-100 px-4 py-2 rounded-lg font-bold text-sm hover:bg-indigo-50 transition-all flex items-center gap-2 shadow-sm"
+                        >
+                            <PanelsTopLeft size={16} /> <span className="hidden sm:inline">Customize Layout</span>
+                        </button>
                         <button
                             onClick={() => setActiveTab('share')}
                             className="bg-indigo-600 text-white px-5 py-2 rounded-lg font-bold text-sm hover:bg-indigo-700 transition-all flex items-center gap-2 shadow-sm"

@@ -97,12 +97,7 @@ const BioTrees: React.FC = () => {
                         <p className="text-slate-500 text-sm mt-1">Manage and scale your digital identities.</p>
                     </div>
                     <div className="flex gap-3">
-                        <button
-                            onClick={() => navigate('/dashboard/builder')}
-                            className="border border-indigo-200 bg-indigo-50 text-indigo-700 px-5 py-3 rounded-lg font-bold text-sm hover:bg-indigo-100 transition-all flex items-center gap-2"
-                        >
-                            <PanelsTopLeft size={16} /> Page Builder
-                        </button>
+
                         <button
                             onClick={() => setShowCreate(true)}
                             className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-sm"
@@ -193,7 +188,7 @@ const BioTrees: React.FC = () => {
                                     Manage Tree
                                 </button>
                                 <button
-                                    onClick={() => navigate('/dashboard/builder')}
+                                    onClick={() => navigate(`/dashboard/builder/${page.id}`)}
                                     title="Open Page Builder"
                                     className="p-2.5 text-indigo-600 border border-indigo-100 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
                                 >

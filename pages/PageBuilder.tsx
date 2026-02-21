@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
     DndContext, DragOverlay, closestCenter, PointerSensor,
     useSensor, useSensors, DragStartEvent, DragEndEvent, useDroppable, useDraggable
@@ -14,8 +14,11 @@ import {
     Undo2, Redo2, Globe, Upload, Eye, EyeOff, ZoomIn, ZoomOut,
     Settings, BarChart2, Palette, Trash2, Copy,
     GripVertical, X, Plus, Check, ArrowLeft, Smartphone, Monitor,
-    Bold, Italic, AlignLeft, AlignCenter, AlignRight, LayoutTemplate, Save
+    Bold, Italic, AlignLeft, AlignCenter, AlignRight, LayoutTemplate, Save, Loader2
 } from 'lucide-react';
+import { useAuth } from '../src/context/AuthContext';
+import client from '../src/api/client';
+import { useToast } from '../src/context/ToastContext';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -386,10 +389,13 @@ const LibraryItem: React.FC<{ type: BlockType; label: string; icon: React.ReactN
     );
 };
 
-// ─── Main Page Builder ────────────────────────────────────────────────────────
-
 const PageBuilder: React.FC = () => {
+    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { user: profile, updateUser, refreshProfile } = useAuth();
+    const { showToast } = useToast();
+
+    const [isAutoSaveEnabled, setIsAutoSaveEnabled] = useState(false);
     const [history, setHistory] = useState<PageConfig[]>([defaultConfig]);
     const [historyIdx, setHistoryIdx] = useState(0);
     const config = history[historyIdx];
@@ -399,14 +405,108 @@ const PageBuilder: React.FC = () => {
     const [zoom, setZoom] = useState(100);
     const [dragOverlay, setDragOverlay] = useState<BlockType | null>(null);
     const [saved, setSaved] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const [previewMode, setPreviewMode] = useState<'mobile' | 'desktop'>('mobile');
     const [showTemplates, setShowTemplates] = useState(false);
     const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
+    // ── Load real data from profile ──────────────────────────────────────────
+    useEffect(() => {
+        if (!profile || !id) return;
+        const tree = profile.pages.find(p => p.id === id);
+        if (!tree) return;
+
+        const initialConfig: PageConfig = {
+            colors: { background: tree.theme === 'dark' ? '#0f172a' : '#ffffff', text: tree.theme === 'dark' ? '#f8fafc' : '#0f172a', accent: '#6366f1', cardBg: '#f8fafc' },
+            fonts: { family: 'Inter', weight: '500' },
+            profile: {
+                avatar: tree.avatarUrl || '',
+                name: tree.displayName || '',
+                bio: tree.bio || '',
+            },
+            blocks: (tree.links || []).map((l: any) => ({
+                id: l.id,
+                type: 'link',
+                visible: l.active,
+                data: {
+                    label: l.title,
+                    url: l.url,
+                    bg: '#6366f1',
+                    textColor: '#ffffff',
+                    radius: '1rem'
+                }
+            })) as Block[]
+        };
+
+        setHistory([initialConfig]);
+        setHistoryIdx(0);
+    }, [id, profile]);
+
     const activeBlock = config.blocks.find(b => b.id === activeBlockId) || null;
 
-    // ── Auto-save to localStorage every 30s ─────────────────────────────────
-    // NOTE: restore effect is placed AFTER pushHistory so it can call it.
+    // ── Real Saving to Backend ─────────────────────────────────────────────
+    const handleSave = async (silent = false) => {
+        if (!id) return;
+        if (!silent) setIsSaving(true);
+        else setAutoSaveStatus('saving');
+
+        try {
+            // 1. Update Page details (displayName, bio)
+            await client.post('/pages/update.php', {
+                id,
+                displayName: config.profile.name,
+                bio: config.profile.bio,
+                theme: config.colors.background === '#0f172a' ? 'dark' : 'default'
+            });
+
+            // 2. Update Links (In a real app, you'd have a batch endpoint)
+            // For now, we update individually or just rely on the fact that existing links are updated.
+            // Note: Adding new links in PageBuilder would need new link IDs from backend.
+            for (const block of config.blocks) {
+                if (block.type === 'link' && !block.id.startsWith('b')) { // 'b' means local temp ID
+                    await client.post('/links/update.php', {
+                        id: block.id,
+                        title: block.data.label,
+                        url: block.data.url,
+                        active: block.visible !== false
+                    });
+                }
+            }
+
+            await refreshProfile();
+
+            if (!silent) {
+                setSaved(true);
+                showToast('Page published successfully!', 'success');
+                setTimeout(() => setSaved(false), 2500);
+            } else {
+                setAutoSaveStatus('saved');
+                setTimeout(() => setAutoSaveStatus('idle'), 3000);
+            }
+        } catch (err) {
+            console.error('Save error:', err);
+            if (!silent) showToast('Failed to save changes.', 'error');
+        } finally {
+            if (!silent) setIsSaving(false);
+        }
+    };
+
+    // ── Auto-save logic ────────────────────────────────────────────────────
+    const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        if (!isAutoSaveEnabled || historyIdx === 0) return;
+
+        if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+
+        autoSaveTimerRef.current = setTimeout(() => {
+            handleSave(true);
+        }, 3000); // Save after 3s of inactivity
+
+        return () => {
+            if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+        };
+    }, [config, isAutoSaveEnabled]);
 
     // ── History helpers ─────────────────────────────────────────────────────
     const pushHistory = useCallback((newConfig: PageConfig) => {
@@ -417,25 +517,8 @@ const PageBuilder: React.FC = () => {
         setHistoryIdx(i => i + 1);
     }, [historyIdx]);
 
-    // Restore draft from localStorage on mount
-    useEffect(() => {
-        const draft = localStorage.getItem('pb_draft');
-        if (draft) {
-            try { pushHistory(JSON.parse(draft) as PageConfig); } catch { /* ignore */ }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    // Auto-save every 30s
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setAutoSaveStatus('saving');
-            localStorage.setItem('pb_draft', JSON.stringify(config));
-            setTimeout(() => setAutoSaveStatus('saved'), 600);
-            setTimeout(() => setAutoSaveStatus('idle'), 3000);
-        }, 30000);
-        return () => clearInterval(timer);
-    }, [config]);
+    // Note: Removed draft restoration from localStorage to ensure we always load fresh tree data
+    // Auto-save logic is now handled by the isAutoSaveEnabled state and backend API
 
     const undo = () => historyIdx > 0 && setHistoryIdx(i => i - 1);
     const redo = () => historyIdx < history.length - 1 && setHistoryIdx(i => i + 1);
@@ -561,9 +644,9 @@ const PageBuilder: React.FC = () => {
                     <button className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-black hover:bg-slate-50 transition-all">
                         <Globe size={14} /> Connect Domain
                     </button>
-                    <button onClick={handlePublish}
-                        className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-black transition-all shadow-sm ${saved ? 'bg-emerald-500 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200'}`}>
-                        {saved ? <><Check size={14} /> Saved!</> : <><Upload size={14} /> Publish</>}
+                    <button onClick={() => handleSave()} disabled={isSaving}
+                        className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-black transition-all shadow-sm ${saved ? 'bg-emerald-500 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200'} disabled:opacity-50`}>
+                        {isSaving ? <><Loader2 size={14} className="animate-spin" /> Saving...</> : saved ? <><Check size={14} /> Saved!</> : <><Upload size={14} /> Publish</>}
                     </button>
                 </div>
             </header>
@@ -855,6 +938,19 @@ const PageBuilder: React.FC = () => {
                                     <label className="block"><span className="settings-label">Meta Description</span>
                                         <textarea value={config.profile.bio} onChange={e => updateConfig({ profile: { ...config.profile, bio: e.target.value } })} rows={3} className="settings-input resize-none" /></label>
                                     <div className="space-y-2">
+                                        <label className="flex items-center justify-between p-3 bg-indigo-50 border border-indigo-100 rounded-2xl cursor-pointer group hover:bg-indigo-100 transition-all">
+                                            <div className="flex items-center gap-2">
+                                                <Save size={14} className="text-indigo-600" />
+                                                <span className="text-xs font-black text-indigo-700 uppercase tracking-widest">Auto Save Changes</span>
+                                            </div>
+                                            <div onClick={(e) => { e.preventDefault(); setIsAutoSaveEnabled(!isAutoSaveEnabled); }}
+                                                className={`w-10 h-6 rounded-full relative transition-all duration-300 ${isAutoSaveEnabled ? 'bg-indigo-600' : 'bg-slate-200'}`}>
+                                                <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all duration-300 ${isAutoSaveEnabled ? 'left-5' : 'left-1'} shadow-sm`} />
+                                            </div>
+                                        </label>
+
+                                        <div className="h-px bg-slate-100 my-4" />
+
                                         {[['Hide from search engines', 'noindex'], ['Enable link animations', 'animations'], ['Show view count', 'viewcount']].map(([label, key]) => (
                                             <label key={key} className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl cursor-pointer">
                                                 <span className="text-xs font-bold text-slate-600">{label}</span>

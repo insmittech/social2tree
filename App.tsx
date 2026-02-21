@@ -79,7 +79,7 @@ const AppRoutes: React.FC = () => {
           element={isAuthenticated ? <Layout userProfile={user} onLogout={handleLogout}><TreeEditor /></Layout> : <Navigate to="/login" />}
         />
         <Route
-          path="/dashboard/builder"
+          path="/dashboard/builder/:id?"
           element={isAuthenticated ? <PageBuilder /> : <Navigate to="/login" />}
         />
         <Route
