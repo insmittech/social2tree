@@ -3,7 +3,7 @@ import {
   Shield, ShieldAlert, Lock, Fingerprint, History,
   Globe, ShieldCheck, AlertTriangle, Trash2,
   Download, RefreshCw, Plus, X, Server, Activity,
-  ShieldOff, LockKeyhole
+  ShieldOff, LockKeyhole, Clock
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -404,8 +404,8 @@ const AdminSecurity: React.FC<AdminSecurityProps> = () => {
                     </td>
                     <td className="px-10 py-6 text-center">
                       <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-[0.1em] border shadow-sm ${log.severity === 'info' ? 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:border-emerald-500/20' :
-                          log.severity === 'warning' ? 'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/10 dark:border-amber-500/20' :
-                            'bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-500/10 dark:border-rose-500/20'
+                        log.severity === 'warning' ? 'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/10 dark:border-amber-500/20' :
+                          'bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-500/10 dark:border-rose-500/20'
                         }`}>
                         {log.severity}
                       </span>
@@ -466,7 +466,5 @@ const AdminSecurity: React.FC<AdminSecurityProps> = () => {
     </div>
   );
 };
-
-export default AdminSecurity;
 
 export default AdminSecurity;
