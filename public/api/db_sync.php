@@ -57,7 +57,8 @@ try {
         'role' => "ENUM('user', 'admin') DEFAULT 'user' AFTER plan",
         'status' => "ENUM('active', 'suspended') DEFAULT 'active' AFTER role",
         'custom_domain' => "VARCHAR(255) NULL AFTER status",
-        'is_verified' => "TINYINT(1) DEFAULT 0 AFTER custom_domain"
+        'is_verified' => "TINYINT(1) DEFAULT 0 AFTER custom_domain",
+        'views' => "INT DEFAULT 0 AFTER is_verified"
     ];
 
     foreach ($userColsToAdd as $col => $def) {
@@ -129,7 +130,9 @@ try {
             ip_address VARCHAR(45),
             user_agent VARCHAR(255),
             referrer VARCHAR(255),
+            country VARCHAR(100),
             country_code VARCHAR(3),
+            city VARCHAR(100),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
@@ -158,6 +161,23 @@ try {
         echo "Validating core table <code>$name</code>... ";
         $pdo->exec($sql);
         echo "<span class='success'>✅ Proper</span><br>";
+    }
+
+    // Check analytics table columns
+    $stmt = $pdo->query("DESCRIBE analytics");
+    $existingAnCols = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    
+    $anColsToAdd = [
+        'country' => "VARCHAR(100) AFTER referrer",
+        'city' => "VARCHAR(100) AFTER country_code"
+    ];
+
+    foreach ($anColsToAdd as $col => $def) {
+        if (!in_array($col, $existingAnCols)) {
+            echo "Adding <code>analytics.$col</code>... ";
+            $pdo->exec("ALTER TABLE analytics ADD $col $def");
+            echo "<span class='success'>✅ Done</span><br>";
+        }
     }
 
     // -------------------------------------------------------------------------

@@ -79,7 +79,7 @@ function sanitize_input($data)
 function get_user_profile($pdo, $user_id) {
     try {
         // Fetch User Details
-        $stmt = $pdo->prepare("SELECT id, username, email, display_name, bio, avatar_url, role, plan, status, is_verified, created_at FROM users WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT id, username, email, display_name, bio, avatar_url, role, plan, status, is_verified, views, created_at FROM users WHERE id = ?");
         $stmt->execute([$user_id]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -95,7 +95,7 @@ function get_user_profile($pdo, $user_id) {
                 'status' => $user['status'],
                 'isVerified' => (bool)$user['is_verified'],
                 'createdAt' => $user['created_at'],
-                'views' => 0,
+                'views' => (int)($user['views'] ?? 0),
                 'pages' => [],
                 'roles' => [],
                 'permissions' => []
@@ -152,10 +152,7 @@ function get_user_profile($pdo, $user_id) {
                 ];
             }, $pages);
 
-            // Fetch views count
-            $stmt = $pdo->prepare("SELECT COUNT(*) FROM analytics WHERE user_id = ? AND link_id IS NULL");
-            $stmt->execute([$user_id]);
-            $profile['views'] = (int)$stmt->fetchColumn();
+            // Page views are now fetched directly from the users.views column above
 
             return $profile;
         }

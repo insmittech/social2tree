@@ -45,6 +45,17 @@ const PublicProfile: React.FC = () => {
     if (username) fetchProfile();
   }, [username]);
 
+  // Track Page View
+  useEffect(() => {
+    if (profile?.id) {
+      try {
+        client.post('/analytics/track.php', { page_id: profile.id });
+      } catch (e) {
+        console.error("Failed to track page view", e);
+      }
+    }
+  }, [profile?.id]);
+
   const handleLinkClick = async (id: string, url: string, password?: string | null) => {
     if (password) {
       setPasswordModal({ isOpen: true, linkId: id, url, correctPassword: password });

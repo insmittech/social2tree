@@ -691,9 +691,6 @@ const PageBuilder: React.FC = () => {
                             <Save size={10} /> {autoSaveStatus === 'saving' ? 'Saving…' : 'Auto-saved'}
                         </span>
                     )}
-                    <button className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-900/40 text-slate-600 dark:text-slate-300 text-xs font-black hover:bg-slate-50 transition-all">
-                        <Globe size={14} /> <span className="hidden lg:inline">Connect Domain</span>
-                    </button>
                     <button onClick={() => handleSave()} disabled={isSaving}
                         className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-900/40 text-slate-600 dark:text-slate-300 text-xs font-black hover:bg-slate-50 transition-all disabled:opacity-50`}>
                         {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
