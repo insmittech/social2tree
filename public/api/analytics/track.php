@@ -4,24 +4,23 @@ json_response();
 include_once __DIR__ . '/../db.php';
 
 /**
- * Resolve geo info from an IP using ip-api.com.
+ * Resolve geo info from an IP using multiple providers.
  * Handles proxy headers and provides mock data for local IPs.
  */
 function resolve_geo(string $ip): array {
     // Check for proxy/Cloudflare headers
-    if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+    if (isset($_SERVER['HTTP_CF_CONNECTING_IP']) && filter_var($_SERVER['HTTP_CF_CONNECTING_IP'], FILTER_VALIDATE_IP)) {
         $ip = $_SERVER['HTTP_CF_CONNECTING_IP'];
     } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        $ip = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
+        $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        $ip = trim($ips[0]);
     }
 
-    // Handle private/local IPs for developer testing
-    $is_local = in_array($ip, ['127.0.0.1', '::1']) || 
-                str_starts_with($ip, '192.168.') || 
-                str_starts_with($ip, '10.') || 
-                str_starts_with($ip, '172.16.');
-
-    if ($is_local) {
+    // Comprehensive private/local IP check
+    $is_local = !filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+    
+    // Explicit localhost check
+    if ($ip === '127.0.0.1' || $ip === '::1' || $is_local) {
         return [
             'country'      => 'Local Access',
             'country_code' => 'LO',
@@ -29,34 +28,51 @@ function resolve_geo(string $ip): array {
         ];
     }
 
-    try {
-        $url = "http://ip-api.com/json/{$ip}?fields=country,countryCode,city";
-        
-        if (function_exists('curl_version')) {
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 3);
-            curl_setopt($ch, CURLOPT_USERAGENT, 'Social2Tree/1.0');
-            $raw = curl_exec($ch);
-            curl_close($ch);
-        } else {
-            $ctx = stream_context_create(['http' => ['timeout' => 3]]);
-            $raw = @file_get_contents($url, false, $ctx);
-        }
+    $providers = [
+        "http://ip-api.com/json/{$ip}?fields=status,country,countryCode,city",
+        "https://ipapi.co/{$ip}/json/",
+        "https://freeipapi.com/api/json/{$ip}"
+    ];
 
-        if ($raw) {
-            $geo = json_decode($raw, true);
-            if (isset($geo['country'])) {
-                return [
-                    'country'      => $geo['country'],
-                    'country_code' => $geo['countryCode'] ?? 'UN',
-                    'city'         => $geo['city'] ?? 'Unknown'
-                ];
+    foreach ($providers as $url) {
+        try {
+            $raw = null;
+            if (function_exists('curl_version')) {
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+                curl_setopt($ch, CURLOPT_USERAGENT, 'Social2Tree/1.2');
+                if (str_starts_with($url, 'https')) {
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                }
+                $raw = curl_exec($ch);
+                curl_close($ch);
+            } else {
+                $ctx = stream_context_create(['http' => ['timeout' => 3]]);
+                $raw = @file_get_contents($url, false, $ctx);
             }
-        }
-    } catch (\Throwable $e) { /* background task silent */ }
 
+            if ($raw) {
+                $geo = json_decode($raw, true);
+                
+                // Flexible success detection for different providers
+                $is_success = (isset($geo['status']) && $geo['status'] === 'success') || 
+                             (isset($geo['country']) && !isset($geo['error'])) ||
+                             (isset($geo['countryName']) && !empty($geo['countryName']));
+
+                if ($is_success) {
+                    return [
+                        'country'      => $geo['country'] ?? $geo['countryName'] ?? $geo['country_name'] ?? 'Unknown',
+                        'country_code' => $geo['countryCode'] ?? $geo['countryCode'] ?? $geo['country_code'] ?? 'UN',
+                        'city'         => $geo['city'] ?? $geo['cityName'] ?? 'Unknown'
+                    ];
+                }
+            }
+        } catch (\Throwable $e) { continue; }
+    }
+
+    // Final Fallback
     return ['country' => 'Unknown Origin', 'country_code' => 'UN', 'city' => 'Unknown Sector'];
 }
 
