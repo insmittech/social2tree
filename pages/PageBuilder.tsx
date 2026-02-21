@@ -409,6 +409,8 @@ const PageBuilder: React.FC = () => {
     const [previewMode, setPreviewMode] = useState<'mobile' | 'desktop'>('mobile');
     const [showTemplates, setShowTemplates] = useState(false);
     const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+    const [mobileView, setMobileView] = useState<'library' | 'canvas' | 'settings'>('canvas');
+    const [deletedLinkIds, setDeletedLinkIds] = useState<string[]>([]);
 
     // ── Load real data from profile ──────────────────────────────────────────
     useEffect(() => {
@@ -451,7 +453,19 @@ const PageBuilder: React.FC = () => {
         else setAutoSaveStatus('saving');
 
         try {
-            // 1. Update Page details (displayName, bio)
+            // 1. Handle Deletions
+            if (deletedLinkIds.length > 0) {
+                // Only delete if the ID is NOT in the current config (handles undo)
+                const currentIds = new Set(config.blocks.map(b => b.id));
+                for (const delId of deletedLinkIds) {
+                    if (!currentIds.has(delId)) {
+                        await client.post('/links/delete.php', { id: delId });
+                    }
+                }
+                setDeletedLinkIds([]);
+            }
+
+            // 2. Update Page details (displayName, bio)
             await client.post('/pages/update.php', {
                 id,
                 displayName: config.profile.name,
@@ -459,11 +473,29 @@ const PageBuilder: React.FC = () => {
                 theme: config.colors.background === '#0f172a' ? 'dark' : 'default'
             });
 
-            // 2. Update Links (In a real app, you'd have a batch endpoint)
-            // For now, we update individually or just rely on the fact that existing links are updated.
-            // Note: Adding new links in PageBuilder would need new link IDs from backend.
-            for (const block of config.blocks) {
-                if (block.type === 'link' && !block.id.startsWith('b')) { // 'b' means local temp ID
+            // 3. Handle Creations and Updates
+            const updatedBlocks = [...config.blocks];
+            const linkBlocks = updatedBlocks.filter(b => b.type === 'link') as LinkBlock[];
+
+            for (let i = 0; i < linkBlocks.length; i++) {
+                const block = linkBlocks[i];
+                if (block.id.startsWith('b')) {
+                    // Create new link
+                    const res = await client.post('/links/create.php', {
+                        pageId: id,
+                        title: block.data.label,
+                        url: block.data.url,
+                        type: 'social'
+                    });
+                    if (res.data?.link?.id) {
+                        // Replace temp ID with real ID in the local block array
+                        const blockIdx = updatedBlocks.findIndex(b => b.id === block.id);
+                        if (blockIdx !== -1) {
+                            updatedBlocks[blockIdx] = { ...block, id: res.data.link.id };
+                        }
+                    }
+                } else {
+                    // Update existing link
                     await client.post('/links/update.php', {
                         id: block.id,
                         title: block.data.label,
@@ -472,6 +504,15 @@ const PageBuilder: React.FC = () => {
                     });
                 }
             }
+
+            // 4. Handle Reordering
+            const finalIds = updatedBlocks.filter(b => b.type === 'link').map(b => b.id);
+            if (finalIds.length > 0) {
+                await client.post('/links/reorder.php', { ids: finalIds });
+            }
+
+            // 5. Update local state with new IDs to prevent duplicate creates
+            pushHistory({ ...config, blocks: updatedBlocks });
 
             await refreshProfile();
 
@@ -528,6 +569,10 @@ const PageBuilder: React.FC = () => {
         pushHistory({ ...config, blocks: config.blocks.map(b => b.id === id ? { ...b, data } : b) });
     };
     const deleteBlock = (id: string) => {
+        const block = config.blocks.find(b => b.id === id);
+        if (block && !id.startsWith('b')) {
+            setDeletedLinkIds(prev => [...prev, id]);
+        }
         pushHistory({ ...config, blocks: config.blocks.filter(b => b.id !== id) });
         if (activeBlockId === id) setActiveBlockId(null);
     };
@@ -581,11 +626,19 @@ const PageBuilder: React.FC = () => {
     // ── Keyboard shortcuts ──────────────────────────────────────────────────
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
+            if ((e.metaKey || e.ctrlKey)) {
+                if (e.key === 'z') {
+                    e.preventDefault();
+                    e.shiftKey ? redo() : undo();
+                } else if (e.key === 's') {
+                    e.preventDefault();
+                    handleSave();
+                }
+            }
         };
         window.addEventListener('keydown', handler);
         return () => window.removeEventListener('keydown', handler);
-    }, [historyIdx, history.length]);
+    }, [historyIdx, history.length, config, id]); // Added config and id to dependencies to ensure handleSave has latest context
 
     const handlePublish = () => { setSaved(true); setTimeout(() => setSaved(false), 2500); };
 
@@ -612,52 +665,58 @@ const PageBuilder: React.FC = () => {
     return (
         <div className="h-screen w-screen flex flex-col overflow-hidden bg-slate-50 font-sans">
             {/* ── HEADER ─────────────────────────────────────────────────── */}
-            <header className="h-14 flex-shrink-0 bg-white border-b border-slate-100 flex items-center justify-between px-4 shadow-sm z-50">
-                <div className="flex items-center gap-3">
-                    <button onClick={() => navigate('/dashboard')}
-                        className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all">
-                        <ArrowLeft size={18} />
-                    </button>
-                    <div className="w-px h-5 bg-slate-200" />
-                    <div className="flex items-center gap-1">
-                        <button onClick={undo} disabled={historyIdx === 0}
-                            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all disabled:opacity-30" title="Undo (⌘Z)">
-                            <Undo2 size={16} />
+            <header className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-white border-b border-slate-100 flex-shrink-0">
+                <div className="flex items-center justify-between w-full sm:w-auto">
+                    <div className="flex items-center gap-3">
+                        <button onClick={() => navigate('/dashboard/trees')}
+                            className="p-2 text-slate-400 hover:text-slate-900 transition-colors bg-slate-50 rounded-xl lg:hidden">
+                            <ArrowLeft size={18} />
                         </button>
-                        <button onClick={redo} disabled={historyIdx === history.length - 1}
-                            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all disabled:opacity-30" title="Redo (⌘⇧Z)">
-                            <Redo2 size={16} />
+                        <button onClick={() => navigate('/dashboard/trees')}
+                            className="hidden lg:flex items-center gap-2 p-2 text-slate-400 hover:text-slate-900 transition-colors bg-slate-50 rounded-xl">
+                            <ArrowLeft size={18} />
+                            <span className="text-xs font-black uppercase tracking-widest">Back</span>
                         </button>
                     </div>
+                    <div className="hidden sm:flex items-center gap-2 text-xs text-slate-400 font-bold ml-4">
+                        {previewMode === 'mobile' ? <Smartphone size={14} /> : <Monitor size={14} />} Page Builder
+                    </div>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-slate-400 font-bold">
-                    {previewMode === 'mobile' ? <Smartphone size={14} /> : <Monitor size={14} />} Page Builder
-                </div>
-                <div className="flex items-center gap-2">
+
+                <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar py-1">
                     {/* Auto-save indicator */}
                     {autoSaveStatus !== 'idle' && (
-                        <span className={`flex items-center gap-1 text-[10px] font-black px-2 py-1 rounded-lg transition-all
+                        <span className={`flex-shrink-0 flex items-center gap-1 text-[10px] font-black px-2 py-1 rounded-lg transition-all
                             ${autoSaveStatus === 'saving' ? 'text-amber-500 bg-amber-50' : 'text-emerald-600 bg-emerald-50'}`}>
                             <Save size={10} /> {autoSaveStatus === 'saving' ? 'Saving…' : 'Auto-saved'}
                         </span>
                     )}
-                    <button className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-black hover:bg-slate-50 transition-all">
-                        <Globe size={14} /> Connect Domain
+                    <button className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-black hover:bg-slate-50 transition-all">
+                        <Globe size={14} /> <span className="hidden lg:inline">Connect Domain</span>
                     </button>
                     <button onClick={() => handleSave()} disabled={isSaving}
-                        className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-black transition-all shadow-sm ${saved ? 'bg-emerald-500 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200'} disabled:opacity-50`}>
-                        {isSaving ? <><Loader2 size={14} className="animate-spin" /> Saving...</> : saved ? <><Check size={14} /> Saved!</> : <><Upload size={14} /> Publish</>}
+                        className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-black hover:bg-slate-50 transition-all disabled:opacity-50`}>
+                        {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                        Save
+                    </button>
+                    <button onClick={() => handleSave()} disabled={isSaving}
+                        className={`flex-shrink-0 flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-xl text-xs font-black transition-all shadow-sm ${saved ? 'bg-emerald-500 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200'} disabled:opacity-50`}>
+                        {isSaving ? <><Loader2 size={14} className="animate-spin" /> Publishing...</> : saved ? <><Check size={14} /> Published!</> : <><Upload size={14} /> Publish</>}
                     </button>
                 </div>
             </header>
 
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-                <div className="flex flex-1 overflow-hidden">
+                <div className="flex flex-1 overflow-hidden relative">
 
-                    {/* ── LEFT SIDEBAR ── */}
-                    <aside className="w-52 flex-shrink-0 bg-white border-r border-slate-100 flex flex-col overflow-hidden">
+                    {/* ── LEFT SIDEBAR (Library) ── */}
+                    <aside className={`fixed inset-0 z-30 lg:relative lg:inset-auto lg:flex w-full lg:w-52 flex-shrink-0 bg-white border-r border-slate-100 flex flex-col overflow-hidden transition-transform duration-300 ${mobileView === 'library' ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+                        <div className="lg:hidden flex justify-between items-center p-4 border-b">
+                            <h2 className="text-sm font-black uppercase tracking-widest text-slate-800">Add Elements</h2>
+                            <button onClick={() => setMobileView('canvas')} className="p-2 text-slate-400"><X size={20} /></button>
+                        </div>
                         {/* Tab switcher: Blocks | Templates */}
-                        <div className="flex border-b border-slate-100 flex-shrink-0">
+                        <div className="flex border-b border-slate-100 flex-shrink-0 lg:mt-0">
                             <button onClick={() => setShowTemplates(false)}
                                 className={`flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 flex items-center justify-center gap-1
                                     ${!showTemplates ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>
@@ -700,8 +759,8 @@ const PageBuilder: React.FC = () => {
                         </div>
                     </aside>
 
-                    {/* ── CANVAS ── */}
-                    <main className="flex-1 flex flex-col items-center overflow-auto bg-slate-100 relative" onClick={() => setActiveBlockId(null)}>
+                    {/* ── CANVAS (Preview) ── */}
+                    <main className={`flex-1 flex flex-col items-center overflow-auto bg-slate-100 relative transition-all duration-300 ${mobileView === 'canvas' ? 'block' : 'hidden lg:block'}`} onClick={() => setActiveBlockId(null)}>
                         {/* Toolbar: device toggle + zoom */}
                         <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-white rounded-2xl shadow-sm border border-slate-100 px-3 py-1.5 z-10">
                             <button onClick={() => setPreviewMode('mobile')} title="Mobile"
@@ -723,7 +782,7 @@ const PageBuilder: React.FC = () => {
                                 className="transition-transform duration-200">
                                 {previewMode === 'mobile' ? (
                                     /* ── Phone frame ── */
-                                    <div className="w-[390px]">
+                                    <div className="w-full max-w-[390px] px-4">
                                         <div className="bg-slate-900 rounded-[3rem] p-3 shadow-2xl shadow-slate-500/40">
                                             <div className="flex justify-center mb-3"><div className="w-28 h-5 bg-slate-800 rounded-full" /></div>
                                             <div style={{ background: config.colors.background, fontFamily: config.fonts.family, color: config.colors.text, minHeight: 600 }}
@@ -797,8 +856,12 @@ const PageBuilder: React.FC = () => {
                         </div>
                     </main>
 
-                    {/* ── RIGHT SIDEBAR ── */}
-                    <aside className="w-72 flex-shrink-0 bg-white border-l border-slate-100 flex flex-col overflow-hidden">
+                    {/* ── RIGHT SIDEBAR (Settings/Analytics) ── */}
+                    <aside className={`fixed inset-0 z-30 lg:relative lg:inset-auto lg:flex w-full lg:w-80 flex-shrink-0 bg-white lg:border-l border-slate-100 flex flex-col overflow-hidden transition-transform duration-300 ${mobileView === 'settings' ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}`}>
+                        <div className="lg:hidden flex justify-between items-center p-4 border-b">
+                            <h2 className="text-sm font-black uppercase tracking-widest text-slate-800">Settings</h2>
+                            <button onClick={() => setMobileView('canvas')} className="p-2 text-slate-400"><X size={20} /></button>
+                        </div>
                         {/* Tabs */}
                         <div className="flex border-b border-slate-100 flex-shrink-0">
                             {([['design', 'Design', <Palette size={13} />], ['analytics', 'Analytics', <BarChart2 size={13} />], ['settings', 'Settings', <Settings size={13} />]] as const).map(([id, label, icon]) => (
@@ -962,6 +1025,25 @@ const PageBuilder: React.FC = () => {
                             )}
                         </div>
                     </aside>
+                </div>
+
+                {/* Mobile Tab Bar */}
+                <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-2 flex justify-around items-center z-40 pb-safe">
+                    <button onClick={() => setMobileView('library')}
+                        className={`flex flex-col items-center gap-1 p-2 transition-all ${mobileView === 'library' ? 'text-indigo-600' : 'text-slate-400'}`}>
+                        <Plus size={20} />
+                        <span className="text-[10px] font-black uppercase tracking-widest">Library</span>
+                    </button>
+                    <button onClick={() => setMobileView('canvas')}
+                        className={`flex flex-col items-center gap-1 p-2 transition-all ${mobileView === 'canvas' ? 'text-indigo-600' : 'text-slate-400'}`}>
+                        <Eye size={20} />
+                        <span className="text-[10px] font-black uppercase tracking-widest">Preview</span>
+                    </button>
+                    <button onClick={() => setMobileView('settings')}
+                        className={`flex flex-col items-center gap-1 p-2 transition-all ${mobileView === 'settings' || activeBlockId ? 'text-indigo-600' : 'text-slate-400'}`}>
+                        <Settings size={20} />
+                        <span className="text-[10px] font-black uppercase tracking-widest">{activeBlockId ? 'Edit' : 'Settings'}</span>
+                    </button>
                 </div>
 
                 {/* DnD overlay ghost */}

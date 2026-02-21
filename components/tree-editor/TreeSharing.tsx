@@ -5,9 +5,10 @@ import { useToast } from '../../src/context/ToastContext';
 
 interface TreeSharingProps {
     page: any;
+    onUpdate: (updatedPage: any) => void;
 }
 
-const TreeSharing: React.FC<TreeSharingProps> = ({ page }) => {
+const TreeSharing: React.FC<TreeSharingProps> = ({ page, onUpdate }) => {
     const { showToast } = useToast();
     const profileUrl = `${window.location.origin}/${page.slug}`;
 

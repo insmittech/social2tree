@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Lock, Shield, Calendar, UserCircle, Save, CheckCircle2, AlertCircle, Camera, Trash2, Github, Twitter, Instagram } from 'lucide-react';
+import { User, Mail, Lock, Shield, Calendar, UserCircle, Save, CheckCircle2, AlertCircle, Camera, Trash2, Github, Twitter, Instagram, Zap } from 'lucide-react';
 import client from '../src/api/client';
 import { UserProfile } from '../types';
 import { useToast } from '../src/context/ToastContext';
@@ -84,31 +84,46 @@ const Profile: React.FC = () => {
     }
 
     return (
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full pb-32 lg:pb-12">
-            <header className="mb-10">
-                <h1 className="text-4xl font-black text-slate-900 tracking-tight">Account Settings</h1>
-                <p className="text-slate-500 font-medium mt-1">Manage your identity and security across the platform</p>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6 sm:space-y-10 pb-32 sm:pb-10">
+            {/* Header */}
+            <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">Account Settings</h1>
+                    <p className="text-slate-400 font-bold text-[11px] sm:text-sm uppercase tracking-wider mt-1">Manage your identity and preferences</p>
+                </div>
+                <div className="bg-indigo-50 border border-indigo-100 px-4 py-2.5 rounded-2xl flex items-center justify-center gap-2 w-full sm:w-auto">
+                    <Zap size={16} className="text-indigo-600" />
+                    <span className="text-xs font-black text-indigo-700 uppercase tracking-widest">{profile?.role === 'admin' ? 'Admin' : 'Pro Plan'}</span>
+                </div>
             </header>
 
-            <div className="grid lg:grid-cols-3 gap-8">
-                {/* Left Column: Stats & Overview */}
-                <div className="lg:col-span-1 space-y-6">
-                    <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100 flex flex-col items-center text-center">
-                        <div className="relative mb-6">
-                            <img
-                                src={formData.avatarUrl || `https://ui-avatars.com/api/?name=${profile.username}&background=6366f1&color=fff`}
-                                alt={profile.username}
-                                className="w-32 h-32 rounded-full border-4 border-indigo-50 shadow-xl object-cover"
-                            />
-                            <label className="absolute bottom-1 right-1 bg-indigo-600 text-white p-2.5 rounded-full shadow-lg cursor-pointer hover:bg-indigo-700 transition-all hover:scale-110 active:scale-95">
-                                <Camera size={18} />
-                                <input type="file" className="hidden" />
-                            </label>
+            <div className="grid grid-cols-1 gap-6 sm:gap-10">
+                {/* Profile Card */}
+                <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden group hover:shadow-md transition-shadow">
+                    <div className="h-24 sm:h-32 bg-gradient-to-r from-indigo-500 to-violet-500" />
+                    <div className="px-5 sm:px-8 pb-8 -mt-12 sm:-mt-16">
+                        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+                            <div className="relative inline-block">
+                                <img
+                                    src={profile?.avatarUrl || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150&h=150"}
+                                    alt="Avatar"
+                                    className="w-24 h-24 sm:w-32 sm:h-32 rounded-[2rem] border-4 border-white shadow-xl object-cover"
+                                />
+                                <button className="absolute -bottom-2 -right-2 bg-indigo-600 p-2.5 rounded-2xl text-white shadow-lg hover:scale-110 transition-transform">
+                                    <Camera size={18} />
+                                </button>
+                            </div>
+                            <div className="flex-1 min-w-0 pt-2 sm:pt-0">
+                                <h2 className="text-xl sm:text-2xl font-black text-slate-900 truncate">
+                                    {profile?.displayName}
+                                </h2>
+                                <p className="text-slate-400 font-bold text-xs sm:text-sm uppercase tracking-widest mt-1">
+                                    Member since {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString(undefined, { month: 'long', year: 'numeric' }) : 'Join Date'}
+                                </p>
+                            </div>
                         </div>
-                        <h2 className="text-2xl font-black text-slate-900">{formData.displayName || profile.username}</h2>
-                        <p className="text-slate-500 font-medium text-sm">@{formData.username}</p>
 
-                        <div className="mt-8 pt-8 border-t border-slate-50 w-full grid grid-cols-2 gap-4">
+                        <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
                             <div className="bg-slate-50 p-4 rounded-2xl">
                                 <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Plan</p>
                                 <p className="text-indigo-600 font-black flex items-center justify-center gap-1">

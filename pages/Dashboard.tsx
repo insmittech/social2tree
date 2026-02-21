@@ -88,45 +88,45 @@ const Dashboard: React.FC = () => {
   const vBadge = verificationBadge();
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-8 pb-24 lg:pb-10">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 sm:space-y-8 pb-24 lg:pb-10">
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
             Welcome back, <span className="text-indigo-600">{profile?.displayName?.split(' ')[0] || 'User'}</span> 👋
           </h1>
-          <p className="text-slate-400 font-bold text-sm mt-1">Here's what's happening with your Social2Tree</p>
+          <p className="text-slate-400 font-bold text-[11px] sm:text-sm mt-1 uppercase tracking-wider">Activity Overview</p>
         </div>
         {activePage && (
           <a
             href={publicUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-5 py-3 bg-indigo-600 text-white rounded-2xl text-sm font-black hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 whitespace-nowrap"
+            className="flex items-center justify-center gap-2 px-5 py-3.5 bg-indigo-600 text-white rounded-2xl text-xs font-black hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 whitespace-nowrap sm:w-auto"
           >
-            <ExternalLink size={16} /> View Live Page
+            <ExternalLink size={14} /> View Live Page
           </a>
         )}
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[
-          { label: 'Total Views', value: totalViews.toLocaleString(), icon: <Eye size={20} />, color: 'text-indigo-600 bg-indigo-50', trend: '+12%' },
-          { label: 'Total Clicks', value: totalClicks.toLocaleString(), icon: <MousePointerClick size={20} />, color: 'text-violet-600 bg-violet-50', trend: '+8%' },
-          { label: 'Click Rate', value: `${ctr}%`, icon: <TrendingUp size={20} />, color: 'text-emerald-600 bg-emerald-50', trend: null },
-          { label: 'Bio Trees', value: (profile?.pages?.length || 0).toString(), icon: <Layout size={20} />, color: 'text-amber-600 bg-amber-50', trend: null },
+          { label: 'Total Views', value: totalViews.toLocaleString(), icon: <Eye size={18} />, color: 'text-indigo-600 bg-indigo-50', trend: '+12%' },
+          { label: 'Total Clicks', value: totalClicks.toLocaleString(), icon: <MousePointerClick size={18} />, color: 'text-violet-600 bg-violet-50', trend: '+8%' },
+          { label: 'Click Rate', value: `${ctr}%`, icon: <TrendingUp size={18} />, color: 'text-emerald-600 bg-emerald-50', trend: null },
+          { label: 'Bio Trees', value: (profile?.pages?.length || 0).toString(), icon: <Layout size={18} />, color: 'text-amber-600 bg-amber-50', trend: null },
         ].map(stat => (
-          <div key={stat.label} className="bg-white rounded-3xl border border-slate-100 p-5 shadow-sm hover:shadow-md transition-all">
-            <div className={`w-10 h-10 rounded-2xl ${stat.color} flex items-center justify-center mb-4`}>
+          <div key={stat.label} className="bg-white rounded-[2rem] border border-slate-100 p-4 sm:p-5 shadow-sm hover:shadow-md transition-all">
+            <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl ${stat.color} flex items-center justify-center mb-3 sm:mb-4`}>
               {stat.icon}
             </div>
-            <p className="text-2xl font-black text-slate-900">{stat.value}</p>
-            <div className="flex items-center gap-2 mt-1">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
+            <p className="text-xl sm:text-2xl font-black text-slate-900 leading-none">{stat.value}</p>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 mt-1.5">
+              <p className="text-[9px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
               {stat.trend && (
-                <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">{stat.trend}</span>
+                <span className="w-fit text-[9px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">{stat.trend}</span>
               )}
             </div>
           </div>
@@ -134,10 +134,10 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Main grid */}
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
 
         {/* Plan Card */}
-        <div className="bg-gradient-to-br from-indigo-600 to-violet-600 rounded-3xl p-6 text-white shadow-xl shadow-indigo-200 flex flex-col">
+        <div className="bg-gradient-to-br from-indigo-600 to-violet-600 rounded-[2rem] p-6 text-white shadow-xl shadow-indigo-200 flex flex-col">
           <div className="flex items-start justify-between mb-4">
             <div className="bg-white/20 p-3 rounded-2xl">
               <CreditCard size={22} />
@@ -164,7 +164,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Verification Card */}
-        <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm flex flex-col">
+        <div className="bg-white rounded-[2rem] border border-slate-100 p-6 shadow-sm flex flex-col">
           <div className="flex items-start justify-between mb-4">
             <div className="bg-slate-50 p-3 rounded-2xl text-slate-600">
               <ShieldCheck size={22} />
@@ -174,7 +174,7 @@ const Dashboard: React.FC = () => {
             </span>
           </div>
           <h3 className="text-lg font-black text-slate-900 mb-2">Verification</h3>
-          <p className="text-slate-400 font-medium text-sm flex-1">
+          <p className="text-slate-400 font-medium text-sm flex-1 leading-relaxed">
             {verificationLoading
               ? 'Checking status...'
               : verificationStatus === 'approved'
@@ -187,7 +187,7 @@ const Dashboard: React.FC = () => {
           </p>
           <button
             onClick={() => navigate('/dashboard/verification')}
-            className="mt-5 w-full py-3 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center justify-center gap-2"
+            className="mt-5 w-full py-3.5 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center justify-center gap-2 active:scale-95"
           >
             {verificationStatus === 'approved' ? 'View Status' : verificationStatus === 'none' ? 'Apply Now' : 'Check Status'}
             <ArrowRight size={14} />
@@ -195,7 +195,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Analytics Card */}
-        <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm flex flex-col">
+        <div className="bg-white rounded-[2rem] border border-slate-100 p-6 shadow-sm flex flex-col">
           <div className="flex items-start justify-between mb-4">
             <div className="bg-violet-50 p-3 rounded-2xl text-violet-600">
               <BarChart2 size={22} />
@@ -205,32 +205,32 @@ const Dashboard: React.FC = () => {
             </span>
           </div>
           <h3 className="text-lg font-black text-slate-900 mb-5">Analytics</h3>
-          <div className="space-y-3 flex-1">
+          <div className="space-y-4 flex-1">
             {[
               { label: 'Profile Views', value: totalViews, max: Math.max(totalViews, 1), color: 'bg-indigo-500' },
               { label: 'Link Clicks', value: totalClicks, max: Math.max(totalViews, 1), color: 'bg-violet-500' },
             ].map(bar => (
               <div key={bar.label}>
-                <div className="flex justify-between text-xs font-bold text-slate-500 mb-1">
+                <div className="flex justify-between text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wide">
                   <span>{bar.label}</span>
                   <span className="text-slate-900">{bar.value.toLocaleString()}</span>
                 </div>
-                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-2.5 bg-slate-50 rounded-full overflow-hidden border border-slate-100">
                   <div
-                    className={`h-full ${bar.color} rounded-full transition-all`}
+                    className={`h-full ${bar.color} rounded-full transition-all duration-1000`}
                     style={{ width: `${Math.min((bar.value / bar.max) * 100, 100)}%` }}
                   />
                 </div>
               </div>
             ))}
-            <div className="flex items-center justify-between pt-2 border-t border-slate-50 text-sm">
-              <span className="text-slate-400 font-bold text-xs">Click-through rate</span>
+            <div className="flex items-center justify-between pt-3 border-t border-slate-50 text-sm mt-2">
+              <span className="text-slate-400 font-bold text-xs uppercase tracking-wider">CTR</span>
               <span className="text-slate-900 font-black">{ctr}%</span>
             </div>
           </div>
           <button
             onClick={() => navigate('/dashboard/analytics')}
-            className="mt-5 w-full py-3 bg-slate-50 text-slate-700 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-100 transition-all flex items-center justify-center gap-2"
+            className="mt-6 w-full py-3.5 bg-slate-50 text-slate-700 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-100 transition-all flex items-center justify-center gap-2 active:scale-95"
           >
             Full Analytics <ArrowRight size={14} />
           </button>
@@ -238,27 +238,27 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Bottom row */}
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
 
         {/* Public Link */}
         {activePage && (
-          <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
+          <div className="bg-white rounded-[2rem] border border-slate-100 p-6 shadow-sm">
             <h3 className="text-base font-black text-slate-900 mb-1">Your Public Link</h3>
             <p className="text-xs text-slate-400 font-bold mb-4">Share this link anywhere to direct people to your Bio-Tree.</p>
-            <div className="flex items-center gap-3 bg-slate-50 rounded-2xl px-4 py-3 border border-slate-100">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-slate-50 rounded-2xl px-4 py-3 border border-slate-100">
               <span className="text-sm font-bold text-slate-600 truncate flex-1">{publicUrl}</span>
               <button
                 onClick={handleCopy}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black transition-all ${copied ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200'}`}
+                className={`flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black transition-all ${copied ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200'} active:scale-95`}
               >
-                {copied ? <><Check size={13} /> Copied!</> : <><Copy size={13} /> Copy</>}
+                {copied ? <><Check size={13} /> Copied!</> : <><Copy size={13} /> Copy Link</>}
               </button>
             </div>
           </div>
         )}
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
+        <div className="bg-white rounded-[2rem] border border-slate-100 p-6 shadow-sm">
           <h3 className="text-base font-black text-slate-900 mb-4">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-3">
             {[
@@ -270,7 +270,7 @@ const Dashboard: React.FC = () => {
               <button
                 key={action.label}
                 onClick={() => navigate(action.to)}
-                className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all ${action.color}`}
+                className={`flex items-center gap-3 px-4 py-4 rounded-2xl text-[13px] font-black transition-all ${action.color} active:scale-95`}
               >
                 {action.icon} {action.label}
               </button>

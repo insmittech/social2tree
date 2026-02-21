@@ -37,7 +37,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans tracking-tight">
+    <div className="min-h-screen bg-slate-50 font-sans tracking-tight overflow-x-hidden">
       <Navbar
         isAuthenticated={isAuthenticated}
         userProfile={userProfile}
@@ -45,46 +45,46 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
       />
 
       {/* Hero Section */}
-      <section className="bg-white pt-24 pb-32 px-4 overflow-hidden relative border-b border-slate-100">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
+      <section className="bg-white pt-16 sm:pt-24 pb-20 sm:pb-32 px-4 overflow-hidden relative border-b border-slate-100">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 sm:gap-20 items-center">
           <div className="text-center lg:text-left relative z-10">
-            <div className="inline-flex items-center gap-3 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-2xl text-sm font-black uppercase tracking-[0.2em] mb-10 border border-indigo-100 shadow-sm shadow-indigo-100">
-              <Zap size={16} fill="currentColor" /> Premium Identity
+            <div className="inline-flex items-center gap-3 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-2xl text-[10px] sm:text-sm font-black uppercase tracking-[0.2em] mb-8 sm:mb-10 border border-indigo-100 shadow-sm shadow-indigo-100">
+              <Zap size={14} fill="currentColor" /> Premium Identity
             </div>
-            <h1 className="text-6xl md:text-9xl font-black text-slate-900 leading-[0.85] tracking-tighter mb-10 italic uppercase">
+            <h1 className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-slate-900 leading-[0.9] sm:leading-[0.85] tracking-tighter mb-8 sm:mb-10 italic uppercase">
               Your World <br />
-              <span className="text-indigo-600">In One Link.</span>
+              <span className="text-indigo-600 font-black">In One Link.</span>
             </h1>
-            <p className="text-xl text-slate-400 max-w-xl mx-auto lg:mx-0 leading-relaxed mb-12 font-bold uppercase tracking-widest">
+            <p className="text-base sm:text-xl text-slate-400 max-w-xl mx-auto lg:mx-0 leading-relaxed mb-10 sm:mb-12 font-bold uppercase tracking-widest px-4 sm:px-0">
               The professional way to connect your audience to all of your content.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5 mb-12">
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-5 mb-10 sm:mb-12">
               <div className="relative w-full sm:w-auto rounded-[2rem] overflow-hidden border-4 border-slate-100 bg-white shadow-2xl shadow-slate-200">
-                <span className="absolute left-8 top-1/2 -translate-y-1/2 text-slate-300 font-black text-sm uppercase tracking-widest">s2t.me/</span>
+                <span className="absolute left-6 sm:left-8 top-1/2 -translate-y-1/2 text-slate-300 font-black text-[10px] sm:text-sm uppercase tracking-widest">s2t.me/</span>
                 <input
                   type="text"
                   placeholder="username"
-                  className="w-full sm:w-80 pl-28 pr-8 py-6 bg-transparent outline-none font-black text-lg text-slate-900 uppercase tracking-tighter"
+                  className="w-full sm:w-80 pl-24 sm:pl-28 pr-6 sm:pr-8 py-5 sm:py-6 bg-transparent outline-none font-black text-base sm:text-lg text-slate-900 uppercase tracking-tighter"
                 />
               </div>
               <Link
                 to="/register"
-                className="w-full sm:w-auto bg-indigo-600 text-white px-12 py-6 rounded-[2rem] text-lg font-black uppercase tracking-widest hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-indigo-300 flex items-center justify-center gap-4 group"
+                className="w-full sm:w-auto bg-indigo-600 text-white px-8 sm:px-12 py-5 sm:py-6 rounded-[2rem] text-base sm:text-lg font-black uppercase tracking-widest hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-indigo-300 flex items-center justify-center gap-3 sm:gap-4 group"
               >
-                Join Free <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform" />
+                Join Free <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
               </Link>
             </div>
 
-            <div className="flex items-center justify-center lg:justify-start gap-8 pt-8 border-t border-slate-50 w-full lg:w-fit">
-              <div className="flex -space-x-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 sm:gap-8 pt-8 border-t border-slate-50 w-full lg:w-fit">
+              <div className="flex -space-x-3 sm:-space-x-4">
                 {[1, 2, 3, 4, 5].map(i => (
-                  <img key={i} src={`https://i.pravatar.cc/150?img=${i + 30}`} className="w-12 h-12 rounded-[1.2rem] border-4 border-white shadow-2xl rotate-3 first:rotate-0" alt="user" />
+                  <img key={i} src={`https://i.pravatar.cc/150?img=${i + 30}`} className="w-10 h-10 sm:w-12 sm:h-12 rounded-[1rem] sm:rounded-[1.2rem] border-4 border-white shadow-2xl rotate-3 first:rotate-0" alt="user" />
                 ))}
               </div>
-              <div className="text-left">
-                <p className="text-2xl font-black text-slate-900 leading-none">5,000,000+</p>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1">Global Creators</p>
+              <div className="text-center sm:text-left">
+                <p className="text-xl sm:text-2xl font-black text-slate-900 leading-none">5,000,000+</p>
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mt-1">Global Creators</p>
               </div>
             </div>
           </div>
