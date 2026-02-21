@@ -28,8 +28,9 @@ function resolve_geo(string $ip): array {
     }
 
     $providers = [
-        "http://ipwho.is/{$ip}", // New fast provider (IPv6 support)
-        "http://ip-api.com/json/{$ip}?fields=status,country,countryCode,city",
+        "http://ip-api.com/php/{$ip}", // User suggested PHP format
+        "https://demo.ip-api.com/json/{$ip}?fields=66842623", 
+        "http://ipwho.is/{$ip}", 
         "https://ipapi.co/{$ip}/json/",
         "https://freeipapi.com/api/json/{$ip}"
     ];
@@ -41,8 +42,8 @@ function resolve_geo(string $ip): array {
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, $url);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_TIMEOUT, 5); // Increased timeout
-                curl_setopt($ch, CURLOPT_USERAGENT, 'Social2Tree/1.3');
+                curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+                curl_setopt($ch, CURLOPT_USERAGENT, 'Social2Tree/1.4');
                 if (str_starts_with($url, 'https')) {
                     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
                 }
@@ -54,18 +55,25 @@ function resolve_geo(string $ip): array {
             }
 
             if ($raw) {
-                $geo = json_decode($raw, true);
+                // Support both JSON and PHP Serialized formats
+                if (str_contains($url, '/php/')) {
+                    $geo = @unserialize($raw);
+                } else {
+                    $geo = json_decode($raw, true);
+                }
                 
+                if (!$geo) continue;
+
                 // Flexible success detection
-                $is_success = (isset($geo['success']) && $geo['success'] === true) || // ipwho.is
-                             (isset($geo['status']) && $geo['status'] === 'success') || // ip-api
+                $is_success = (isset($geo['status']) && $geo['status'] === 'success') || // ip-api
+                             (isset($geo['success']) && $geo['success'] === true) || // ipwho.is
                              (isset($geo['country']) && !isset($geo['error'])) || // ipapi.co
                              (isset($geo['countryName']) && !empty($geo['countryName'])); // freeipapi
 
                 if ($is_success) {
                     return [
                         'country'      => $geo['country'] ?? $geo['country_name'] ?? $geo['countryName'] ?? 'Unknown Origin',
-                        'country_code' => $geo['country_code'] ?? $geo['countryCode'] ?? (isset($geo['country']) && strlen($geo['country']) === 2 ? $geo['country'] : 'UN'),
+                        'country_code' => $geo['countryCode'] ?? $geo['country_code'] ?? (isset($geo['country']) && strlen($geo['country']) === 2 ? $geo['country'] : 'UN'),
                         'city'         => $geo['city'] ?? $geo['cityName'] ?? $geo['city_name'] ?? 'Unknown Sector'
                     ];
                 }
