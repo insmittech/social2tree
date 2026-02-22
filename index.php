@@ -162,7 +162,8 @@ foreach ($locations as $loc) {
           "@google/genai": "https://esm.sh/@google/genai@^1.40.0",
           "react-router-dom": "https://esm.sh/react-router-dom@^7.13.0",
           "react/": "https://esm.sh/react@^19.2.4/",
-          "react": "https://esm.sh/react@^19.2.4"
+          "react": "https://esm.sh/react@^19.2.4",
+          "react-icons/fa6": "https://esm.sh/react-icons@5.5.0/fa6"
         }
       }
     </script>

@@ -4,6 +4,7 @@ import { TreePine, ArrowLeft, Mail, Lock } from 'lucide-react';
 import client from '../src/api/client';
 import { useToast } from '../src/context/ToastContext';
 import { useAuth } from '../src/context/AuthContext';
+import { Helmet } from 'react-helmet-async';
 
 interface LoginProps {
   onLogin: (isAdmin: boolean, user: any) => void;
@@ -57,6 +58,9 @@ const Login: React.FC<LoginProps> = ({ onLogin, isAuthenticated }) => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0b0f19] flex items-center justify-center px-4 transition-colors duration-300">
+      <Helmet>
+        <title>Login | Social2Tree</title>
+      </Helmet>
       <Link to="/" className="fixed top-8 left-8 flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors font-bold text-sm">
         <ArrowLeft size={16} /> Back
       </Link>

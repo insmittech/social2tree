@@ -6,6 +6,7 @@ import MobileThemeShowcase from '../components/MobileThemeShowcase';
 import AIAssistantShowcase from '../components/AIAssistantShowcase';
 import { Shield, ChevronRight, Activity, Search, Globe, Lock, Cpu, Database, Eye, Fingerprint, Expand, Layers, BoxSelect, Zap, ShieldCheck, Sparkles, Network, User, ArrowRight } from 'lucide-react';
 import { FaInstagram, FaFacebookF, FaLinkedinIn, FaWhatsapp, FaYoutube, FaTwitter, FaSnapchat, FaXTwitter, FaPinterest, FaDiscord, FaTelegram, FaGithub } from 'react-icons/fa6';
+import { Helmet } from 'react-helmet-async';
 import client from '../src/api/client';
 
 interface LandingPageProps {
@@ -19,12 +20,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
     footer_explore: [],
     footer_legal: []
   });
+  const [seo, setSeo] = useState<any>(null);
 
   useEffect(() => {
-    const fetchMenu = async () => {
+    const fetchLandingData = async () => {
       try {
-        const res = await client.get('/admin/settings/get.php');
-        const settings = res.data.settings;
+        // Fetch Menus
+        const menuRes = await client.get('/admin/settings/get.php');
+        const settings = menuRes.data.settings;
         if (settings) {
           setMenuLinks({
             navbar: JSON.parse(settings.navbar_links || '[]'),
@@ -32,11 +35,17 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
             footer_legal: JSON.parse(settings.footer_legal_links || '[]')
           });
         }
+
+        // Fetch SEO for "home" page
+        const seoRes = await client.get('/public/get_profile.php?username=home');
+        if (seoRes.data && seoRes.data.seo) {
+          setSeo(seoRes.data.seo);
+        }
       } catch (err) {
-        console.error('Failed to load menu settings:', err);
+        console.error('Failed to load landing data:', err);
       }
     };
-    fetchMenu();
+    fetchLandingData();
   }, []);
 
   // Custom Links for the Header as requested
@@ -51,6 +60,21 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0b0f19] font-sans tracking-tight transition-colors duration-300">
+      <Helmet>
+        <title>{seo?.title_tag || "Social2Tree | Everything you are in one link"}</title>
+        <meta name="description" content={seo?.meta_description || "Social2Tree - The ultimate bio link tool for creators."} />
+        {seo?.meta_keywords && <meta name="keywords" content={seo.meta_keywords} />}
+
+        {/* Open Graph */}
+        <meta property="og:title" content={seo?.title_tag || "Social2Tree"} />
+        <meta property="og:description" content={seo?.meta_description} />
+        {seo?.og_image && <meta property="og:image" content={seo.og_image} />}
+
+        {/* Twitter */}
+        <meta name="twitter:title" content={seo?.title_tag} />
+        <meta name="twitter:description" content={seo?.meta_description} />
+      </Helmet>
+
       <Navbar
         isAuthenticated={isAuthenticated}
         userProfile={userProfile}
@@ -118,7 +142,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
               <div className="radar-ring radar-ring-1"></div>
 
               {/* Sweeping Radar Line */}
-              <div className="absolute top-1/2 left-1/2 w-[375px] h-[375px] origin-top-left border-l border-teal-500/50 bg-gradient-to-br from-teal-500/10 to-transparent animate-spin-slow rounded-tl-full [mask-image:linear-gradient(to_bottom_right,white,transparent_50%)]"></div>
+              <div className="absolute top-1/2 left-1/2 w-[375px] h-[375px] origin-top-left border-l border-teal-400/80 bg-gradient-to-br from-teal-400/20 to-transparent animate-spin-slow rounded-tl-full [mask-image:linear-gradient(to_bottom_right,white_20%,transparent_60%)]"></div>
 
               {/* Center Node */}
               <div className="relative z-10 w-24 h-24 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-teal-500/50 shadow-xl dark:shadow-[0_0_30px_rgba(20,184,166,0.3)] flex items-center justify-center transition-colors">
@@ -130,9 +154,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
               <div className="absolute top-0 left-0 w-full h-full animate-spin-reverse">
 
                 {/* Node 1: Instagram (Ring 2) */}
-                <div className="absolute top-[25%] left-[25%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                <div className="absolute top-[25%] left-[25%] -translate-x-1/2 -translate-y-1/2">
                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '0s' }}>
-                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-pink-200 dark:border-pink-500/40 group-hover:bg-pink-50 dark:group-hover:bg-pink-900/50 group-hover:border-pink-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(236,72,153,0.2)]">
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-pink-200 dark:border-pink-500/40 group-hover:bg-pink-50 dark:group-hover:bg-pink-900/50 group-hover:border-pink-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(236,72,153,0.2)] animate-keep-upright">
                       <FaInstagram size={24} className="text-pink-500 dark:text-pink-400" />
                     </div>
                     <span className="text-xs font-medium text-slate-700 dark:text-pink-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">Instagram</span>
@@ -140,9 +164,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
                 </div>
 
                 {/* Node 2: Facebook (Ring 3) */}
-                <div className="absolute top-[75%] left-[15%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                <div className="absolute top-[75%] left-[15%] -translate-x-1/2 -translate-y-1/2">
                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '1s' }}>
-                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-blue-200 dark:border-blue-500/40 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/50 group-hover:border-blue-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-blue-200 dark:border-blue-500/40 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/50 group-hover:border-blue-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(59,130,246,0.2)] animate-keep-upright">
                       <FaFacebookF size={22} className="text-blue-500 dark:text-blue-400" />
                     </div>
                     <span className="text-xs font-medium text-slate-700 dark:text-blue-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">Facebook</span>
@@ -150,9 +174,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
                 </div>
 
                 {/* Node 3: LinkedIn (Ring 4) */}
-                <div className="absolute top-[10%] left-[60%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                <div className="absolute top-[10%] left-[60%] -translate-x-1/2 -translate-y-1/2">
                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '2s' }}>
-                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-blue-200 dark:border-blue-400/40 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/50 group-hover:border-blue-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-blue-200 dark:border-blue-400/40 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/50 group-hover:border-blue-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(59,130,246,0.2)] animate-keep-upright">
                       <FaLinkedinIn size={22} className="text-blue-600 dark:text-blue-400" />
                     </div>
                     <span className="text-xs font-medium text-slate-700 dark:text-blue-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">LinkedIn</span>
@@ -160,9 +184,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
                 </div>
 
                 {/* Node 4: WhatsApp (Ring 2) */}
-                <div className="absolute top-[80%] left-[80%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                <div className="absolute top-[80%] left-[80%] -translate-x-1/2 -translate-y-1/2">
                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '0.5s' }}>
-                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-green-200 dark:border-green-500/40 group-hover:bg-green-50 dark:group-hover:bg-green-900/50 group-hover:border-green-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-green-200 dark:border-green-500/40 group-hover:bg-green-50 dark:group-hover:bg-green-900/50 group-hover:border-green-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(34,197,94,0.2)] animate-keep-upright">
                       <FaWhatsapp size={24} className="text-green-500 dark:text-green-400" />
                     </div>
                     <span className="text-xs font-medium text-slate-700 dark:text-green-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">WhatsApp</span>
@@ -170,9 +194,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
                 </div>
 
                 {/* Node 5: YouTube (Ring 3) */}
-                <div className="absolute top-[40%] left-[85%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                <div className="absolute top-[40%] left-[85%] -translate-x-1/2 -translate-y-1/2">
                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '1.5s' }}>
-                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-red-200 dark:border-red-500/40 group-hover:bg-red-50 dark:group-hover:bg-red-900/50 group-hover:border-red-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-red-200 dark:border-red-500/40 group-hover:bg-red-50 dark:group-hover:bg-red-900/50 group-hover:border-red-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(239,68,68,0.2)] animate-keep-upright">
                       <FaYoutube size={24} className="text-red-500 dark:text-red-400" />
                     </div>
                     <span className="text-xs font-medium text-slate-700 dark:text-red-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">YouTube</span>
@@ -180,9 +204,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
                 </div>
 
                 {/* Node 6: Snapchat (Ring 4) */}
-                <div className="absolute top-[90%] left-[20%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                <div className="absolute top-[90%] left-[20%] -translate-x-1/2 -translate-y-1/2">
                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '2.5s' }}>
-                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-yellow-200 dark:border-yellow-500/40 group-hover:bg-yellow-50 dark:group-hover:bg-yellow-900/50 group-hover:border-yellow-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(250,204,21,0.2)]">
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-yellow-200 dark:border-yellow-500/40 group-hover:bg-yellow-50 dark:group-hover:bg-yellow-900/50 group-hover:border-yellow-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(250,204,21,0.2)] animate-keep-upright">
                       <FaSnapchat size={24} className="text-yellow-500 dark:text-yellow-400" />
                     </div>
                     <span className="text-xs font-medium text-slate-700 dark:text-yellow-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">Snapchat</span>
@@ -190,9 +214,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
                 </div>
 
                 {/* Node 7: X (Twitter) (Ring 1) */}
-                <div className="absolute top-[35%] left-[65%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                <div className="absolute top-[35%] left-[65%] -translate-x-1/2 -translate-y-1/2">
                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '0.8s' }}>
-                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-300 dark:border-slate-500/40 group-hover:bg-slate-200 dark:group-hover:bg-slate-800/50 group-hover:border-slate-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(148,163,184,0.2)]">
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-300 dark:border-slate-500/40 group-hover:bg-slate-200 dark:group-hover:bg-slate-800/50 group-hover:border-slate-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(148,163,184,0.2)] animate-keep-upright">
                       <FaXTwitter size={22} className="text-slate-900 dark:text-white" />
                     </div>
                     <span className="text-xs font-medium text-slate-700 dark:text-slate-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">X (Twitter)</span>
@@ -200,9 +224,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
                 </div>
 
                 {/* Node 8: Pinterest (Ring 3) */}
-                <div className="absolute top-[20%] left-[80%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                <div className="absolute top-[20%] left-[80%] -translate-x-1/2 -translate-y-1/2">
                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '1.2s' }}>
-                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-red-200 dark:border-red-500/40 group-hover:bg-red-50 dark:group-hover:bg-red-900/50 group-hover:border-red-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-red-200 dark:border-red-500/40 group-hover:bg-red-50 dark:group-hover:bg-red-900/50 group-hover:border-red-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(239,68,68,0.2)] animate-keep-upright">
                       <FaPinterest size={22} className="text-red-600 dark:text-red-500" />
                     </div>
                     <span className="text-xs font-medium text-slate-700 dark:text-red-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">Pinterest</span>
@@ -210,9 +234,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
                 </div>
 
                 {/* Node 9: Discord (Ring 4) */}
-                <div className="absolute top-[50%] left-[90%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                <div className="absolute top-[50%] left-[90%] -translate-x-1/2 -translate-y-1/2">
                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '2.2s' }}>
-                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-indigo-200 dark:border-indigo-500/40 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/50 group-hover:border-indigo-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-indigo-200 dark:border-indigo-500/40 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/50 group-hover:border-indigo-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(99,102,241,0.2)] animate-keep-upright">
                       <FaDiscord size={24} className="text-indigo-500 dark:text-indigo-400" />
                     </div>
                     <span className="text-xs font-medium text-slate-700 dark:text-indigo-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">Discord</span>
@@ -220,9 +244,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
                 </div>
 
                 {/* Node 10: Telegram (Ring 2) */}
-                <div className="absolute top-[65%] left-[35%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                <div className="absolute top-[65%] left-[35%] -translate-x-1/2 -translate-y-1/2">
                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '0.3s' }}>
-                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-sky-200 dark:border-sky-500/40 group-hover:bg-sky-50 dark:group-hover:bg-sky-900/50 group-hover:border-sky-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(14,165,233,0.2)]">
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-sky-200 dark:border-sky-500/40 group-hover:bg-sky-50 dark:group-hover:bg-sky-900/50 group-hover:border-sky-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(14,165,233,0.2)] animate-keep-upright">
                       <FaTelegram size={24} className="text-sky-500 dark:text-sky-400" />
                     </div>
                     <span className="text-xs font-medium text-slate-700 dark:text-sky-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">Telegram</span>
@@ -230,9 +254,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
                 </div>
 
                 {/* Node 11: GitHub (Ring 3) */}
-                <div className="absolute top-[10%] left-[40%] -translate-x-1/2 -translate-y-1/2 animate-spin-slow">
+                <div className="absolute top-[10%] left-[40%] -translate-x-1/2 -translate-y-1/2">
                   <div className="flex flex-col items-center gap-2 group cursor-pointer animate-float" style={{ animationDelay: '1.8s' }}>
-                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-300 dark:border-slate-500/40 group-hover:bg-slate-200 dark:group-hover:bg-slate-800/50 group-hover:border-slate-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(148,163,184,0.2)]">
+                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-[#0b0f19] border border-slate-300 dark:border-slate-500/40 group-hover:bg-slate-200 dark:group-hover:bg-slate-800/50 group-hover:border-slate-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center shadow-lg dark:shadow-[0_0_15px_rgba(148,163,184,0.2)] animate-keep-upright">
                       <FaGithub size={24} className="text-slate-800 dark:text-white" />
                     </div>
                     <span className="text-xs font-medium text-slate-700 dark:text-slate-300/70 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white dark:bg-slate-900 px-2 py-1 rounded">GitHub</span>
@@ -246,7 +270,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ isAuthenticated, userProfile 
         </div>
       </section>
 
-      
+
 
       {/* Feature Section: The Most Accurate and In-Depth Data */}
       <section className="relative py-24 lg:py-32 bg-slate-50 dark:bg-[#0b0f19] overflow-hidden transition-colors duration-300">

@@ -6,6 +6,7 @@ import MobileNav from './MobileNav';
 import { useLocation } from 'react-router-dom';
 import { useTheme } from '../src/context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -20,8 +21,31 @@ const Layout: React.FC<LayoutProps> = ({ children, userProfile, onLogout, isAdmi
     const isAdminPath = location.pathname.startsWith('/admin');
     const [isCollapsed, setIsCollapsed] = useState(false);
 
+    // Dynamic Title Logic
+    const getPageTitle = () => {
+        const path = location.pathname;
+        if (path.startsWith('/admin')) {
+            if (path.includes('/users')) return 'Users | Admin';
+            if (path.includes('/settings/menus')) return 'Menus | Admin';
+            if (path.includes('/settings')) return 'Settings | Admin';
+            return 'Admin Dashboard';
+        }
+        if (path.startsWith('/dashboard')) {
+            if (path.includes('/trees/')) return 'Editing Tree';
+            if (path.includes('/trees')) return 'Bio-Trees';
+            if (path.includes('/analytics')) return 'Analytics';
+            if (path.includes('/profile')) return 'Profile';
+            if (path.includes('/settings')) return 'Account Settings';
+            return 'Dashboard';
+        }
+        return 'Social2Tree';
+    };
+
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-[#0b0f19] flex transition-colors duration-300">
+            <Helmet>
+                <title>{getPageTitle()} | Social2Tree</title>
+            </Helmet>
             {/* Sidebar for Desktop */}
             <Sidebar
                 isAdmin={isAdmin || isAdminPath}
