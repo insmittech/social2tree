@@ -35,6 +35,7 @@ import { ToastProvider } from './src/context/ToastContext';
 import { ToastContainer } from './components/Toast';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { ThemeProvider } from './src/context/ThemeContext';
+import { SEOProvider } from './src/context/SEOContext';
 
 const AppRoutes: React.FC = () => {
   const { isAuthenticated, isAdmin, user, isLoading, logout } = useAuth();
@@ -52,7 +53,7 @@ const AppRoutes: React.FC = () => {
   };
 
   return (
-    <BrowserRouter>
+    <>
       <Routes>
         <Route path="/" element={<LandingPage isAuthenticated={isAuthenticated} userProfile={user} />} />
         <Route path="/features" element={<Features />} />
@@ -172,7 +173,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/:username" element={<PublicProfile />} />
       </Routes>
       <ToastContainer />
-    </BrowserRouter>
+    </>
   );
 };
 
@@ -181,7 +182,11 @@ const App: React.FC = () => {
     <ThemeProvider>
       <ToastProvider>
         <AuthProvider>
-          <AppRoutes />
+          <BrowserRouter>
+            <SEOProvider>
+              <AppRoutes />
+            </SEOProvider>
+          </BrowserRouter>
         </AuthProvider>
       </ToastProvider>
     </ThemeProvider>
