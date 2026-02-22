@@ -60,9 +60,20 @@ $locations = ['/dist/assets', '/assets'];
 
 foreach ($locations as $loc) {
     if (is_dir(__DIR__ . $loc)) {
-        $js_files = glob(__DIR__ . $loc . '/index-*.js');
-        $css_files = glob(__DIR__ . $loc . '/index-*.css');
+        // Look for 'main' (from our new app.html build) or 'index' bundles
+        $js_files = array_merge(
+            glob(__DIR__ . $loc . '/main-*.js'),
+            glob(__DIR__ . $loc . '/index-*.js')
+        );
+        $css_files = array_merge(
+            glob(__DIR__ . $loc . '/main-*.css'),
+            glob(__DIR__ . $loc . '/index-*.css')
+        );
         
+        // Final fallback: just find any .js and .css if the above fail
+        if (empty($js_files)) $js_files = glob(__DIR__ . $loc . '/*.js');
+        if (empty($css_files)) $css_files = glob(__DIR__ . $loc . '/*.css');
+
         if (!empty($js_files)) {
             $is_production = true;
             $js_bundle = $loc . '/' . basename($js_files[0]);
