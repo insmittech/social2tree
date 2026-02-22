@@ -51,20 +51,26 @@ if (!$is_system_route) {
     }
 }
 // 2. Production Asset Detection
-$is_production = is_dir(__DIR__ . '/dist/assets');
+$is_production = false;
 $js_bundle = '/index.tsx';
 $css_bundle = '/index.css';
 
-if ($is_production) {
-    // Look for hashed files in dist/assets
-    $js_files = glob(__DIR__ . '/dist/assets/index-*.js');
-    $css_files = glob(__DIR__ . '/dist/assets/index-*.css');
-    
-    if (!empty($js_files)) {
-        $js_bundle = '/dist/assets/' . basename($js_files[0]);
-    }
-    if (!empty($css_files)) {
-        $css_bundle = '/dist/assets/' . basename($css_files[0]);
+// Check common production locations
+$locations = ['/dist/assets', '/assets'];
+
+foreach ($locations as $loc) {
+    if (is_dir(__DIR__ . $loc)) {
+        $js_files = glob(__DIR__ . $loc . '/index-*.js');
+        $css_files = glob(__DIR__ . $loc . '/index-*.css');
+        
+        if (!empty($js_files)) {
+            $is_production = true;
+            $js_bundle = $loc . '/' . basename($js_files[0]);
+            if (!empty($css_files)) {
+                $css_bundle = $loc . '/' . basename($css_files[0]);
+            }
+            break; 
+        }
     }
 }
 ?>

@@ -29,70 +29,29 @@ jobs:
         run: |
           mkdir deploy_package
 
-          # A. Copy React Build (Frontend) to root
+          # A. Copy React Build (Frontend)
           cp -r dist/* deploy_package/
 
-          # B. Create Backend API Folder Structure
-          mkdir -p deploy_package/api
-          cp -r public/api/* deploy_package/api/
+          # B. Copy Backend Structure
+          # Our index.php expects public/api structure
+          mkdir -p deploy_package/public/api
+          cp -r public/api/* deploy_package/public/api/
 
-          # C. Copy Database Schema (if needed for reference)
+          # C. Copy Root Files for SEO and Routing
+          cp index.php deploy_package/
+          cp .htaccess deploy_package/
+          if [ -f "robots.txt" ]; then cp robots.txt deploy_package/; fi
+
+          # D. Copy Database Schema (if needed for reference)
           if [ -d "server" ]; then 
             mkdir -p deploy_package/server
             cp -r server/* deploy_package/server/
           fi
 
-          # D. Copy Environment Template
+          # E. Copy Environment Template
           if [ -f ".env" ]; then
             cp .env deploy_package/.env.example
           fi
-
-          # E. Create .htaccess for URL Rewriting
-          echo "<IfModule mod_rewrite.c>" > deploy_package/.htaccess
-          echo "  RewriteEngine On" >> deploy_package/.htaccess
-          echo "  RewriteBase /" >> deploy_package/.htaccess
-
-          # 1. Force HTTPS (Prevents Loops)
-          echo "" >> deploy_package/.htaccess
-          echo "  # Force HTTPS" >> deploy_package/.htaccess
-          echo "  RewriteCond %{HTTPS} off" >> deploy_package/.htaccess
-          echo "  RewriteCond %{HTTP:X-Forwarded-Proto} !https" >> deploy_package/.htaccess
-          echo "  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]" >> deploy_package/.htaccess
-
-          # 2. Force non-www (optional - uncomment if needed)
-          # echo "" >> deploy_package/.htaccess
-          # echo "  # Force non-www" >> deploy_package/.htaccess
-          # echo "  RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]" >> deploy_package/.htaccess
-          # echo "  RewriteRule ^(.*)$ https://%1/$1 [R=301,L]" >> deploy_package/.htaccess
-
-          # 3. Protect API Folder (allow PHP execution)
-          echo "" >> deploy_package/.htaccess
-          echo "  # Allow API routes to work" >> deploy_package/.htaccess
-          echo "  RewriteRule ^api/ - [L,NC]" >> deploy_package/.htaccess
-
-          # 4. Ignore Real Files & Directories
-          echo "" >> deploy_package/.htaccess
-          echo "  # Don't rewrite files or directories that exist" >> deploy_package/.htaccess
-          echo "  RewriteCond %{REQUEST_FILENAME} -f [OR]" >> deploy_package/.htaccess
-          echo "  RewriteCond %{REQUEST_FILENAME} -d" >> deploy_package/.htaccess
-          echo "  RewriteRule ^ - [L]" >> deploy_package/.htaccess
-
-          # 5. Frontend Fallback (React Router)
-          echo "" >> deploy_package/.htaccess
-          echo "  # Fallback to index.html for React Router" >> deploy_package/.htaccess
-          echo "  RewriteRule ^ index.html [L]" >> deploy_package/.htaccess
-          echo "</IfModule>" >> deploy_package/.htaccess
-
-          # F. Create API .htaccess (for cleaner URLs without .php extension)
-          echo "<IfModule mod_rewrite.c>" > deploy_package/api/.htaccess
-          echo "  RewriteEngine On" >> deploy_package/api/.htaccess
-          echo "  RewriteBase /api/" >> deploy_package/api/.htaccess
-          echo "" >> deploy_package/api/.htaccess
-          echo "  # Remove .php extension" >> deploy_package/api/.htaccess
-          echo "  RewriteCond %{REQUEST_FILENAME} !-d" >> deploy_package/api/.htaccess
-          echo "  RewriteCond %{REQUEST_FILENAME}\.php -f" >> deploy_package/api/.htaccess
-          echo "  RewriteRule ^(.*)$ \$1.php [L]" >> deploy_package/api/.htaccess
-          echo "</IfModule>" >> deploy_package/api/.htaccess
 
           echo "✓ Deployment package prepared"
           ls -la deploy_package/
