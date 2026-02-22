@@ -465,6 +465,21 @@ try {
         }
     }
     echo "<span class='success'>✅ Done</span><br>";
+
+    // Seed Marketing/System Pages
+    echo "Seeding system pages (Home, Pricing, etc.)... ";
+    $systemPages = [
+        ['slug' => 'home', 'display_name' => 'Home Page', 'bio' => 'Social2Tree - The ultimate bio link tool for creators.'],
+        ['slug' => 'pricing', 'display_name' => 'Pricing Plans', 'bio' => 'Choose the best plan for your social growth.'],
+        ['slug' => 'about', 'display_name' => 'About Us', 'bio' => 'Learn more about the team behind Social2Tree.'],
+        ['slug' => 'features', 'display_name' => 'Platform Features', 'bio' => 'Explore all the powerful tools Social2Tree offers.'],
+        ['slug' => 'contact', 'display_name' => 'Contact Us', 'bio' => 'Get in touch with the Social2Tree support team.'],
+    ];
+    $spStmt = $pdo->prepare("INSERT IGNORE INTO pages (user_id, slug, display_name, bio) VALUES (?, ?, ?, ?)");
+    foreach ($systemPages as $sp) {
+        $spStmt->execute([1, $sp['slug'], $sp['display_name'], $sp['bio']]);
+    }
+    echo "<span class='success'>✅ Done</span><br>";
     
     // Clear permission cache to reflect changes immediately
     clear_permission_cache();

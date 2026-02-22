@@ -102,6 +102,11 @@ function require_admin() {
     return $user_id;
 }
 
+function is_admin() {
+    start_secure_session();
+    return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+}
+
 function sanitize_input($data)
 {
     if (is_array($data)) {

@@ -14,11 +14,14 @@
   # Map API requests to the public/api folder
   RewriteRule ^api/(.*)$ public/api/$1 [L,NC]
 
+  # Map sitemap.xml to the dynamic sitemap script
+  RewriteRule ^sitemap\.xml$ public/api/public/sitemap.php [L,NC]
+
   # Don't rewrite files or directories that exist
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # Fallback to index.html for React Router
-  RewriteRule ^ index.html [L]
+  # Fallback to index.php for React Router
+  RewriteRule ^ index.php [L]
 </IfModule>

@@ -4,11 +4,16 @@ header('Content-Type: application/xml; charset=utf-8');
 include_once __DIR__ . '/../db.php';
 include_once __DIR__ . '/../utils.php';
 
-$baseUrl = get_env_var('APP_URL', 'https://social2tree.com');
+$baseUrl = get_env_var('APP_URL');
+if (!$baseUrl) {
+    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
+    $baseUrl = $protocol . '://' . $_SERVER['HTTP_HOST'];
+}
 
 // Get all indexed pages
 try {
     // Join with seo_metadata to filter out noindex and sitemap=false
+    // We include all pages that are either explicitly allowed in sitemap or have no SEO record yet (defaulting to included)
     $query = "SELECT p.slug, p.updated_at 
               FROM pages p 
               LEFT JOIN seo_metadata s ON p.id = s.page_id 
@@ -29,9 +34,12 @@ try {
     echo '</url>';
 
     foreach ($pages as $p) {
+        // Skip 'home' as it's already added as the root URL at the top
+        if ($p['slug'] === 'home') continue;
+        
         $lastmod = date('Y-m-d', strtotime($p['updated_at']));
         echo '<url>';
-        echo '<loc>' . $baseUrl . '/' . htmlspecialchars($p['slug']) . '</loc>';
+        echo '<loc>' . rtrim($baseUrl, '/') . '/' . htmlspecialchars($p['slug']) . '</loc>';
         echo '<lastmod>' . $lastmod . '</lastmod>';
         echo '<changefreq>weekly</changefreq>';
         echo '<priority>0.8</priority>';

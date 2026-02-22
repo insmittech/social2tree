@@ -1,12 +1,9 @@
 <?php
 include_once __DIR__ . '/../../utils.php';
 
-// Auth check - Admin only for overriding SEO
+// Auth check
 $user_id = require_auth();
-if (!is_admin()) {
-    json_response(["message" => "Admin access required."], 403);
-    exit();
-}
+$is_admin = is_admin();
 
 include_once __DIR__ . '/../../db.php';
 
@@ -18,6 +15,15 @@ if (!$page_id) {
 }
 
 try {
+    // Check access
+    if (!$is_admin) {
+        $check = $pdo->prepare("SELECT COUNT(*) FROM pages WHERE id = ? AND user_id = ?");
+        $check->execute([$page_id, $user_id]);
+        if ($check->fetchColumn() == 0) {
+            json_response(["message" => "Access denied."], 403);
+            exit();
+        }
+    }
     $stmt = $pdo->prepare("SELECT * FROM seo_metadata WHERE page_id = ?");
     $stmt->execute([$page_id]);
     $seo = $stmt->fetch();

@@ -9,7 +9,8 @@ import {
     QrCode,
     MousePointer2,
     X,
-    PanelsTopLeft
+    PanelsTopLeft,
+    Search
 } from 'lucide-react';
 import { useAuth } from '../src/context/AuthContext';
 import PhonePreview from '../components/PhonePreview';
@@ -18,13 +19,14 @@ import TreeLinks from '../components/tree-editor/TreeLinks';
 import TreeSocial from '../components/tree-editor/TreeSocial';
 import TreeThemes from '../components/tree-editor/TreeThemes';
 import TreeSharing from '../components/tree-editor/TreeSharing';
+import TreeSEO from '../components/tree-editor/TreeSEO';
 
 const TreeEditor: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { user: profile, updateUser } = useAuth();
 
-    const [activeTab, setActiveTab] = useState<'links' | 'social' | 'themes' | 'share'>('links');
+    const [activeTab, setActiveTab] = useState<'links' | 'social' | 'themes' | 'seo' | 'share'>('links');
     const [showMobilePreview, setShowMobilePreview] = useState(false);
 
     const activePage = profile?.pages?.find(p => p.id === id) ?? null;
@@ -50,6 +52,7 @@ const TreeEditor: React.FC = () => {
         { id: 'links', label: 'Links', icon: <MousePointer2 size={16} /> },
         { id: 'social', label: 'Socials', icon: <Share2 size={16} /> },
         { id: 'themes', label: 'Style', icon: <Palette size={16} /> },
+        { id: 'seo', label: 'SEO', icon: <Search size={16} /> },
         { id: 'share', label: 'Share', icon: <QrCode size={16} /> },
     ];
 
@@ -137,6 +140,12 @@ const TreeEditor: React.FC = () => {
                         )}
                         {activeTab === 'themes' && (
                             <TreeThemes
+                                page={activePage}
+                                onUpdate={handleProfileUpdate}
+                            />
+                        )}
+                        {activeTab === 'seo' && (
+                            <TreeSEO
                                 page={activePage}
                                 onUpdate={handleProfileUpdate}
                             />
