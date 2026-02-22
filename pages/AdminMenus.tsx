@@ -14,10 +14,13 @@ import {
     ChevronRight,
     ChevronDown,
     Search, ShieldCheck,
-    FolderOpen
+    FolderOpen,
+    HelpCircle
 } from 'lucide-react';
+import IconRenderer, { availableIcons } from '../components/IconRenderer';
 import {
     DndContext,
+
     closestCenter,
     KeyboardSensor,
     PointerSensor,
@@ -117,9 +120,32 @@ const UrlInput: React.FC<{
                     className={cls}
                 />
             )}
+
+            {/* Icon Picker (only for parent items) */}
+            {!("children" in item) === false && (
+                <div className="flex flex-wrap gap-2 mt-2 p-3 bg-slate-50 dark:bg-[#0b0f19] rounded-xl border-2 border-slate-100 dark:border-slate-800/50">
+                    <div className="w-full mb-2 flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Select Icon</span>
+                        <IconRenderer iconName={(item as MenuItem).icon || 'HelpCircle'} size={16} className="text-indigo-600" />
+                    </div>
+                    <div className="flex flex-wrap gap-1 max-h-32 overflow-y-auto no-scrollbar">
+                        {availableIcons.map(icon => (
+                            <button
+                                key={icon}
+                                onClick={() => onChange({ icon })}
+                                className={`p-2 rounded-lg transition-all ${(item as MenuItem).icon === icon ? 'bg-indigo-600 text-white shadow-md' : 'bg-white dark:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                                title={icon}
+                            >
+                                <IconRenderer iconName={icon} size={14} />
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
         </>
     );
 };
+
 
 const SortableMenuItem: React.FC<SortableItemProps> = ({ item, onRemove, onUpdate, allPages, isDashboardTab }) => {
     const [showChildren, setShowChildren] = useState(false);

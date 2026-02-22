@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Layout, BarChart2, User, LayoutDashboard, Users, Settings } from 'lucide-react';
+import client from '../src/api/client';
+import IconRenderer from './IconRenderer';
 
 interface MobileNavProps {
   isAdmin?: boolean;
@@ -8,8 +10,27 @@ interface MobileNavProps {
 
 const MobileNav: React.FC<MobileNavProps> = ({ isAdmin }) => {
   const location = useLocation();
+  const [dynamicLinks, setDynamicLinks] = useState<any[]>([]);
 
-  const userLinks = [
+  useEffect(() => {
+    if (!isAdmin) {
+      const fetchMenus = async () => {
+        try {
+          const res = await client.get('/admin/settings/get.php');
+          const s = res.data.settings || {};
+          const links = JSON.parse(s.dashboard_menu_links || '[]');
+          if (links.length > 0) {
+            setDynamicLinks(links);
+          }
+        } catch (err) {
+          console.error('Failed to load mobile nav links:', err);
+        }
+      };
+      fetchMenus();
+    }
+  }, [isAdmin]);
+
+  const defaultUserLinks = [
     { to: '/dashboard/trees', icon: <Layout size={20} />, label: 'Trees' },
     { to: '/dashboard/analytics', icon: <BarChart2 size={20} />, label: 'Stats' },
     { to: '/dashboard/profile', icon: <User size={20} />, label: 'Profile' },
@@ -20,6 +41,14 @@ const MobileNav: React.FC<MobileNavProps> = ({ isAdmin }) => {
     { to: '/admin/users', icon: <Users size={20} />, label: 'Users' },
     { to: '/admin/settings', icon: <Settings size={20} />, label: 'Setup' },
   ];
+
+  const userLinks = dynamicLinks.length > 0
+    ? dynamicLinks.map(l => ({
+      to: l.to,
+      icon: <IconRenderer iconName={l.icon || 'LayoutDashboard'} size={20} />,
+      label: l.label
+    }))
+    : defaultUserLinks;
 
   const links = isAdmin ? adminLinks : userLinks;
 

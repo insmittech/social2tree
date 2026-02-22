@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import client from '../src/api/client';
+import IconRenderer from './IconRenderer';
 import {
     TreePine,
     Layout,
@@ -92,10 +93,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, userProfile, onLogout, isCol
                     if (links.length > 0) {
                         setDynamicUserLinks(links.map((l: any) => ({
                             ...l,
-                            icon: <LayoutDashboard size={18} />,
+                            icon: <IconRenderer iconName={l.icon || 'LayoutDashboard'} size={18} />,
                             children: l.children || []
                         })));
                     }
+
                 } catch (err) {
                     console.error('Failed to load dynamic sidebar links:', err);
                 }
